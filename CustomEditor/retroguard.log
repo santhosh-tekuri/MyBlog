@@ -1,0 +1,57 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Thu Nov 03 23:24:56 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           CustomEditor.jar
+# Target Jar file for obfuscated code: CustomEditor_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# Memory in use after class data structure built: 420424 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 3 times	(33%)
+#  'if'   	used 1 times	(11%)
+#  'for'   	used 1 times	(11%)
+#  'new'   	used 1 times	(11%)
+#  'int'   	used 1 times	(11%)
+#  'b'   	used 1 times	(11%)
+#  'do'   	used 1 times	(11%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (1%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/CustomEditorDemo
+.method santhosh/CustomEditorDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/StringActionTableCellEditor a
+.method_map santhosh/StringActionTableCellEditor/editCell (Ljavax/swing/JTable;II)V a
+.class_map santhosh/ActionTableCellEditor b
+.field_map santhosh/ActionTableCellEditor/customEditorButton a
+.field_map santhosh/ActionTableCellEditor/DOTDOTDOT_ICON if
+.field_map santhosh/ActionTableCellEditor/column do
+.field_map santhosh/ActionTableCellEditor/editor for
+.field_map santhosh/ActionTableCellEditor/table int
+.field_map santhosh/ActionTableCellEditor/row new
+.method_map santhosh/ActionTableCellEditor/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.method_map santhosh/ActionTableCellEditor/shouldSelectCell (Ljava/util/EventObject;)Z shouldSelectCell
+.method_map santhosh/ActionTableCellEditor/getTableCellEditorComponent (Ljavax/swing/JTable;Ljava/lang/Object;ZII)Ljava/awt/Component; getTableCellEditorComponent
+.method_map santhosh/ActionTableCellEditor/isCellEditable (Ljava/util/EventObject;)Z isCellEditable
+.method_map santhosh/ActionTableCellEditor/removeCellEditorListener (Ljavax/swing/event/CellEditorListener;)V removeCellEditorListener
+.method_map santhosh/ActionTableCellEditor/addCellEditorListener (Ljavax/swing/event/CellEditorListener;)V addCellEditorListener
+.method_map santhosh/ActionTableCellEditor/getCellEditorValue ()Ljava/lang/Object; getCellEditorValue
+.method_map santhosh/ActionTableCellEditor/editCell (Ljavax/swing/JTable;II)V a
+.method_map santhosh/ActionTableCellEditor/stopCellEditing ()Z stopCellEditing
+.method_map santhosh/ActionTableCellEditor/cancelCellEditing ()V cancelCellEditing

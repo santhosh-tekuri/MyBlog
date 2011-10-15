@@ -1,0 +1,122 @@
+<html>
+<body>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/MoreButton.png"></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+<PRE>
+<FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> javax.swing.*; 
+
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> javax.swing.event.PopupMenuListener; 
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> javax.swing.event.PopupMenuEvent; 
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> java.awt.event.ActionEvent; 
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> java.awt.event.ActionListener; 
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> java.awt.event.ComponentAdapter; 
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> java.awt.event.ComponentEvent; 
+
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>import</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> java.awt.*; 
+ 
+</FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * </I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>&lt;p/&gt;</I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I> 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * </I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>&lt;p/&gt;</I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I> 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+ 
+</FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>/** 
+ * to use this feature replace: 
+ *   frame.getContentPane().add(toolbar, BorderLayout.NORTH); 
+ * with 
+ *   frame.getContentPane().add(MoreButton.wrapToolbar(toolBar), BorderLayout.NORTH); 
+ * 
+ * </I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><B><I>@author</I></B></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I> Santhosh Kumar T 
+ * </I></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><B><I>@email</I></B></FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>  santhosh@in.fiorano.com 
+ */</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+
+</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>class</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> MoreButton </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>extends</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JToggleButton </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>implements</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> ActionListener{ 
+    JToolBar toolbar; 
+ 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>private</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> MoreButton(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>final</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JToolBar toolbar){ 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>super</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> ImageIcon(MoreButtonDemo.</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>class</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">.getResource(</FONT><FONT style="font-family:monospaced;" COLOR="#008000"><B>&quot;more.gif&quot;</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">))); 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>this</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">.toolbar = toolbar; 
+        addActionListener(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>this</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">); 
+        setFocusPainted(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>false</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">); 
+ 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>// hide &amp; seek</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+        toolbar.addComponentListener(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> ComponentAdapter(){ 
+            </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>void</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> componentResized(ComponentEvent e){ 
+                setVisible(!isVisible(toolbar.getComponent(toolbar.getComponentCount()-</FONT><FONT style="font-family:monospaced;" COLOR="#0000ff">1</FONT><FONT style="font-family:monospaced;" COLOR="#000000">), </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>null</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">)); 
+            } 
+        }); 
+    } 
+ 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>// check visibility</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>// partially visible is treated as not visible</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>private</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>boolean</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> isVisible(Component comp, Rectangle rect){ 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>if</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(rect==</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>null</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">) 
+            rect = toolbar.getVisibleRect(); 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>return</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> comp.getLocation().x+comp.getWidth()&lt;=rect.getWidth(); 
+    } 
+ 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>void</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> actionPerformed(ActionEvent e){ 
+        Component[] comp = toolbar.getComponents(); 
+        Rectangle visibleRect = toolbar.getVisibleRect(); 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>for</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>int</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> i = </FONT><FONT style="font-family:monospaced;" COLOR="#0000ff">0</FONT><FONT style="font-family:monospaced;" COLOR="#000000">; i&lt;comp.length; i++){ 
+            </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>if</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(!isVisible(comp[i], visibleRect)){ 
+                JPopupMenu popup = </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JPopupMenu(); 
+                </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>for</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(; i&lt;comp.length; i++){ 
+                    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>if</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(comp[i] </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>instanceof</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> AbstractButton){ 
+                        AbstractButton button = (AbstractButton)comp[i]; 
+                        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>if</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(button.getAction()!=</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>null</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">) 
+                            popup.add(button.getAction()); 
+                    } </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>else</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>if</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">(comp[i] </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>instanceof</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JSeparator) 
+                        popup.addSeparator(); 
+                } 
+ 
+                </FONT><FONT style="font-family:monospaced;" COLOR="#808080"><I>//on popup close make more-button unselected</I></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> 
+                popup.addPopupMenuListener(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> PopupMenuListener(){ 
+                    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>void</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> popupMenuWillBecomeInvisible(PopupMenuEvent e){ 
+                        setSelected(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>false</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">); 
+                    } 
+                    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>void</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> popupMenuCanceled(PopupMenuEvent e){} 
+                    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>void</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> popupMenuWillBecomeVisible(PopupMenuEvent e){} 
+                }); 
+                popup.show(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>this</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">, </FONT><FONT style="font-family:monospaced;" COLOR="#0000ff">0</FONT><FONT style="font-family:monospaced;" COLOR="#000000">, getHeight()); 
+            } 
+        } 
+    } 
+ 
+    </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>public</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>static</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> Component wrapToolBar(JToolBar toolbar){ 
+        JToolBar moreToolbar = </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JToolBar(); 
+        moreToolbar.setRollover(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>true</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">); 
+        moreToolbar.setFloatable(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>false</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000">); 
+        moreToolbar.add(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> MoreButton(toolbar)); 
+ 
+        JPanel panel = </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> JPanel(</FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>new</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> BorderLayout()); 
+        panel.add(toolbar, BorderLayout.CENTER); 
+        panel.add(moreToolbar, BorderLayout.EAST); 
+ 
+        </FONT><FONT style="font-family:monospaced;" COLOR="#000080"><B>return</B></FONT><FONT style="font-family:monospaced;" COLOR="#000000"> panel; 
+    } 
+} 
+
+</FONT></PRE>
+    </td>
+  </tr>
+</table>
+<p><a href="http://jroller.com/resources/s/santhosh/MoreButton.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

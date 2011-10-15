@@ -1,0 +1,99 @@
+Swing component like JList, JTree and JTable doesn't scroll automatically, when drag-cursor goes beyond the component during drag and drop. This happens even if these components are placed in JScrollPane.
+
+When a swing component is placed in JScrollPane, <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html">javax.swing.Scrollable</a> interface tells how to scroll that component. All the above mentioned three component this interface. More over, we can place any swing component in JScrollPane, to make it scroll. The component need not implement <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html">javax.swing.Scrollable</a> interface. Implementing <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html">javax.swing.Scrollable</a> interface we can give more details such as how much scroll/page in each direction.
+
+But during drag-n-drop the same components doesn't scroll if the drag cursor is moved to the border of the component. Later I found an interface in AWT called <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/dnd/Autoscroll.html">java.awt.dnd.Autoscroll</a>. This interface dictates when/how to scroll a component during drag-n-drop. Bad luck is the above mentioned three components doesn't implement this interface. Let us see how to implement this.
+
+First we will write a helper class which can be used in implementing this interface for any component:
+[code]
+public class AutoscrollSupport implements Autoscroll{ 
+    // component for which autoscroll to be enabled 
+    Component comp; 
+ 
+    // The insets where autoscrolling is active */ 
+    Insets insets; 
+ 
+    // no of units to be scrolled in each direction 
+    Insets scrollUnits; 
+ 
+    public AutoscrollSupport(Component comp, Insets insets){ 
+        this(comp, insets, insets); 
+    } 
+ 
+    public AutoscrollSupport(Component comp, Insets insets, Insets scrollUnits){ 
+        this.comp = comp; 
+        this.insets = insets; 
+        this.scrollUnits = scrollUnits; 
+    } 
+ 
+    public void autoscroll(Point cursorLoc){ 
+        JViewport viewport = getViewport(); 
+        if(viewport==null) 
+            return; 
+        Point viewPos = viewport.getViewPosition(); 
+        int viewHeight = viewport.getExtentSize().height; 
+        int viewWidth = viewport.getExtentSize().width; 
+ 
+        // perform scrolling 
+        if((cursorLoc.y-viewPos.y)<insets.top){ // scroll up 
+            viewport.setViewPosition( 
+                    new Point(viewPos.x, 
+                            Math.max(viewPos.y-scrollUnits.top, 0))); 
+        } else if((viewPos.y+viewHeight-cursorLoc.y)<insets.bottom){ // scroll down 
+            viewport.setViewPosition( 
+                    new Point(viewPos.x, 
+                            Math.min(viewPos.y+scrollUnits.bottom, 
+                                    comp.getHeight()-viewHeight))); 
+        } else if((cursorLoc.x-viewPos.x)<insets.left){ // scroll left 
+            viewport.setViewPosition( 
+                    new Point(Math.max(viewPos.x-scrollUnits.left, 0), 
+                            viewPos.y)); 
+        } else if((viewPos.x+viewWidth-cursorLoc.x)<insets.right){ // scroll right 
+            viewport.setViewPosition( 
+                    new Point(Math.min(viewPos.x+scrollUnits.right, comp.getWidth()-viewWidth), 
+                            viewPos.y)); 
+        } 
+    } 
+ 
+    public Insets getAutoscrollInsets(){ 
+        int height = comp.getHeight(); 
+        int width = comp.getWidth(); 
+        return new Insets(height, width, height, width); 
+    } 
+ 
+    JViewport getViewport(){ 
+        return (JViewport)SwingUtilities.getAncestorOfClass(JViewport.class, comp); 
+    } 
+} 
+[/code]
+
+The constructor takes the autoscrolling Insets and scrollingInsets.
+
+Autoscrolling Insets, tells that when mouse cursor is moved inside this insets of visiblerect of component, then autoscroll should start.
+Scrolling Insets, tells how much to scroll in each direction.
+Rest of the code is self-explanatory. Now let us see how to add autoscrolling support to JList using the above class:
+[code]
+class MyList extends JList implements Autoscroll{ 
+    AutoscrollSupport scrollSupport = new AutoscrollSupport(this, new Insets(10, 10, 10, 10)); 
+ 
+    public MyList(ListModel model){ 
+        super(model); 
+    } 
+ 
+    public Insets getAutoscrollInsets(){ 
+        return scrollSupport.getAutoscrollInsets(); 
+    } 
+ 
+    public void autoscroll(Point cursorLocn){ 
+        scrollSupport.autoscroll(cursorLocn); 
+    } 
+}
+[/code]
+
+<img border="0" src="http://jroller.com/resources/s/santhosh/Autoscroll.gif" width="332" height="250">
+
+You can see this in action with the following webstart demo. Drag an item from &quot;DragSource&quot; list to &quot;Standard JList&quot; and &quot;MyList&quot;. Here &quot;MyList&quot; implements Autoscroll interface.
+
+<a href="http://jroller.com/resources/s/santhosh/Autoscroll.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your comments are appreciated.

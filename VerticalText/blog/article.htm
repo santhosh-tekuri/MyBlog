@@ -1,0 +1,140 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">Let us see how Adobe tabbed pane look like:</font></p>
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="17%">
+    <font size="2" face="Verdana">
+    <img border="0" src="http://www.jroller.com/resources/s/santhosh/AdobeTabs.gif" width="74" height="385"></font></td>
+    <td width="83%" valign="top"><font size="2" face="Verdana">&nbsp;If you try to create JTabbedPane using 
+    left tab placements it looks as below:</font><p>
+    <font size="2" face="Verdana">
+    <img border="0" src="http://www.jroller.com/resources/s/santhosh/uglyLeftTabs.gif" width="120" height="146"></font></p>
+    <p><font size="2" face="Verdana">It looks very ugly, and also occupies more screen space.</font></p>
+    <p><font size="2" face="Verdana">How do I make the tab title painted vertical without extending 
+    JTabbedPane or creating any custom UI classes.</font></p>
+    <p><font size="2" face="Verdana">Simple solution is create an icon which actually paints the text in such 
+    orientation.</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">So I started creating VerticalTextIcon:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> VerticalTextIcon </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Icon, SwingConstants{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Font font = UIManager.getFont(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Label.font&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(font); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> String text; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> width, height; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> clockwize; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> VerticalTextIcon(String text, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> clockwize){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.text = text; 
+        width = SwingUtilities.computeStringWidth(fm, text); 
+        height = fm.getHeight(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.clockwize = clockwize; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paintIcon(Component c, Graphics g, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> x, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> y){ 
+        Graphics2D g2 = (Graphics2D)g; 
+        Font oldFont = g.getFont(); 
+        Color oldColor = g.getColor(); 
+        AffineTransform oldTransform = g2.getTransform(); 
+ 
+        g.setFont(font); 
+        g.setColor(Color.black); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(clockwize){ 
+            g2.translate(x+getIconWidth(), y); 
+            g2.rotate(Math.PI/</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            g2.translate(x, y+getIconHeight()); 
+            g2.rotate(-Math.PI/</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+        g.drawString(text, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, fm.getLeading()+fm.getAscent()); 
+ 
+        g.setFont(oldFont); 
+        g.setColor(oldColor); 
+        g2.setTransform(oldTransform); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getIconWidth(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> height; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getIconHeight(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> width; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">It is very simple class which uses AfflineTransformation from Java2D.</font></p>
+<p><font size="2" face="Verdana">when clockwize is true, text is rotated 90 degrees clockwize and vice versa.</font></p>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<p><font size="2" face="Verdana">Instead of adding tab directly to tabbed pane we will following helper 
+method:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addTab(JTabbedPane tabPane, String text, Component comp){ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> tabPlacement = tabPane.getTabPlacement(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(tabPlacement){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane.LEFT: 
+        </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane.RIGHT: 
+            tabPane.addTab(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> VerticalTextIcon(text, tabPlacement==JTabbedPane.RIGHT), comp); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>default</b></font><font style="font-family: monospaced;" color="#000000">: 
+            tabPane.addTab(text, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, comp); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">It creates VerticalTextIcon from specified title, and uses that as icon and 
+null title for the tab.</font></p>
+<p><font size="2" face="Verdana">You should also take care of how JTabbedPane is created:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane createTabbedPane(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> tabPlacement){ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(tabPlacement){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane.LEFT: 
+        </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane.RIGHT: 
+            Object textIconGap = UIManager.get(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.textIconGap&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            Insets tabInsets = UIManager.getInsets(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.tabInsets&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            UIManager.put(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.textIconGap&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Integer(</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)); 
+            UIManager.put(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.tabInsets&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(tabInsets.left, tabInsets.top, tabInsets.right, tabInsets.bottom)); 
+            JTabbedPane tabPane = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane(tabPlacement); 
+            UIManager.put(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.textIconGap&quot;</b></font><font style="font-family: monospaced;" color="#000000">, textIconGap); 
+            UIManager.put(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TabbedPane.tabInsets&quot;</b></font><font style="font-family: monospaced;" color="#000000">, tabInsets); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> tabPane; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>default</b></font><font style="font-family: monospaced;" color="#000000">: 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTabbedPane(tabPlacement); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">It changes for UI property values before creating JTabbedPane and restores 
+the original values after it is created.<br>
+This is because, we are adjusting these UI property values to make it work with 
+our changes.</font></p>
+<p><b><font size="2" face="Verdana">Now see how it looks:</font></b></p>
+
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/leftTabs.gif" width="74" height="312">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/rightTabs.gif" width="84" height="312"></p>
+
+<p><font size="2" face="Verdana">I heard that in Mustang, they are adding cell-renderers 
+to JTabbbedPane, so that it becomes easier to add buttons like [Close] etc.<br>
+I love, if this text orientation is also added to Mustang...</font></p>
+
+<p><a href="http://www.jroller.com/resources/s/santhosh/AdobeTabs.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+</html>

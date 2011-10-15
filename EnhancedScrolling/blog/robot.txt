@@ -1,0 +1,38 @@
+<a href="http://java.sun.com/j2se/1.3/docs/api/java/awt/Robot.html">Robot</a> provides a way to generate system events and some additional methods to capture screen etc. The primary purpose of Robot is to facilitate automated testing of java applications.
+
+I have seen many examples which used Robot in the following scenarios:
+<ol><li>capture screen to create non-rectangular/transparent splash screens</li><li>implementing a color picker to pick the color of any pixel in the screen</li></ol>
+
+The above two examples use the screen-capturing facility.
+
+I didn't find any nice example using the system events generation feature. Today for the first time, I used Robot class to solve a problem.
+
+In the previous post:<a href="http://www.javalobby.org/java/forums/t19779.html">Enhanced Scrolling for Swing</a>, I have shown how to use middle mouse button to scroll a component.
+
+In that example, we first press the component to be scrolled with middle mouse button and then release it. Now the component starts moving in the direction you move the mouse. If you observe the scrolling behavior in web-browsers, they can also scroll the document simply by dragging with middle mouse button. Today I was trying to implement this. First I changed the mouseDragged(...) method of ScrollGlassPane as follows:
+[code]
+public void mouseDragged(MouseEvent e) { 
+    mouseLocation = e.getPoint(); 
+} 
+[/code]
+I though this small change is enough to make this work. But on running the application, I found that it was not working. Surprisingly, I noticed that mouseDragged(...) method is never getting called. So my question was where was these mouseDragged events are getting delivered. Then I added a mouseMotionListener to JTextArea and found that, there mouseDragged events are actually delivered to the JTextArea.
+
+<b>So the conclusion is:</b>
+&nbsp;&nbsp;&nbsp; mouseDragged events will be delivered to the component in which last mouseClicked happened. This happens even if we cover the JTextArea with our ScrollGlassPane.
+
+Then how this could be solved. one solution is add mouseMotionListener to that component and do the scrolling. But this might not work always. Why? suppose if Drag is enabled on JTextArea, it initiates the dragging of text along with scrolling.
+
+I solved this problem very easily using Robot class. In ScrollGestureRecognizer, when middle mouse is clicked, before replacing with ScrollGlasspane, generate a mouseReleased event using Robot:
+[code]
+    public void eventDispatched(AWTEvent event){ 
+        ..... 
+        try{ 
+            Robot robot = new Robot(); 
+            robot.mouseRelease(InputEvent.BUTTON2_MASK); 
+        } catch(AWTException ignore){ 
+            ignore.printStackTrace(); 
+        } 
+    }
+[/code]
+<b>Note:</b> we don't need to modify the mouseDragged(...) method in ScrollGlassPane. Because as we have generated mouseReleased event using Robot, all mouseDragged events actually become mouseMoved events. Thus even though user is actually dragging the mouse, mouseDragged(...) never gets called, rather mouseMoved(...) will be called.
+<a href="https://myswing.dev.java.net/webstart/EnhancedScrolling.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>

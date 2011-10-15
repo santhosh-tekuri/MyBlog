@@ -1,0 +1,139 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/IncrementalSearchTextComponent.gif" width="346" height="210"></font></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">11   </font></font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> TextComponentFindAction </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> FindAction </font><font style="font-family: monospaced" color="#000080"><b>implements</b></font><font style="font-family: monospaced" color="#000000"> FocusListener{ 
+<font style="font-style: normal" color="#000000">12   </font> 
+<font style="font-style: normal" color="#000000">13   </font>    </font><font style="font-family: monospaced" color="#808080"><i>// 1. inits searchField with selected text</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">14   </font>    </font><font style="font-family: monospaced" color="#808080"><i>// 2. adds focus listener so that textselection gets painted</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">15   </font>    </font><font style="font-family: monospaced" color="#808080"><i>//    even if the textcomponent has no focus</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">16   </font>    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> initSearch(ActionEvent ae){ 
+<font style="font-style: normal" color="#000000">17   </font>        </font><font style="font-family: monospaced" color="#000080"><b>super</b></font><font style="font-family: monospaced" color="#000000">.initSearch(ae); 
+<font style="font-style: normal" color="#000000">18   </font>        JTextComponent textComp = (JTextComponent)ae.getSource(); 
+<font style="font-style: normal" color="#000000">19   </font>        String selectedText = textComp.getSelectedText(); 
+<font style="font-style: normal" color="#000000">20   </font>        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(selectedText!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+<font style="font-style: normal" color="#000000">21   </font>            searchField.setText(selectedText); 
+<font style="font-style: normal" color="#000000">22   </font>        searchField.removeFocusListener(</font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">); 
+<font style="font-style: normal" color="#000000">23   </font>        searchField.addFocusListener(</font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">); 
+<font style="font-style: normal" color="#000000">24   </font>    } 
+<font style="font-style: normal" color="#000000">25   </font> 
+<font style="font-style: normal" color="#000000">26   </font>    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> changed(JComponent comp, String str, Position.Bias bias){ 
+<font style="font-style: normal" color="#000000">27   </font>        JTextComponent textComp = (JTextComponent)comp; 
+<font style="font-style: normal" color="#000000">28   </font>        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> offset = bias==Position.Bias.Forward ? textComp.getCaretPosition() : textComp.getCaret().getMark() - </font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">; 
+<font style="font-style: normal" color="#000000">29   </font> 
+<font style="font-style: normal" color="#000000">30   </font>        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> index = getNextMatch(textComp, str, offset, bias); 
+<font style="font-style: normal" color="#000000">31   </font>        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(index!=-</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">){ 
+<font style="font-style: normal" color="#000000">32   </font>            textComp.select(index, index + str.length()); 
+<font style="font-style: normal" color="#000000">33   </font>            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+<font style="font-style: normal" color="#000000">34   </font>        }</font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000">{ 
+<font style="font-style: normal" color="#000000">35   </font>            offset = bias==</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000"> || bias==Position.Bias.Forward ? </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000"> : textComp.getDocument().getLength(); 
+<font style="font-style: normal" color="#000000">36   </font>            index = getNextMatch(textComp, str, offset, bias); 
+<font style="font-style: normal" color="#000000">37   </font>            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(index!=-</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">){ 
+<font style="font-style: normal" color="#000000">38   </font>                textComp.select(index, index + str.length()); 
+<font style="font-style: normal" color="#000000">39   </font>                </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+<font style="font-style: normal" color="#000000">40   </font>            }</font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">41   </font>                </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">; 
+<font style="font-style: normal" color="#000000">42   </font>        } 
+<font style="font-style: normal" color="#000000">43   </font>    } 
+<font style="font-style: normal" color="#000000">44   </font> 
+<font style="font-style: normal" color="#000000">45   </font>    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> getNextMatch(JTextComponent textComp, String str, </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> startingOffset, Position.Bias bias){ 
+<font style="font-style: normal" color="#000000">46   </font>        String text = textComp.getText(); 
+<font style="font-style: normal" color="#000000">47   </font> 
+<font style="font-style: normal" color="#000000">48   </font>        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(ignoreCase) { 
+<font style="font-style: normal" color="#000000">49   </font>            str = str.toUpperCase(); 
+<font style="font-style: normal" color="#000000">50   </font>            text = text.toUpperCase(); 
+<font style="font-style: normal" color="#000000">51   </font>        } 
+<font style="font-style: normal" color="#000000">52   </font> 
+<font style="font-style: normal" color="#000000">53   </font>        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> bias==</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000"> || bias==Position.Bias.Forward 
+<font style="font-style: normal" color="#000000">54   </font>                 ? text.indexOf(str, startingOffset) 
+<font style="font-style: normal" color="#000000">55   </font>                 : text.lastIndexOf(str, startingOffset); 
+<font style="font-style: normal" color="#000000">56   </font>    } 
+<font style="font-style: normal" color="#000000">57   </font> 
+<font style="font-style: normal" color="#000000">58   </font>    </font><font style="font-family: monospaced" color="#808080"><i>/*-------------------------------------------------[ FocusListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">59   </font> 
+<font style="font-style: normal" color="#000000">60   </font>    </font><font style="font-family: monospaced" color="#808080"><i>// ensures that the selection is visible</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">61   </font>    </font><font style="font-family: monospaced" color="#808080"><i>// because textcomponent doesn't show selection</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">62   </font>    </font><font style="font-family: monospaced" color="#808080"><i>// when they don't have focus</i></font><font style="font-family: monospaced" color="#000000"> 
+<font style="font-style: normal" color="#000000">63   </font>    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> focusGained(FocusEvent e){ 
+<font style="font-style: normal" color="#000000">64   </font>        Caret caret = ((JTextComponent)comp).getCaret(); 
+<font style="font-style: normal" color="#000000">65   </font>        caret.setVisible(</font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">); 
+<font style="font-style: normal" color="#000000">66   </font>        caret.setSelectionVisible(</font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">); 
+<font style="font-style: normal" color="#000000">67   </font>    } 
+<font style="font-style: normal" color="#000000">68   </font> 
+<font style="font-style: normal" color="#000000">69   </font>    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> focusLost(FocusEvent e){} 
+<font style="font-style: normal" color="#000000">70   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">Source Code Highlights:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="8%" bgcolor="#C0C0C0"><b><font size="2" face="Verdana">Lines</font></b></td>
+    <td width="92%" bgcolor="#C0C0C0"><b><font size="2" face="Verdana">
+    Description</font></b></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">16-24</font></td>
+    <td width="92%"><font size="2" face="Verdana">Overriddes initSearch(...) in 
+    super class<br>
+    1. initializes the search textfield with the selected text if any<br>
+    2. registeres focus listeners to handle text selection (text components 
+    doesn't paint selection when they don't have focus)</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">45-56</font></td>
+    <td width="92%"><font size="2" face="Verdana">The actual implementation of 
+    search algorithm</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">26-43</font></td>
+    <td width="92%"><font size="2" face="Verdana">The abstract method 
+    implementation. Initializes the searching such as fetching caret position, 
+    finding direction. and selecting the next match</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">63-69</font></td>
+    <td width="92%"><font size="2" face="Verdana">when search text field gains 
+    focus, it makes the selection of textcomponent visible. Note: textcomponents 
+    doesn't paint selection when they don't have the focus.</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The only abstract method to be implemented in subclass 
+of the FindAction is 
+changed(....). <br>
+But actually in subclass I divided actual implementation into two parts:</font></p>
+<ol>
+  <li><font size="2" face="Verdana">getNextMatch(.....) : encapsulates the 
+  actual search algorithm. It doesn't change any selection.</font></li>
+  <li><font size="2" face="Verdana">changed(...): computes the arguments 
+  required for getNextMatch(...) call from current context. and from the result 
+  of getNextMatches(...) is updates the selection.</font></li>
+</ol>
+<p><font face="Verdana" size="2">I will follow the same approach in all 
+subclasses of FindAction.</font></p>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">FindAction findAction = new TextComponentFindAction();
+findAction.install(textArea1); 
+</font><font style="font-family: monospaced" color="#000000">findAction.install(textArea2); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">as shown above, the same action instance can be 
+used for multiple text components. I works perfectly irrespective of whether the 
+textcomponent is editable or not.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/IncrementalSearch.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your Comments are appreciated.</font></p>
+
+</body>
+
+</html>

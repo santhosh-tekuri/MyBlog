@@ -1,0 +1,49 @@
+When ever I pack a dialog or frame with a JTable, I always end up with more size than expected. The problem is JTable occupies the more screen space than expected. The simplest solution could be set the preferredScrollableViewPort size of JTable. (Normally developers make mistake here in trying to set the preferredSize of JTable. This will create problems in scrolling of JTable).
+
+Hard coding preferred sizes of any component is not good idea, because it might look working, but it will create problems when application is launched in other look and feels.
+
+I started investigating, how this can be done more effectively.
+
+JList has a concept of visible row count to handle this:
+ <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JList.html#setVisibleRowCount(int)">
+JList.setVisibleRowCount(int rows)</a>
+
+Visible Row Count tells the preferred number of rows in the component (JTable) that can be displayed without scrollbar.
+
+But one such method is missing in JTable. It looks strange to me, why swing team didn't take care of this?
+
+How does visible row count works for JList? Answer is the preferred scrollable viewport size is calcutated based on the visible row count. Then question arises how does JTable determine the preferred scrollable viewport size. I look into the source code of JTable and found that it is hard coded in initializeLocalVars() method as follows:
+
+setPreferredScrollableViewportSize(new Dimension(450, 400));
+
+This is how I tried in my first attempt:
+[code]
+public static void setVisibleRowCount(JTable table, int rows){ 
+    table.setPreferredScrollableViewportSize(new Dimension( 
+            table.getPreferredScrollableViewportSize().width, 
+            rows*table.getRowHeight() 
+    )); 
+} 
+[/code]
+After that I noticed that, JTable can have variable row heights. and these variable row heights are stored in a private variable called rowModel which is instance of SizeSequence. Unfortunately, there is now way to find whether a JTable uses variable row heights or fixed row heights. So to make it work with variable row heights, I modified the above static method as follows:
+[code]
+public static void setVisibleRowCount(JTable table, int rows){ 
+    int height = 0; 
+    for(int row=0; row<rows; row++) 
+        height += table.getRowHeight(row); 
+
+    table.setPreferredScrollableViewportSize(new Dimension( 
+            table.getPreferredScrollableViewportSize().width, 
+            height 
+    )); 
+}
+[/code]
+Note that, I have taken only the beginning row heights into account.
+
+Enjoy!
+Santhosh Kumar T 
+Contributing Editor
+santhosh@javalobby.org
+santhosh@in.fiorano.com
+http://www.jroller.com/page/santhosh
+http://www.fiorano.com

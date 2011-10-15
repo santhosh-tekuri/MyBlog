@@ -1,0 +1,173 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">Java Look and Feel Design Guidelines has a 
+chapter on
+<a href="http://java.sun.com/products/jlf/ed2/book/HIG.Controls.html#41392">
+command buttons</a>. The main point here is command buttons should have same 
+width and height and aligned to left/right.</font></p>
+<p><font face="Verdana" size="2">How do you design Command Buttons using default 
+layout managers. Here is my solution:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/buttonbar.gif" width="589" height="174"></p>
+<p><font face="Verdana" size="2">This seems to be doing more coding. Why there 
+isn't a layout to do this more easily. I searched in Google and got some links
+<a href="http://www.softbear.com/people/larry/javalm.htm">1</a>,
+<a href="http://wiki.java.net/bin/view/Javadesktop/3thParty">2</a>;</font></p>
+<p><font face="Verdana" size="2">I felt very bad. Why Nobody ever tried to 
+create one such layout manager for laying out command buttons which is faced by 
+every swing developer in his/her daily programming. Why don't we implement one on our own. And here is that 
+layout manager.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> java.awt.*; 
+ 
+</font><font style="font-family: monospaced" color="#808080"><i>/** 
+ * </i><b>@author</b><i> Santhosh Kumar - santhosh@in.fiorano.com 
+ */</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> EqualsLayout </font><font style="font-family: monospaced" color="#000080"><b>implements</b></font><font style="font-family: monospaced" color="#000000"> LayoutManager, SwingConstants{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> gap; 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> alignment; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> EqualsLayout(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> alignment, </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> gap){ 
+        setGap(gap); 
+        setAlignment(alignment); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> EqualsLayout(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> gap){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">(RIGHT, gap); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> getAlignment(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> alignment; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> setAlignment(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> alignment){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">.alignment = alignment; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> getGap(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> gap; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> setGap(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> gap){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">.gap = gap; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> Dimension[] dimensions(Component children[]){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> maxWidth = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> maxHeight = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> visibleCount = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        Dimension componentPreferredSize; 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>for</b></font><font style="font-family: monospaced" color="#000000">(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> i = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">, c = children.length; i &lt; c; i++){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(children[i].isVisible()){ 
+                componentPreferredSize = children[i].getPreferredSize(); 
+                maxWidth = Math.max(maxWidth, componentPreferredSize.width); 
+                maxHeight = Math.max(maxHeight, componentPreferredSize.height); 
+                visibleCount++; 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedWidth = maxWidth * visibleCount + gap * (visibleCount - </font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">); 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedHeight = maxHeight; 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Dimension[]{ 
+                </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Dimension(maxWidth, maxHeight), 
+                </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Dimension(usedWidth, usedHeight), 
+        }; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> layoutContainer(Container container){ 
+        Insets insets = container.getInsets(); 
+ 
+        Component[] children = container.getComponents(); 
+        Dimension dim[] = dimensions(children); 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> maxWidth = dim[</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">].width; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> maxHeight = dim[</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">].height; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedWidth = dim[</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">].width; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedHeight = dim[</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">].height; 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>switch</b></font><font style="font-family: monospaced" color="#000000">(alignment){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>case</b></font><font style="font-family: monospaced" color="#000000"> LEFT: 
+            </font><font style="font-family: monospaced" color="#000080"><b>case</b></font><font style="font-family: monospaced" color="#000000"> TOP: 
+                </font><font style="font-family: monospaced" color="#000080"><b>for</b></font><font style="font-family: monospaced" color="#000000">(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> i = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">, c = children.length; i &lt; c; i++){ 
+                    </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!children[i].isVisible()) 
+                        </font><font style="font-family: monospaced" color="#000080"><b>continue</b></font><font style="font-family: monospaced" color="#000000">; 
+                    children[i].setBounds(insets.left+(maxWidth+gap)*i,  insets.top, 
+                                          maxWidth, maxHeight); 
+                } 
+                </font><font style="font-family: monospaced" color="#000080"><b>break</b></font><font style="font-family: monospaced" color="#000000">; 
+            </font><font style="font-family: monospaced" color="#000080"><b>case</b></font><font style="font-family: monospaced" color="#000000"> RIGHT: 
+            </font><font style="font-family: monospaced" color="#000080"><b>case</b></font><font style="font-family: monospaced" color="#000000"> BOTTOM: 
+                </font><font style="font-family: monospaced" color="#000080"><b>for</b></font><font style="font-family: monospaced" color="#000000">(</font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> i = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">, c = children.length; i &lt; c; i++){ 
+                    </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!children[i].isVisible()) 
+                        </font><font style="font-family: monospaced" color="#000080"><b>continue</b></font><font style="font-family: monospaced" color="#000000">; 
+                    children[i].setBounds(container.getWidth()-insets.right-usedWidth+(maxWidth+gap)*i, 
+                                          insets.top, 
+                                          maxWidth, maxHeight); 
+                } 
+                </font><font style="font-family: monospaced" color="#000080"><b>break</b></font><font style="font-family: monospaced" color="#000000">; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> Dimension minimumLayoutSize(Container c){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> preferredLayoutSize(c); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> Dimension preferredLayoutSize(Container container){ 
+        Insets insets = container.getInsets(); 
+ 
+        Component[] children = container.getComponents(); 
+        Dimension dim[] = dimensions(children); 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedWidth = dim[</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">].width; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> usedHeight = dim[</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">].height; 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Dimension( 
+                insets.left + usedWidth + insets.right, 
+                insets.top + usedHeight + insets.bottom); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> addLayoutComponent(String string, Component comp){} 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> removeLayoutComponent(Component c){} 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">How do I use it:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String[] args){        
+        JPanel buttonPanel = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JPanel(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> EqualsLayout(</font><font style="font-family: monospaced" color="#0000ff">3</font><font style="font-family: monospaced" color="#000000">)); 
+        buttonPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JButton(</font><font style="font-family: monospaced" color="#008000"><b>&quot;OK&quot;</b></font><font style="font-family: monospaced" color="#000000">)); 
+        buttonPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JButton(</font><font style="font-family: monospaced" color="#008000"><b>&quot;Cancel&quot;</b></font><font style="font-family: monospaced" color="#000000">)); 
+        buttonPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JButton(</font><font style="font-family: monospaced" color="#008000"><b>&quot;Apply&quot;</b></font><font style="font-family: monospaced" color="#000000">)); 
+        buttonPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JButton(</font><font style="font-family: monospaced" color="#008000"><b>&quot;Help&quot;</b></font><font style="font-family: monospaced" color="#000000">)); 
+</font></pre>
+    <pre><font style="font-family: monospaced" color="#000000">        JFrame challenge = .....
+        challenge.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        ......
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/equalsLayout.gif" width="589" height="165"></p>
+<p><font size="2" face="Verdana">This LayoutManager can further be extended to 
+support orientation (HORIZONTAL/VERTICAL)</font></p>
+<p><font size="2" face="Verdana">Here is an example screenshot where VERTICAL 
+orientation is required:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/verticalCommandBar.gif" width="271" height="149"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/equalsLayout.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

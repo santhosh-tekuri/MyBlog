@@ -1,0 +1,45 @@
+<html>
+<body>
+<font size="2" face="Verdana">I define <b>Long-Lived Models</b> in my terms as follows:
+</font>
+      <p><font size="2" face="Verdana">The model objects which live longer than the the components in which it is displayed.
+      </font>
+
+</p>
+<p><font size="2" face="Verdana">In order to make the problem better understandable, I created a simple webstart demo:</font></p>
+<p><font size="2" face="Verdana">&nbsp;<img border="0" src="http://www.jroller.com/resources/s/santhosh/LongLivedModels.gif" width="462" height="366">
+</font>
+</p>
+<p><font size="2" face="Verdana">I have a tablemodel which is displayed in JTable in the main window. Here this tablemodel is the long-lived model. i.e, the tablemodel remains in JVM memory as long as the application is running.
+</font> 
+</p>
+<p><font size="2" face="Verdana">What happens when a tablemodel is displayed in a JTable, JTable registers itself as a listener to the table. The list of listeners registered to the tablemodel are shown in a JList just below the JTable. When [Show Dialog] button is pressed it pops up a dialog with JTable whose model is again the same one which is shown in mainwindow.
+</font>
+</p>
+<p><font size="2" face="Verdana">Try clicking [Show Dialog], when the dialog pops up, the JTable in that dialog, adds itself as listener to the tablemodel, which can viewed in JList of mainwindow. now close the dialog. Now user expects that the dialog and all its components are eligible for garbage collection. But the new JTable never unregisters itself from the tablemodel, and thus can't be garbage collected. You can confirm this by hitting [Run GC] button.
+Keep opening more dialogs, you will see from the jlist that, all jtable instances created gets piled up in memory.
+So, we should take some special care for long-lived models, otherwise they will introduce memory leaks into the application.
+The long-lived model may not be a swing model. Let us say the application has a FlowChart model, which is displyed in both JGraph, JTree, and lots of components in different ways.</font></p>
+<p><font size="2" face="Verdana">One solution is, explicitly remove the listeners registered by the components when the dialog gets closed. This is more cumbersome and error-prone. because JTable could have registered itself as a listener or a innerclass as a listener.
+</font>
+
+</p>
+<p><font size="2" face="Verdana">Another solution to this will be, override add/remove listener methods in the model, and wrap the original listener in a weak listener as explained
+<a href="http://www.jroller.com/page/santhosh/20050711#use_weak_listeners_to_avoid">here</a>
+</font>
+</p>
+<p><font size="2" face="Verdana">Swing's concept of single model - multiple views is very powerfull and can easily be misued. Most of the beginners, are unaware of this memory leak.</font></p>
+<p>
+<font size="2" face="Verdana">
+<a href="http://www.jroller.com/resources/s/santhosh/LongLivedModels.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></font></p>
+<p><font size="2" face="Verdana">You can find the source code of this demo
+<a href="http://www.jroller.com/resources/s/santhosh/LongLivedModelsDemo.java">here</a>.
+</font>
+
+</p>
+<p><font size="2" face="Verdana">Your comments are appreciated</font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+JDK 1.3 introduced the concept of Dynamic Proxys. Proxy is a class which implements a given set of interfaces and delegates the actual work to an object. A Dynmaic Proxy is one such proxy class which gets defined or created at runtime.
+
+I frequently use Dynamic Proxy for debugging swing models and listeners.
+[code]
+ public static Object newProxyInstance(ClassLoader loader, 
+                    Class[] interfaces, InvocationHandler h) 
+[/code]
+Let us we have an object say myComponentListener which implements ComponentListener interface, and myInvocationHandler is an Object implementing InvocationHandler, then we can do:
+[code]
+ ComponentListener compListener = (ComponentListener)Proxy.newProxyInstance(
+                                   myComponentListener.getClass().getClassLoader()
+                                   , new Class[]{ ComponentListener.class }
+                                   , myInvocationHandler);
+[/code]
+
+Here is my InvocationHandler implementation which is used for debugging purposes:
+[code]
+import java.lang.reflect.InvocationHandler; 
+import java.lang.reflect.InvocationTargetException; 
+import java.lang.reflect.Method; 
+import java.util.ArrayList; 
+import java.util.Arrays; 
+ 
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class DebugProxy implements InvocationHandler{ 
+    private Object obj; 
+ 
+    public static Class[] getAllInterfaces(Class clazz){ 
+        ArrayList<Class> list = new ArrayList<Class>(); 
+        while(clazz!=null){ 
+            list.addAll(Arrays.asList(clazz.getInterfaces())); 
+            clazz = clazz.getSuperclass(); 
+        } 
+        return list.toArray(new Class[0]); 
+    } 
+ 
+    public static Object newInstance(Object obj, StringConvertor stringConvertor) { 
+        return java.lang.reflect.Proxy.newProxyInstance( 
+                obj.getClass().getClassLoader(), 
+                getAllInterfaces(obj.getClass()), 
+                new DebugProxy(obj, stringConvertor) 
+        ); 
+    } 
+ 
+    private StringConvertor stringConvertor; 
+ 
+    private DebugProxy(Object obj, StringConvertor stringConvertor) { 
+        this.obj = obj; 
+        this.stringConvertor = stringConvertor; 
+    } 
+ 
+    public Object invoke(Object proxy, Method m, Object[] args) throws Throwable{ 
+        Object result; 
+        try { 
+            System.out.print(m.getName()+"("); 
+            if(args!=null){ 
+                for(int i = 0; i<args.length; i++){ 
+                    if(i>0) 
+                        System.out.print(", "); 
+                    System.out.print(toString(args[i])); 
+                } 
+            } 
+            System.out.print(")"); 
+            result = m.invoke(obj, args); 
+            if(m.getReturnType()!=Void.class) 
+                System.out.println(" returned "+toString(result)); 
+            else 
+                System.out.println(); 
+            System.out.println("----------------------------------------------------------"); 
+        } catch (InvocationTargetException e) { 
+            throw e.getTargetException(); 
+        } finally { 
+            System.out.flush(); 
+        } 
+        return result; 
+    } 
+ 
+    public String toString(Object obj){ 
+        if(obj!=null && obj.getClass().isArray() && !obj.getClass().getComponentType().isPrimitive()) 
+            return Arrays.asList(obj).toString(); 
+        else if(obj!=null && stringConvertor!=null) 
+            return stringConvertor.toString(obj); 
+        else 
+            return String.valueOf(obj); 
+    } 
+}
+[/code]
+It prints method name &amp; argument values and delegates the method call. After result is obtained it prints the result and returns it.
+
+In the above class, you can specify a class which can do task of converting objects to String, because all objects doesn't override toString();
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public interface StringConvertor{ 
+    public String toString(Object obj); 
+}
+[/code]
+How to use this:
+[code]
+JTree tree = createTree(); 
+ComponentListener compListener = createComponentListener(); 
+tree.addComponentListener(compListener);
+[/code]
+is changed to
+[code]
+JTree tree = createTree(); 
+ComponentListener compListener = createComponentListener(); 
+compListener = (ComponentListener)DebugProxy.newInstance(compListener, null); 
+tree.addComponentListener(compListener);
+[/code]
+or some time to understand how listeners are called, you could simply say:
+[code]
+JTree tree = createTree(); 
+tree.addComponentListener((ComponentListener)DebugProxy.newInstance(new ComponentAdapter(){}, null));
+[/code]
+Even though this can be used at any place (not just swing), I found it very useful in swing programming, as all models and listeners in swing are interfaces.
+
+Your comments are appreciated.
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+Contributing Editor - santhosh@javalobby.org
+MySwing Project     - https://myswing.dev.java.net/
+Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+Sr. Software Eng    - http://www.fiorano.com

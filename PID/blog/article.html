@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Get Current Java process PID</title>
+</head>
+<body>
+<span style="font-family: Verdana;"><br>
+Following is the utility method to get the current process&nbsp;ID.</span><br style="font-family: Verdana;">
+<br style="font-family: Verdana;">
+<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td><span style="font-family: monospace;">/**</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* MySwing: Advanced Swing Utilites</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* Copyright (C) 2005&nbsp; Santhosh Kumar T</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* &lt;p/&gt;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* This library is free software; you can redistribute it and/or</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* modify it under the terms of the GNU Lesser General Public</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* License as published by the Free Software Foundation; either</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* version 2.1 of the License, or (at your option) any later version.</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* &lt;p/&gt;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* This library is distributed in the hope that it will be useful,</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See the GNU</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* Lesser General Public License for more details.</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;*/</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">import java.io.IOException;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">import java.io.File;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">import java.io.FileOutputStream;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">import java.io.ByteArrayOutputStream;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">import java.util.StringTokenizer;</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">/**</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* @author Santhosh Kumar T</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;* @email santhosh.tekuri@gmail.com</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;*/</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">public class JavaUtil{</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; public static String getPID() throws IOException{</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String pid = System.getProperty("pid"); //NOI18N</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(pid==null){</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String cmd[];</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File tempFile = null;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if(System.getProperty("os.name").toLowerCase().indexOf("windows")==-1)</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cmd = new String[]{ "/bin/sh", "-c", "echo $$ $PPID" }; //NOI18N</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else{</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// getpids.exe is taken from
+http://www.scheibli.com/projects/getpids/index.html (GPL)</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tempFile = File.createTempFile("getpids", "exe"); //NOI18N</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// extract the embedded getpids.exe file from the jar and save it to
+above file</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IOUtil.pump(JavaUtil.class.getResourceAsStream("getpids.exe"), new
+FileOutputStream(tempFile), true, true); //NOI18N</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cmd = new String[]{ tempFile.getAbsolutePath() };</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(cmd!=null){</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Process p = Runtime.getRuntime().exec(cmd);</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ByteArrayOutputStream bout = new ByteArrayOutputStream();</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IOUtil.pump(p.getInputStream(), bout, false, true);</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(tempFile!=null)</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tempFile.delete();</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+StringTokenizer stok = new StringTokenizer(bout.toString());</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+stok.nextToken(); // this is pid of the process we spanned</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pid = stok.nextToken();</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(pid!=null)</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+System.setProperty("pid", pid); //NOI18N</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return pid;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; public static void main(String[] args) throws IOException{</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println(getPID());</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; }</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">}</span></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<span style="font-family: Verdana;"> On unix systems,<br>
+&nbsp; &nbsp; &nbsp;echo $$ &nbsp; &nbsp; &nbsp; -&gt; &nbsp;prints current process ID<br>
+&nbsp; &nbsp; &nbsp;echo $PPID &nbsp;-&gt; prints parent process ID<br>
+<br>
+so if we execute command "echo $PPID" using java.lang.Runtime, it will give the current java process id.<br>
+<br>
+on windows systems,<br>
+&nbsp; &nbsp; &nbsp;I found a utility project called getpids.exe from <a href="http://www.scheibli.com/projects/getpids/index.html%20%28GPL%29">http://www.scheibli.com/projects/getpids/index.html (GPL)</a>.
+it prints process heirarchy as a chain of PID's as blank separated
+list. Here we are assuming that getpids.exe is bundled in the same
+package of JavaUtil.class.<br>
+<br>
+We are using another utility method to copy streams. Here it is:<br>
+<br>
+</span>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td><span style="font-family: monospace;">/**<br>
+&nbsp;* MySwing: Advanced Swing Utilites<br>
+&nbsp;* Copyright (C) 2005&nbsp; Santhosh Kumar T<br>
+&nbsp;* &lt;p/&gt;<br>
+&nbsp;* This library is free software; you can redistribute it and/or<br>
+&nbsp;* modify it under the terms of the GNU Lesser General Public<br>
+&nbsp;* License as published by the Free Software Foundation; either<br>
+&nbsp;* version 2.1 of the License, or (at your option) any later version.<br>
+&nbsp;* &lt;p/&gt;<br>
+&nbsp;* This library is distributed in the hope that it will be useful,<br>
+&nbsp;* but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
+&nbsp;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See the GNU<br>
+&nbsp;* Lesser General Public License for more details.<br>
+&nbsp;*/<br>
+      <br>
+import java.io.IOException;<br>
+import java.io.InputStream;<br>
+import java.io.OutputStream;<br>
+      <br>
+/**<br>
+&nbsp;* @author Santhosh Kumar T<br>
+&nbsp;* @email santhosh.tekuri@gmail.com<br>
+&nbsp;*/<br>
+public class IOUtil{<br>
+&nbsp;&nbsp;&nbsp; public static void pump(InputStream in, OutputStream
+out, boolean closeIn, boolean closeOut) throws IOException{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; byte[] bytes = new byte[1024];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int read;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while((read=in.read(bytes))!= -1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out.write(bytes, 0, read);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }finally{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(closeIn)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in.close();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(closeOut)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out.close();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+<span style="font-family: Verdana;"><br>
+you can download the sources from <a href="http://jroller.com/santhosh/resource/PID.jar">here</a>.<br>
+<br>
+Your comments are appreciated.<br>
+<br>
+<br>
+<br>
+</span>
+</body>
+</html>

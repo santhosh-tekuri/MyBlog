@@ -1,0 +1,90 @@
+There are two client properties supported by JTable which are related to editing.
+
+<b>JTable.autoStartsEdit:</b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The value is of type Java.lang.Boolean. This property tells whether JTable should start edit when a key is types. If the value of this property is null, it defaults to Boolean.TRUE. So this feature is enabled by default in JTable.
+
+<b>terminateEditOnFocusLost:</b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The value is of type Java.lang.Boolean. This property tells whether what to do when focus goes outside of JTable. It first tries to commit the changes in editor, if can't be committed then the changes are cancelled. If the value of this property is null, it default to Boolean.FALSE. So this feature is disabled by default in JTable. 
+
+You can enable this feature as follows:
+[code]
+table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+[/code]
+I suggest to make this feature to be enabled for JTable.
+
+<b>Remove Borders of TableCellEditors:</b>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing1.gif" width="114" height="46">&nbsp;&nbsp; ---&gt;&nbsp;&nbsp;<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing2.gif" width="104" height="42">
+[code]
+JTextField tf = new JTextField(); 
+tf.setBorder(BorderFactory.createEmptyBorder()); 
+table.setDefaultEditor(Object.class, new DefaultCellEditor(tf));
+[/code]
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing3.gif" width="108" height="36">&nbsp;&nbsp; ----&gt;&nbsp;<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing4.gif" width="112" height="35">
+[code]
+JComboBox combo = new JComboBox(new String[]{"item1", "item2", "item3"}); 
+combo.setBorder(BorderFactory.createEmptyBorder()); 
+table.getColumn("B").setCellEditor(new DefaultCellEditor(combo));
+[/code]
+
+<b>Make JComboBox popup open when user invokes editing with F2 key:</b>
+
+[code]
+JComboBox combo = new JComboBox(new String[]{"item1", "item2", "item3"}){ 
+     public void processFocusEvent(FocusEvent fe) { 
+           super.processFocusEvent(fe); 
+           Component focusOwner = KeyboardFocusManager. 
+               getCurrentKeyboardFocusManager().getFocusOwner(); 
+ 
+          if (isDisplayable() && fe.getID()==FocusEvent.FOCUS_GAINED 
+                   && focusOwner==this && !isPopupVisible()) { 
+                       showPopup(); 
+           } 
+     } 
+}; 
+combo.setBorder(BorderFactory.createEmptyBorder()); 
+table.getColumn("B").setCellEditor(new DefaultCellEditor(combo));
+[/code]
+<b>Add rows on tabbing to a cell beyond the last cell:</b>
+
+JTable by defaults selects the next cell when TAB is pressed. When the current selection is last cell, pressing tab selects the first cell. But here we want a new row to be inserted and selected the next newly created cell.
+[code]
+JTable table = new JTable(2, 2){ 
+    private final KeyStroke tabKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0); 
+    public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) { 
+        AWTEvent currentEvent = EventQueue.getCurrentEvent(); 
+        if(currentEvent instanceof KeyEvent){ 
+            KeyEvent ke = (KeyEvent)currentEvent; 
+            if(ke.getSource()!=this) 
+                return; 
+            // focus change with keyboard 
+            if(rowIndex==0 && columnIndex==0 
+                    && KeyStroke.getKeyStrokeForEvent(ke).equals(tabKeyStroke)){ 
+                ((DefaultTableModel)getModel()).addRow(new Object[getColumnCount()]); 
+                rowIndex = getRowCount()-1; 
+            } 
+        } 
+        super.changeSelection(rowIndex, columnIndex, toggle, extend); 
+    } 
+};
+[/code]
+See how do we find out whether the selection change is because of tab key press or not.
+
+This trick may be useful in only occasional scenarios. I found such feature during HTML table editing of Microsoft Frontpage.
+
+I created a webstart demo to show this tricks live:
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing.gif" width="286" height="199">
+
+The first tab contains JTable without any of these tricks, and the second tab contains JTable with all these tricks 
+implemented.
+
+<a href="http://www.jroller.com/resources/s/santhosh/JTableEditing.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your comments are appreciated.
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+Contributing Editor - santhosh@javalobby.org
+MySwing Project     - https://myswing.dev.java.net/
+Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+Sr. Software Eng    - http://www.fiorano.com

@@ -1,0 +1,118 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>New Page 1</title>
+</head>
+
+<body>
+
+<p><font size="2" face="Verdana">For those who don't know:</font><br>
+&nbsp;&nbsp;&nbsp; <font size="2" face="Verdana">JXTreeTable is a tree-table 
+component from SwingX project.</font></p>
+<p><font size="2" face="Verdana">You can get the JTree from JXTreeTable as 
+follows:<br>
+<br>
+&nbsp;</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">JTree tree = </font><font style="font-family: monospaced;" color="#000000">(JTree)treeTable.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass)</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">To convert tree-table to check-tree let us try:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">JTree tree = </font><font style="font-family: monospaced;" color="#000000">(JTree)treeTable.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass)
+CheckTreeManager manager = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeManager(tree);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">When you run the application, you will see the 
+CheckBoxes in TreeTable. But they won't respond to mouse clicks. Why is it so 
+???</font></p>
+<p><font size="2" face="Verdana">because, the actual components which is 
+receiving the mouseclick is the JXTreeTable not JTree. So we need to listen for 
+mouse clicks on JXTreeTable and dispatch them to JTree (don't forget to 
+translate mouse coordinates from JXTreeTable to JTree).</font></p>
+<p><font size="2" face="Verdana">Why don't we encapsulate all this into a class:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumr T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeTableManager </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeManager{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeTableManager(JXTreeTable treeTable){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">((JTree)treeTable.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass)); 
+        treeTable.addMouseListener(treeTableMouseListener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> MouseListener treeTableMouseListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent me){ 
+            JXTreeTable treeTable = (JXTreeTable)me.getComponent(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(me.getModifiers()==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> || 
+                    me.getModifiers()==InputEvent.BUTTON1_MASK){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> count = treeTable.getColumnCount(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = count-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; i&gt;= </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i--){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(treeTable.isHierarchical(i)){ 
+ 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> savedHeight = tree.getRowHeight(); 
+                        tree.setRowHeight(treeTable.getRowHeight()); 
+                        MouseEvent pressed = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent 
+                                (tree, 
+                                        me.getID(), 
+                                        me.getWhen(), 
+                                        me.getModifiers(), 
+                                        me.getX()-treeTable.getCellRect(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, i, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">).x, 
+                                        me.getY(), 
+                                        me.getClickCount(), 
+                                        me.isPopupTrigger()); 
+                        tree.dispatchEvent(pressed); 
+                        </font><font style="font-family: monospaced;" color="#808080"><i>// For Mac OS X, we need to dispatch a MOUSE_RELEASED as well</i></font><font style="font-family: monospaced;" color="#000000"> 
+                        MouseEvent released = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent 
+                                (tree, 
+                                        java.awt.event.MouseEvent.MOUSE_RELEASED, 
+                                        pressed.getWhen(), 
+                                        pressed.getModifiers(), 
+                                        pressed.getX(), 
+                                        pressed.getY(), 
+                                        pressed.getClickCount(), 
+                                        pressed.isPopupTrigger()); 
+                        tree.dispatchEvent(released); 
+                        tree.setRowHeight(savedHeight); 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+                    } 
+                } 
+            } 
+        } 
+    }; 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana"><b><font size="2">NOTE:</font></b><font size="2"> don't 
+forget to make tree field in CheckTreeManager protected.</font></font></p>
+<p><font size="2" face="Verdana">How to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">CheckTreeManager manager = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeTableManager(treeTable); // again in just single line</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b>NOTE:</b><br>
+<font size="2" face="Verdana">we are not updating/repainting JXTreeTable when 
+checkselection changes. In my sample test, it is working fine. It seems 
+JXTreeTable paints the hierarchical one&nbsp; mouse click in hierarchical 
+column. If you face repainting problem add TreeSelectionListener to 
+ChcekTreeSelectionModel and repaint JXTreeTable on change.</font></p>
+<p><font size="2" face="Verdana">Your comments are welcome. </font></p>
+
+</body>
+
+</html>

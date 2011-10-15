@@ -1,0 +1,144 @@
+<html>
+<head>
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(128,128,128); font-style: italic; }
+.s1 { color: rgb(128,128,128); font-style: italic; }
+.s2 { color: rgb(0,0,0); }
+.s3 { color: rgb(128,128,128); font-weight: bold; font-style: italic; }
+.s4 { color: rgb(0,0,128); font-weight: bold; }
+.s5 { color: rgb(0,0,255); }
+</style>
+</head>
+
+<body>
+
+<p><font face="Verdana" size="2">By default, JTree has white background. Highlighting here means make the 
+background of tree to some color where a given node and descendants appear.</font></p>
+<p><font face="Verdana" size="2">We create a subclass of JTree which paints highlight backgound for a node as 
+below:</font></p>
+<table border="1" width="100%" id="table1">
+	<tr>
+		<td>
+		<pre><span class="s0">/** 
+<a name="l8"> * MySwing: Advanced Swing Utilites 
+</a><a name="l9"> * Copyright (C) 2005  Santhosh Kumar T 
+</a><a name="l10"> * </a></span><span class="s1"><a name="l10">&lt;p/&gt;</a></span><span class="s0"><a name="l10"> 
+</a><a name="l11"> * This library is free software; you can redistribute it and/or 
+</a><a name="l12"> * modify it under the terms of the GNU Lesser General Public 
+</a><a name="l13"> * License as published by the Free Software Foundation; either 
+</a><a name="l14"> * version 2.1 of the License, or (at your option) any later version. 
+</a><a name="l15"> * </a></span><span class="s1"><a name="l15">&lt;p/&gt;</a></span><span class="s0"><a name="l15"> 
+</a><a name="l16"> * This library is distributed in the hope that it will be useful, 
+</a><a name="l17"> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+</a><a name="l18"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+</a><a name="l19"> * Lesser General Public License for more details. 
+</a><a name="l20"> */</a></span><span class="s2"><a name="l20"> 
+</a><a name="l21"> 
+</a></span><span class="s0"><a name="l22">/** 
+</a><a name="l23"> * </a></span><span class="s3"><a name="l23">@author </a></span><span class="s0"><a name="l23">Santhosh Kumar T 
+</a><a name="l24"> * </a></span><span class="s3"><a name="l24">@email  </a></span><span class="s0"><a name="l24">santhosh@in.fiorano.com 
+</a><a name="l25"> */</a></span><span class="s2"><a name="l25"> 
+</a></span><span class="s4"><a name="l26">public class </a></span><span class="s2"><a name="l26">HighlighterTree </a></span><span class="s4"><a name="l26">extends </a></span><span class="s2"><a name="l26">JTree{ 
+</a><a name="l27">    </a></span><span class="s4"><a name="l27">private </a></span><span class="s2"><a name="l27">TreePath highlightPath = </a></span><span class="s4"><a name="l27">null</a></span><span class="s2"><a name="l27">; 
+</a><a name="l28">    </a></span><span class="s4"><a name="l28">private </a></span><span class="s2"><a name="l28">Color highlightColor = </a></span><span class="s4"><a name="l28">new </a></span><span class="s2"><a name="l28">Color(</a></span><span class="s5"><a name="l28">255</a></span><span class="s2"><a name="l28">, </a></span><span class="s5"><a name="l28">255</a></span><span class="s2"><a name="l28">, </a></span><span class="s5"><a name="l28">204</a></span><span class="s2"><a name="l28">); 
+</a><a name="l29"> 
+</a><a name="l30">    </a></span><span class="s4"><a name="l30">public </a></span><span class="s2"><a name="l30">TreePath getHighlightPath(){ 
+</a><a name="l31">        </a></span><span class="s4"><a name="l31">return </a></span><span class="s2"><a name="l31">highlightPath; 
+</a><a name="l32">    } 
+</a><a name="l33"> 
+</a><a name="l34">    </a></span><span class="s4"><a name="l34">public void </a></span><span class="s2"><a name="l34">setHighlightPath(TreePath highlightPath){ 
+</a><a name="l35">        </a></span><span class="s4"><a name="l35">this</a></span><span class="s2"><a name="l35">.highlightPath = highlightPath; 
+</a><a name="l36">        treeDidChange(); 
+</a><a name="l37">    } 
+</a><a name="l38"> 
+</a><a name="l39">    </a></span><span class="s4"><a name="l39">protected void </a></span><span class="s2"><a name="l39">paintComponent(Graphics g){ 
+</a><a name="l40">        </a></span><span class="s0"><a name="l40">// paint background ur self</a></span><span class="s2"><a name="l40"> 
+</a><a name="l41">        g.setColor(getBackground()); 
+</a><a name="l42">        g.fillRect(</a></span><span class="s5"><a name="l42">0</a></span><span class="s2"><a name="l42">, </a></span><span class="s5"><a name="l42">0</a></span><span class="s2"><a name="l42">, getWidth(),getHeight()); 
+</a><a name="l43"> 
+</a><a name="l44">        </a></span><span class="s0"><a name="l44">// paint the highlight if any</a></span><span class="s2"><a name="l44"> 
+</a><a name="l45">        g.setColor(highlightColor); 
+</a><a name="l46">        </a></span><span class="s4"><a name="l46">int </a></span><span class="s2"><a name="l46">fromRow = getRowForPath(highlightPath); 
+</a><a name="l47">        </a></span><span class="s4"><a name="l47">if</a></span><span class="s2"><a name="l47">(fromRow!=-</a></span><span class="s5"><a name="l47">1</a></span><span class="s2"><a name="l47">){ 
+</a><a name="l48">            </a></span><span class="s4"><a name="l48">int </a></span><span class="s2"><a name="l48">toRow = fromRow; 
+</a><a name="l49">            </a></span><span class="s4"><a name="l49">int </a></span><span class="s2"><a name="l49">rowCount = getRowCount(); 
+</a><a name="l50">            </a></span><span class="s4"><a name="l50">while</a></span><span class="s2"><a name="l50">(toRow&lt;rowCount){ 
+</a><a name="l51">                TreePath path = getPathForRow(toRow); 
+</a><a name="l52">                </a></span><span class="s4"><a name="l52">if</a></span><span class="s2"><a name="l52">(highlightPath.isDescendant(path)) 
+</a><a name="l53">                    toRow++; 
+</a><a name="l54">                </a></span><span class="s4"><a name="l54">else</a></span><span class="s2"><a name="l54"> 
+</a><a name="l55">                    </a></span><span class="s4"><a name="l55">break</a></span><span class="s2"><a name="l55">; 
+</a><a name="l56">            } 
+</a><a name="l57">            Rectangle fromBounds = getRowBounds(fromRow); 
+</a><a name="l58">            Rectangle toBounds = getRowBounds(toRow-</a></span><span class="s5"><a name="l58">1</a></span><span class="s2"><a name="l58">); 
+</a><a name="l59">            g.fillRect(</a></span><span class="s5"><a name="l59">0</a></span><span class="s2"><a name="l59">, fromBounds.y, getWidth(), toBounds.y-fromBounds.y+toBounds.height); 
+</a><a name="l60">        } 
+</a><a name="l61"> 
+</a><a name="l62">        setOpaque(</a></span><span class="s4"><a name="l62">false</a></span><span class="s2"><a name="l62">); </a></span><span class="s0"><a name="l62">// trick not to paint background</a></span><span class="s2"><a name="l62"> 
+</a><a name="l63">        </a></span><span class="s4"><a name="l63">super</a></span><span class="s2"><a name="l63">.paintComponent(g); 
+</a><a name="l64">        setOpaque(</a></span><span class="s4"><a name="l64">true</a></span><span class="s2"><a name="l64">); 
+</a><a name="l65">    } 
+</a><a name="l66">}</a></span></pre>
+		</td>
+	</tr>
+</table>
+
+<p><font face="Verdana" size="2">here we paint the background ourself and call super.paint() after making it 
+transaprent, so that it won't erase the background again.</font></p>
+<p><font face="Verdana" size="2">On testing we see:</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/highlightTree1.png" width="169" height="296"></p>
+<p><font size="2" face="Verdana">Here the TreeCellRenderer is painting background which is white. First I 
+tried making the DefaultCellRenderer transparent. But that didn't work. From 
+code, I found that, DefaultTreeCellRenderer always paints its background even if 
+it is not opaque. So I have to do some hacking here:</font></p>
+<table border="1" width="100%" id="table2">
+	<tr>
+		<td>
+		<pre><span class="s0">/** 
+<a name="l69"> * MySwing: Advanced Swing Utilites 
+</a><a name="l70"> * Copyright (C) 2005  Santhosh Kumar T 
+</a><a name="l71"> * </a></span><span class="s1"><a name="l71">&lt;p/&gt;</a></span><span class="s0"><a name="l71"> 
+</a><a name="l72"> * This library is free software; you can redistribute it and/or 
+</a><a name="l73"> * modify it under the terms of the GNU Lesser General Public 
+</a><a name="l74"> * License as published by the Free Software Foundation; either 
+</a><a name="l75"> * version 2.1 of the License, or (at your option) any later version. 
+</a><a name="l76"> * </a></span><span class="s1"><a name="l76">&lt;p/&gt;</a></span><span class="s0"><a name="l76"> 
+</a><a name="l77"> * This library is distributed in the hope that it will be useful, 
+</a><a name="l78"> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+</a><a name="l79"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+</a><a name="l80"> * Lesser General Public License for more details. 
+</a><a name="l81"> */</a></span><span class="s2"><a name="l81"> 
+</a><a name="l82"> 
+</a></span><span class="s0"><a name="l83">/** 
+</a><a name="l84"> * Trick to make renderer transparent when unselected 
+</a><a name="l85"> * 
+</a><a name="l86"> * </a></span><span class="s3"><a name="l86">@author </a></span><span class="s0"><a name="l86">Santhosh Kumar T 
+</a><a name="l87"> * </a></span><span class="s3"><a name="l87">@email  </a></span><span class="s0"><a name="l87">santhosh@in.fiorano.com 
+</a><a name="l88"> */</a></span><span class="s2"><a name="l88"> 
+</a></span><span class="s4"><a name="l89">public class </a></span><span class="s2"><a name="l89">MyTreeCellRenderer </a></span><span class="s4"><a name="l89">extends </a></span><span class="s2"><a name="l89">DefaultTreeCellRenderer{ 
+</a><a name="l90">    </a></span><span class="s4"><a name="l90">public </a></span><span class="s2"><a name="l90">MyTreeCellRenderer(){ 
+</a><a name="l91">        setBackgroundNonSelectionColor(</a></span><span class="s4"><a name="l91">null</a></span><span class="s2"><a name="l91">); 
+</a><a name="l92">    } 
+</a><a name="l93"> 
+</a><a name="l94">    </a></span><span class="s4"><a name="l94">public </a></span><span class="s2"><a name="l94">Color getBackground(){ 
+</a><a name="l95">        </a></span><span class="s4"><a name="l95">return null</a></span><span class="s2"><a name="l95">; 
+</a><a name="l96">    } 
+</a><a name="l97">}</a></span></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">Now I replaced DefaultTreeCellRenderer with MyTreeCellRenderer:</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/highlightTree2.png" width="143" height="300"></p>
+<p>
+<a href="http://jroller.com/resources/s/santhosh/HighlightTree.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p>
+<font size="2" face="Verdana">In webstart demo, right click a node and select 
+&quot;Highlight Descendants&quot; from popup menu.</font></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+</html>

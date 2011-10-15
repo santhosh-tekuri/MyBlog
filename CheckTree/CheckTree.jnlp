@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="http://www.jroller.com/resources/s/santhosh">
+  <information>
+    <title>JTree with CheckBoxes</title>
+    <vendor>Santhosh Kumar T - santhosh@in.fiorano.com</vendor>
+    <offline-allowed/>
+  </information>  
+  <resources>
+    <j2se version="1.4+" />
+    <jar href="CheckTree.jar"/>
+  </resources>
+  <application-desc main-class="santhosh.CheckTreeTest"/>
+</jnlp>

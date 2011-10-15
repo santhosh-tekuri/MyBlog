@@ -1,0 +1,388 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">If you clearly observe the last webstart demo 
+in previous post, you will notice that there is still 
+place to enhance further. The content of attributes and elements is shown as its 
+child. It makes the tree litter bigger and not easy to browse. If the content is 
+somehow shown to the right of its owner (attribute or element), it looks better.</font></p>
+<p><font size="2" face="Verdana">This can be easily achieved by using TreeTable. 
+On googling, I found the following implementation of TreeTable:</font></p>
+<ol>
+  <li><a href="https://swingx.dev.java.net/"><font size="2" face="Verdana">
+  SwingX</font></a></li>
+  <li><a href="http://java.sun.com/products/jfc/tsc/articles/bookmarks/">
+  <font size="2" face="Verdana">Sun's Article</font></a></li>
+</ol>
+<p><font size="2" face="Verdana">The first choice is ruled out as it requires 
+JDK 1.5. We go with Sun's article.</font></p>
+<p><b><font size="2" face="Verdana">Note:</font></b></p>
+<p><font size="2" face="Verdana">It doesn't mean not to use SwingX. The reason 
+why I ruled out this is, I don't want my webstart demoes require jdk 1.5 and 
+download swingx to run demo. But still you can do whatever we are doing here 
+with JXTreeTable without code changes, as JXTreeTable is actually evolved from 
+this article. (correct me if I am wrong).</font></p>
+<p><font face="Verdana" size="2">First create model for JTreeTable. remember the 
+quote:&nbsp; <b>we 
+don't populate the model. we simply implement the model</b>.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber9">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> XMLTreeTableModel </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TreeTableModel{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Node node; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> XMLTreeTableModel(InputSource is) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Exception{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">(DOMUtil.createDocument(is).getDocumentElement()); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> XMLTreeTableModel(Node node){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.node = node; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getRoot(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> node; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getChild(Object parent, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> attrCount = attrs!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? attrs.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(index&lt;attrCount) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> attrs.item(index); 
+        NodeList children = node.getChildNodes(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> children.item(index - attrCount); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getChildCount(Object parent){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> attrCount = attrs!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? attrs.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        NodeList children = node.getChildNodes(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> childCount = children!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? children.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(childCount==</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; children.item(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">).getNodeType()==Node.TEXT_NODE) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> attrCount; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> attrCount + childCount; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isLeaf(Object node){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> getChildCount(node)==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getIndexOfChild(Object parent, Object child){ 
+        Node node = (Node)parent; 
+        Node childNode = (Node)child; 
+ 
+        NamedNodeMap attrs = node.getAttributes(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> attrCount = attrs!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? attrs.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(childNode.getNodeType()==Node.ATTRIBUTE_NODE){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;attrCount; i++){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(attrs.item(i)==child) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> i; 
+            } 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            NodeList children = node.getChildNodes(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> childCount = children!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? children.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;childCount; i++){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(children.item(i)==child) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> attrCount + i; 
+            } 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> RuntimeException(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;this should never happen!&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addTreeModelListener(TreeModelListener listener){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// not editable</i></font><font style="font-family: monospaced;" color="#000000"> 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeTreeModelListener(TreeModelListener listener){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// not editable</i></font><font style="font-family: monospaced;" color="#000000"> 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> valueForPathChanged(TreePath path, Object newValue){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// not editable</i></font><font style="font-family: monospaced;" color="#000000"> 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getColumnCount(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> String getColumnName(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> column==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> ? </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Node&quot;</b></font><font style="font-family: monospaced;" color="#000000"> : </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Value&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Class getColumnClass(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> column==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> ? TreeTableModel.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> : String.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getValueAt(Object node, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(column==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> node; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Node n = (Node)node; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(n.getNodeType()==Node.ELEMENT_NODE){ 
+                NodeList children = n.getChildNodes(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> childCount = children!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> ? children.getLength() : </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(childCount==</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; children.item(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">).getNodeType()==Node.TEXT_NODE) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> children.item(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">).getNodeValue(); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> n.getNodeValue(); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isCellEditable(Object node, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setValueAt(Object aValue, Object node, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// not editable</i></font><font style="font-family: monospaced;" color="#000000"> 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">This class is actually implemented by 
+implementing some more methods into the class XMLTreeModel which was developed 
+earlier. Ofcourse class signature is changed. </font></p>
+<p><font size="2" face="Verdana">You might have noticed that, getChildCount(node) 
+is little bit modified to make a dom node with just text node as leaf. And some 
+special care is taken in implementing getValueAt(node, column).</font></p>
+<p><font size="2" face="Verdana">There are some issues in JTreeTable from Sun's 
+Article. To fix them, I subclassed it:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber10">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyTreeTable </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JTreeTable{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> MyTreeTable(TreeTableModel treeTableModel){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(treeTableModel); 
+        setShowGrid(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        setGridColor(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Color(</font><font style="font-family: monospaced;" color="#0000ff">234</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">234</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">234</font><font style="font-family: monospaced;" color="#000000">)); 
+ 
+        setIntercellSpacing(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension(</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> editCellAt(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column, EventObject e){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent){ 
+            MouseEvent me = (MouseEvent)e; 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// If the modifiers are not 0 (or the left mouse button),</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// tree may try and toggle the selection, and table</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// will then try and toggle, resulting in the</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// selection remaining the same. To avoid this, we</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// only dispatch when the modifiers are 0 (or the left mouse</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// button).</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(me.getModifiers()==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> || 
+                    me.getModifiers()==InputEvent.BUTTON1_MASK){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> counter = getColumnCount()-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; counter&gt;= </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+                    counter--){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(getColumnClass(counter)==TreeTableModel.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                        MouseEvent newME = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent 
+                                (tree, me.getID(), 
+                                        me.getWhen(), me.getModifiers(), 
+                                        me.getX()-getCellRect(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, counter, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">).x, 
+                                        me.getY(), me.getClickCount(), 
+                                        me.isPopupTrigger()); 
+                        tree.dispatchEvent(newME); 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+                    } 
+                } 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.editCellAt(row, column, e); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Now it is time to test this.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable5.gif" width="469" height="308"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer5.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font face="Verdana"><font size="2">The gray area below the treetable is giving its contribution in making the 
+look ugly. This gray area is actually the scrollpane's viewport. We borrow some 
+code from my earlier tip: </font>
+<a id="itemTextLink14" title="http://www.jroller.com/page/santhosh/20050524#jtable_becomes_uglier_with_auto" onclick="clickOnLink('14', 'http://www.jroller.com/page/santhosh/20050524#jtable_becomes_uglier_with_auto','basefrm');return false;" href="http://www.jroller.com/page/santhosh/20050524#jtable_becomes_uglier_with_auto" target="basefrm">
+<font size="2">JTable becomes uglier with AUTO_RESIZE_OFF</font></a></font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber11">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyTreeTable </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JTreeTable{ 
+ 
+    .....
+
+    </font><font style="font-family: monospaced;" color="#808080"><i>// overriden to make the height of scroll match viewpost height if smaller</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> getScrollableTracksViewportHeight() { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> getPreferredSize().height &lt; getParent().getHeight(); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Now let us have a look at the updated demo:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable6.gif" width="467" height="306"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer6.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font face="Verdana"><font size="2">Now it seems, I the table header is removed, it will look more better. 
+Removing table header is very simple:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; treeTable.setTableHeader(null);<br>
+<br>
+But removing table header, introduces another problem. User won't be able to 
+resize the columns any more. Let us borrow TableColumnResizer from my earlier 
+tip : </font>
+<a href="http://www.jroller.com/page/santhosh/20050701#make_jtable_resiable_better_than">
+<font size="2">Make JTable Resizable (better than Excel)</font></a></font></p>
+<p><font size="2" face="Verdana">MyTreeTable is modified to use TableColumnResizer as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber12">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyTreeTable </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JTreeTable{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> MyTreeTable(TreeTableModel treeTableModel){ 
+        .....
+        </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TableColumnResizer(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    ....
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// mouse press intended for resize shouldn't change row/col/cell celection</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changeSelection(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> toggle, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> extend) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(getCursor()==TableColumnResizer.resizeCursor) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.changeSelection(row, column, toggle, extend); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">Note that you can't do:<br>
+&nbsp;&nbsp;&nbsp; treeTable.setTableHeader(null);<br>
+<br>
+because TableColumnResizer assumes that TableHeader is not null. There are to 
+solutions for this:</font></p>
+<ol>
+  <li>override configureEnclosedScrollPane() and do nothing</li>
+  <li>use a special subclass of JScrollPane to add MyTreeTable:<br>
+&nbsp;<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber13">
+    <tr>
+      <td width="100%">
+      <pre><font style="font-family: monospaced;" color="#000000">    JScrollPane scroll = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setColumnHeaderView(Component view){ 
+        } 
+    };</font></pre>
+      </td>
+    </tr>
+  </table>
+  </li>
+</ol>
+<p><font face="Verdana" size="2">So for we ignored about the namespaces in xml. 
+In order to parse xml with namespace we must turn this feature on:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; factory.setNamespaceAware(true);<br>
+<br>
+Add the above line to DOMUtil.createDocument(...). Note that both 
+SAXParserFactory and DocumentBuilderFactory have same method to turn namespace 
+feature on.<br>
+<br>
+One more thing we need to handle is elements with mixed-content. Element with 
+both text and child elements is called to contain mixed contain. We don't need 
+to change the model. Just we need to modify our renderer.<br>
+<br>
+Here is the updated renderer (I renamed the class): </font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber14">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> XMLTreeTableCellRenderer </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> DefaultTreeCellRenderer{ 
+    Color elementColor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Color(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">128</font><font style="font-family: monospaced;" color="#000000">); 
+    Color attributeColor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Color(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">128</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> XMLTreeTableCellRenderer(){ 
+        setOpenIcon(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        setClosedIcon(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        setLeafIcon(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Component getTreeCellRendererComponent(JTree tree, Object value, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> sel, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> expanded, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> leaf, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> hasFocus){ 
+        Node node = (Node)value; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(node.getNodeType()){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.ELEMENT_NODE: 
+                value = </font><font style="font-family: monospaced;" color="#008000"><b>'&lt;'</b></font><font style="font-family: monospaced;" color="#000000">+node.getNodeName()+</font><font style="font-family: monospaced;" color="#008000"><b>'&gt;'</b></font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.ATTRIBUTE_NODE: 
+                value = </font><font style="font-family: monospaced;" color="#008000"><b>'@'</b></font><font style="font-family: monospaced;" color="#000000">+node.getNodeName(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.TEXT_NODE: 
+                value = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;# text&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.COMMENT_NODE: 
+                value = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;# comment&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.DOCUMENT_TYPE_NODE: 
+                DocumentType dtype = (DocumentType)node; 
+                value = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;# doctype&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>default</b></font><font style="font-family: monospaced;" color="#000000">: 
+                value = node.getNodeName(); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!selected){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(node.getNodeType()){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.ELEMENT_NODE: 
+                    setForeground(elementColor); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> Node.ATTRIBUTE_NODE: 
+                    setForeground(attributeColor); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">now see how xml with namespaces and mixed 
+content looks like:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber15">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">&lt;</font><font style="font-family: monospaced;" color="#000080"><b>tns:body</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff"><b>xmlns:tns=</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;http://jroller.org&quot;</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+<b>Here</b> <b>is</b> <b>link</b> <b>to</b> <b>my</b> &lt;</font><font style="font-family: monospaced;" color="#000080"><b>a</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff"><b>href=</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;http://www.jroller.com/page/santhosh&quot;</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>weblog</b>&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>a</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>it</b> <b>contains</b> <b>some</b> <b>cool</b> <b>swing</b> <b>stuff.</b> 
+&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>tns:body</b></font><font style="font-family: monospaced;" color="#000000">&gt; </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable7_1.gif"></font></p>
+<p><font face="Verdana" size="2">Now here is the final webstart demo:</font></p>
+<p><font face="Verdana" size="2">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable7.gif" width="554" height="372"></font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer7.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">If you have sincerely followed this and the 
+previous post, who should have leaned:</font></p>
+<ol>
+  <li><font size="2" face="Verdana">Don't populate the model, instead implement 
+  it.</font></li>
+  <li><font size="2" face="Verdana">How to create DOM Document.</font></li>
+  <li><font size="2" face="Verdana">How to configure the DOM Builder</font></li>
+  <li><font size="2" face="Verdana">How to use XMLFilter to modify events on the 
+  fly</font></li>
+  <li><font size="2" face="Verdana">How to create DOM from SAX Events</font></li>
+  <li><font size="2" face="Verdana">How to remove ugly gray area of viewport</font></li>
+  <li><font size="2" face="Verdana">How to make columns resizable without table 
+  header</font></li>
+  <li><font size="2" face="Verdana">and lot more...</font></li>
+</ol>
+<p><font size="2" face="Verdana">Your Comments are appreciated.</font></p>
+
+<p>&nbsp;</p>
+
+</body>
+
+</html>

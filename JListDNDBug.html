@@ -1,0 +1,43 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">There is an <b>irritating bug</b> in JList Drag 
+and Drop.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JListDNDBug.gif" width="300" height="300"></font></p>
+<p><font size="2" face="Verdana">Most of our clients has reposted a problem 
+that, when they drag an item in list and drop somewhere, sometimes an item above 
+or below actually gets dropped rather than the actually dragged item in list. 
+Then I tried to find why it is happening so. I found the reason for this, and it 
+is always reproducible even in JDK1.5 </font></p>
+<p><font size="2" face="Verdana"><b>When does this actually happen ?</b><br>
+<br>
+Select an item say &quot;Item3&quot; in JList. Press the mouse Just above &quot;Item4&quot;. Then 
+drag the mouse over &quot;Item4&quot; to another JList as shown by arrow in the above 
+figure. When the mouse is over &quot;Item4&quot;, suddenly the selection switches to 
+&quot;Item4&quot; and on drop, instead of &quot;Item3&quot; getting dropped, &quot;Item4&quot; gets dropped.</font></p>
+<p><b><font size="2" face="Verdana">Why is it happening so?</font></b></p>
+<p><font size="2" face="Verdana">JList changes its selection on mouse drag. the 
+drag gesture threshold is 5 pixels in swing. Thus the mouse drag is actually 
+recognized as drag-gesture after the mouse is dragged 5 pixels, If you have 
+dragged the mouse along the patch shown in figure, after 5 pixels the mouse will 
+be over &quot;Item4&quot;. As JList changes its selection on mouse drag, the selection is 
+changed to &quot;Item4&quot;. and after the drag of 5 pixels, the mouse gesture is 
+recognized as drag-gesture and drag-gesture-recognizer takes the current 
+selection as transferable object which is &quot;Item4&quot; rather than &quot;Item3&quot;.</font></p>
+<p><font size="2" face="Verdana">This is happening of because of the use of hack 
+that I mentioned in following post:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.jroller.com/page/santhosh/20050524#jlist_dnd_hack">
+http://www.jroller.com/page/santhosh/20050524#jlist_dnd_hack</a><br>
+<br>
+If you don't apply this hack, it works fine. So we need to find better fix. 
+please don't use the hack in above mentioned post.<br>
+<br>
+You can try to reproduce this using the 
+following webstart demo.</font></p>
+<p><font face="Verdana"><font size="2">&nbsp;</font><a href="http://www.jroller.com/resources/s/santhosh/JListDrop.jnlp"><font size="2"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></font></p>
+
+</body>
+
+</html>

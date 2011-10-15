@@ -1,0 +1,248 @@
+<html>
+
+<body>
+
+<p><font face="Verdana"><font size="2">Here I am not going to explain about 
+Netbeans approach to Internationalization. You can read more about it at:<br>
+</font>
+<a href="http://www.netbeans.org/download/dev/javadoc/OpenAPIs/org/openide/doc-files/i18n-branding.html">
+<font size="2">Internationalization, Localization, and Branding</font></a></p>
+<p><font size="2" face="Verdana">I found some irritating issues regarding this 
+during my module development. They are:</font></p>
+<ul>
+  <li><font size="2" face="Verdana">While writing a code, I encounter a string 
+  that needs to be i18nized. Then I have to open Bundle.properties file of that 
+  package and add an entry for that string. and then switch back to my java 
+  file, and use that entry's key. if I don't find any Bundle.properties in that 
+  package, I have to create one. Switching between properties file and the java 
+  file, every time I introduce a string in my code is very irritating. Sometimes 
+  times I get irritated and leave some strings un-internationalized.</font></li>
+  <li><font size="2" face="Verdana">When I remove some portion of my code, I 
+  have to remove the corresponding entries in properties file. Otherwise, 
+  properties file end up having many unused entries. This not only increases the 
+  size of jar, but also effect the performance as we parse and store many unused 
+  entries in application's memory.</font></li>
+</ul>
+<p><font size="2" face="Verdana">One day, I have lost my patience and tried to 
+find some solutions to get rid of the above two issues somehow for ever. I want 
+to inline these resource entries directly in java source file. One solution is 
+to use XDoclet. XDoclet has one ready-made solution for this. you can found it
+<a href="http://xdoclet.sourceforge.net/xdoclet/tags/xdoclet-tags.html#@msg_bundle__0__1_">
+here</a>. </font></p>
+<p><font size="2" face="Verdana">After reading the above link, I found that it 
+doesn't fit into Netbeans I18N approach. The drawbacks of using this is:</font></p>
+<ul>
+  <li><font size="2" face="Verdana">It always creates properties file with the 
+  same name of java file, i.e., if java file MyAction.java, it creates 
+  MyAction.properties. and I end up up multiple properties files for single 
+  package.</font></li>
+  <li><font size="2" face="Verdana">If I some how solve the above problem may be 
+  by writing my own xdoclet plug-in, still I found some other areas where XDoclet syntax 
+  will never fit in. According to Netbeans guidlines you need to give 
+  description of parameters if any. for ex:<br>
+  <br>
+  </font><font size="2" face="Courier New"># 0 - Unique ID of the application<br>
+  # 1 - Name/IP of the computer<br>
+  APPLICATION_LAUNCH_FAILED=Failed to launch application {0} on {1}<br>
+  </font><font size="2" face="Verdana"><br>
+  I can't specify such comments  using XDoclet syntax.<br>
+  <br>
+  Another example:<br>
+  <br>
+  </font><font size="2" face="Courier New"># NOI18N<br>
+  MyAction.helpid=XYZProject.usage.newProject<br>
+  </font><font size="2" face="Verdana"><br>
+  the above comment tells that, the value of this entry shouldn't be localized 
+  by translators<br>
+  <br>
+  I can't generate such comments using XDoclet syntax.</font></li>
+</ul>
+<p><font size="2" face="Verdana">So I can't use XDoclet. Then what next.<br>
+XDoclet is actually implemented on top of JavaDoc. Then we can't I implement my 
+solution directly on top of JavaDoc. </font></p>
+<p><font size="2">Here is how I want them to be inlined into javadoc:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * performs the action 
+ * 
+ * </i><b>@bundle</b><i> APPLICATION_NAME=Unique Name of the application 
+ * 
+ * </i><b>@bundle</b><i> UID_DESCRIPTION=UID is the unique name of the application\ 
+ * </i><b>@bundle</b><i> by which it is recognized 
+ * 
+ * </i><b>@bundle</b><i> # NOI17N 
+ * </i><b>@bundle</b><i> MyAction.helpid=XYZProject.usage.newProject 
+ * 
+ * </i><b>@bundle</b><i> # 0 - Unique ID of the Application 
+ * </i><b>@bundle</b><i> # 1 - Name/IP of the Application 
+ * </i><b>@bundle</b><i> APPLICATION_LAUNCH_FAILED=Failed to launch application {0} on {1} 
+ * 
+ * </i><b>@param</b><i> node array of activated nodes 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> performAction(Node node[]){ 
+    ....... 
+    JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), 
+            NBBundle.getMessage(MyAction.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;APPLICATION_NAME&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+    ..... 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Thus we have to allow freeform syntax. We will 
+use @bundle tags just above the method where it is actually required. So when I 
+no longer need that method, I can delete that method along with its javadoc. 
+Thus my 2 problems are solved.</font></p>
+<p><font size="2" face="Verdana">The generated properties should look as shown 
+below:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%"><font size="2" face="Courier New"><font color="#C0C0C0">
+    #-------------------------------[ InvokeCustomizer 
+    ]-------------------------------#</font><br>
+    LBL_INPUT_VAR=Input Variable:<br>
+    LBL_OUTPUT_VAR=Output Variable:<br>
+    LBL_ADD_BTN=Add...<br>
+    <br>
+    <font color="#C0C0C0">#------------------------------------[ XMLMapper 
+    ]------------------------------------#</font><br>
+    DELETE_MAPPING=Delete Mapping<br>
+    LITERAL_MAPPING=Literal Mapping<br>
+    GENERATE_LITERAL=Generate Sample Literal<br>
+    <br>
+    <font color="#C0C0C0">#--------------------------------[ 
+    AbstractCustomizer ]-------------------------------#</font><br>
+    LBL_OK_ACTION=OK<br>
+    LBL_CANCEL_ACTION=Cancel</font><br>
+&nbsp;</td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">The entries in properties file are grouped and 
+titled by Class name. Thus when you see the properties file, you can clearly 
+tell in which class a particular entry is used. This is one plus point in our 
+implementation.</font></p>
+<p><font face="Verdana" size="2">Here the code of that amazing Doclet:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> com.sun.javadoc.*; 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.io.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.util.HashMap; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+</i></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> I18NDoclet{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> PrintWriter writer = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> titleWritten = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> hasi18n = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+     * </i><b>@bundle</b><i> 0 - name of the application 
+     * </i><b>@bundle</b><i> TEST_LABEL_MSG=unable to load specified file {0} 
+     */</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> start(RootDoc root) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> IOException{ 
+        File destDir = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        String options[][] = root.options(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;options.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(options[i][</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">].equals(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;-d&quot;</b></font><font style="font-family: monospaced;" color="#000000">)){ 
+                destDir = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> File(options[i][</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+ 
+        PackageDoc packages[] = root.specifiedPackages(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;packages.length; i++){ 
+            writer = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            ClassDoc classes[] = packages[i].allClasses(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> j = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; j&lt;classes.length; j++){ 
+                titleWritten = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+                writeDoc(classes[j], packages[i], classes[j], destDir); 
+ 
+                ConstructorDoc constructors[] = classes[j].constructors(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> k = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; k&lt;constructors.length; k++) 
+                    writeDoc(constructors[k], packages[i], classes[j], destDir); 
+ 
+                FieldDoc fields[] = classes[j].fields(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> k = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; k&lt;fields.length; k++) 
+                    writeDoc(fields[k], packages[i], classes[j], destDir); 
+ 
+                MethodDoc methods[] = classes[j].methods(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> k = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; k&lt;methods.length; k++) 
+                    writeDoc(methods[k], packages[i], classes[j], destDir); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(writer!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                writer.close(); 
+                writer = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!hasi18n)
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IOException(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;None of the classes have i18nizable stuff !!&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> writeDoc(Doc doc, PackageDoc pkg, ClassDoc clazz, File dir) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> IOException{ 
+        Tag tags[] = doc.tags(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;@bundle&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(tags.length&gt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!titleWritten){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(writer==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    writer = createWriter(pkg, dir); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                    writer.println(); 
+                writer.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;#------------------------------------[ &quot;</b></font><font style="font-family: monospaced;" color="#000000">+ clazz.name() +</font><font style="font-family: monospaced;" color="#008000"><b>&quot; ]------------------------------------#&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+                titleWritten = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+                hasi18n = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> m = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; m&lt;tags.length; m++) 
+            writer.println(</font><font style="font-family: monospaced" color="#000000">tags[m].text()</font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> PrintWriter createWriter(PackageDoc pkg, File dir) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> IOException{ 
+        String str = pkg.name().replace(</font><font style="font-family: monospaced;" color="#008000"><b>'.'</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>'/'</b></font><font style="font-family: monospaced;" color="#000000">); 
+        File file = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> File(dir, str); 
+        file.mkdirs(); 
+        file = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> File(file, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Bundle.properties&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PrintWriter(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FileWriter(file)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> optionLength(String option){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(option.equals(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;-d&quot;</b></font><font style="font-family: monospaced;" color="#000000">)){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">And here is how I use the above Doclet in ant 
+script:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%"><font size="2" face="Courier New">&lt;target name=&quot;i18nize&quot;&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;echo&gt;{ ${ant.project.name} } Internationalizing ...&lt;/echo&gt;<br>
+&nbsp;&nbsp; &lt;xjavadoc<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; docletpath=&quot;${user.home}/.ant/lib/antTasks.jar&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; doclet=&quot;santhosh.I18NDoclet&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sourcepath=&quot;src;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; packagenames=&quot;*&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; additionalparam=&quot;-d ${basedir}/${build.dir}/classes&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; private=&quot;true&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; failonerror=&quot;true&quot;&gt;<br>
+&nbsp;&nbsp; &lt;/xjavadoc&gt;<br>
+    &lt;/target&gt;</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">I have used xjavadoc rather than javadoc task. 
+This is modified javadoc task which suppresses the javadoc warnings that are shown in 
+console. I did this, because we are generating properties file and don't want to see javadoc warnings.</font></p>
+<p><font size="2" face="Verdana">Your comments are welcome.<br>
+<br>
+&nbsp;</font></p>
+
+</body>
+
+</html>

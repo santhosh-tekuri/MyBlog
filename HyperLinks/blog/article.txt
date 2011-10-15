@@ -1,0 +1,167 @@
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JEditorPane.html">JEditorPane</a> is the swing component which can display html pages. We can add a <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/event/HyperlinkListener.html">HyperLinkListener</a> to JEditorPane to listen for any hyperlink events.
+
+It is very easy to build a WebBrowser in Swing by a simple HyperLinkListener Implementation:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class HyperlinkActivator implements HyperlinkListener{ 
+    public void hyperlinkUpdate(HyperlinkEvent e){ 
+        if(e.getEventType()==HyperlinkEvent.EventType.ACTIVATED){ 
+            try{ 
+                ((JEditorPane)e.getSource()).setPage(e.getURL()); 
+            } catch(Exception ex){ 
+                ex.printStackTrace(); 
+            } 
+        } 
+    } 
+} 
+[/code]
+There is nothing new in the above class. One such class is available directly in JEditorPane's <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JEditorPane.html">JavaDoc</a>.
+
+Now we will see how these hyperlinks can be used to invoke <a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Action.html">swing actions</a>. Let us see the following screenshot from Microsoft Outlook's Message Rule Dialog:
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/hyperLinks0.gif" width="444" height="105">
+
+Swing Components manage their list of action using<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/ActionMap.html">ActionMap</a> Let us see the class which binds hyperlinks with swing actions.:</p>
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class ActionBasedHyperlinkListener implements HyperlinkListener{ 
+    ActionMap actionMap; 
+ 
+    public ActionBasedHyperlinkListener(ActionMap actionMap){ 
+        this.actionMap = actionMap; 
+    } 
+ 
+    public void hyperlinkUpdate(HyperlinkEvent e){ 
+        if(e.getEventType()!=HyperlinkEvent.EventType.ACTIVATED) 
+            return; 
+        String href = e.getDescription(); 
+        Action action = actionMap.get(href); 
+        if(action!=null) 
+            action.actionPerformed(new ActionEvent(e, ActionEvent.ACTION_PERFORMED, href)); 
+    } 
+} 
+[/code]
+When a hyperlinks gets activated, we get its href value from<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/event/HyperlinkEvent.html">HyperLinkEvent</a> and find the action with that key from actionMap. If any action is found, we perform that action.
+
+Let us create a simple action which simulates the above screenshot:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class SelectPeopleAction extends AbstractAction{ 
+    private final static String people[] = {"Santhosh", "Rick", "Matt", "Lorimer", "Scott"}; 
+ 
+    public SelectPeopleAction(){ 
+        super("selectPeople"); 
+    } 
+ 
+    public void actionPerformed(ActionEvent e){ 
+        HyperlinkEvent hle = (HyperlinkEvent)e.getSource(); 
+ 
+        try{ 
+            Element elem = hle.getSourceElement(); 
+            Document doc = elem.getDocument(); 
+            int start = elem.getStartOffset(); 
+            int end = elem.getEndOffset(); 
+            String link = doc.getText(start, end-start); 
+            link = link.equals("contains people") ? "" : link.substring("contains ".length()); 
+ 
+            JList list = new JList(people); 
+            StringTokenizer stok = new StringTokenizer(link, ", "); 
+            while(stok.hasMoreTokens()){ 
+                String token = stok.nextToken(); 
+                for(int i = 0; i<list.getModel().getSize(); i++){ 
+                    if(list.getModel().getElementAt(i).equals(token)) 
+                        list.getSelectionModel().addSelectionInterval(i, i); 
+                } 
+            } 
+ 
+            int response = JOptionPane.showOptionDialog((Component)hle.getSource(), new JScrollPane(list), "People", 
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 
+                    null, null, null); 
+            if(response==JOptionPane.OK_OPTION){ 
+                String newLink = ""; 
+                Object selected[] = list.getSelectedValues(); 
+                for(int i = 0; i<selected.length; i++){ 
+                    if(i!=0) 
+                        newLink += ", "; 
+                    newLink += selected[i]; 
+                } 
+                newLink = newLink.length()==0 ? "contains people" : "contains "+newLink; 
+                elem.getDocument().remove(start, end-start); 
+                elem.getDocument().insertString(start, newLink, elem.getAttributes()); 
+            } 
+        } catch(BadLocationException ex){ 
+            ex.printStackTrace(); 
+        } 
+    } 
+} 
+[/code]
+The above action will be activated when the hyperlink "contains people" is activated. It finds the text of hyperlink from the offsets got from hyperlink event. It then creates a JList with available people and selects the current people from the hyperlink text by tokenizing it. It pops up a dialog from which user can change the selected people. On this dialog's confirm, it computes the new text for hyperlink and updates the html accordingly.
+
+From the above class, you learn:
+<ol><li>How to fetch href attribute value from hyperlink</li><li>How to fetch hyperlink text.</li><li>How to modify html partially</li></ol>
+
+Let us write the demo application:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class HyperLinksDemo extends JFrame{ 
+    public HyperLinksDemo() throws Exception{ 
+        super("Hyperlinks Demo - santhosh@in.fiorano.com"); 
+        JEditorPane editor = new JEditorPane(); 
+        editor.setPage(getClass().getResource("rule.html")); 
+        editor.setEditable(false); 
+ 
+        ActionMap actionMap = new ActionMap(); 
+        actionMap.put("selectPeople", new SelectPeopleAction()); 
+        editor.addHyperlinkListener(new ActionBasedHyperlinkListener(actionMap)); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); 
+        contents.add(new JScrollPane(editor)); 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setSize(400, 300); 
+    } 
+ 
+    public static void main(String[] args) throws Exception{ 
+        try{ 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } catch(Exception e){ 
+            e.printStackTrace(); 
+        } 
+        new HyperLinksDemo().setVisible(true); 
+    } 
+}
+[/code]
+This is the file rule.html used:
+
+&lt;html&gt;
+&lt;body&gt;
+
+&lt;p&gt;When the newly arrived message arrives&lt;br&gt; 
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; where the From &lt;a href=&quot;selectPeople&quot;&gt; 
+contains people&lt;/a&gt;&lt;br&gt; 
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; delete it.&lt;/p&gt; 
+
+&lt;/body&gt; 
+
+&lt;/html&gt;
+
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks1.gif" width="338" height="146">
+
+When hyperlink is clicked it displays:
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks2.gif" width="268" height="221">
+
+On confirming the above dialog:
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks3.gif" width="338" height="146">
+
+<a href="http://www.jroller.com/resources/s/santhosh/HyperLinks.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Enjoy!
+Santhosh Kumar T 
+Contributing Editor
+santhosh@javalobby.org
+santhosh@in.fiorano.com
+http://www.jroller.com/page/santhosh
+http://www.fiorano.com

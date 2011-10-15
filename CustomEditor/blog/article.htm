@@ -1,0 +1,171 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">JTable allows editing with TableCellEditor. Sometimes the table might contain 
+some complex objects, whose editing may not fit it the small area allocated to 
+TableCellEditor. In such case it is good idea to add custom-editor button to 
+TableCellEditor. CustomEditor is a button with icon [...]. On clicking this 
+button, a more sofisticated UI in a dialog will popup. This is very common in 
+PropertySheets.</font></p>
+<p><font size="2" face="Verdana">Today I tried doing this. Instead of throwing already implemented 
+TableCellEditors, what I did is, reuse them by adding custom-editor button. Here 
+is the class which allows such reusability:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ActionTableCellEditor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TableCellEditor, ActionListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Icon DOTDOTDOT_ICON = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ImageIcon(getClass().getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;dotdotdot.gif&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TableCellEditor editor; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JButton customEditorButton = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(DOTDOTDOT_ICON); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> JTable table; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, column; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ActionTableCellEditor(TableCellEditor editor){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.editor = editor; 
+        customEditorButton.addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// ui-tweaking</i></font><font style="font-family: monospaced;" color="#000000"> 
+        customEditorButton.setFocusable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        customEditorButton.setFocusPainted(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        customEditorButton.setMargin(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Component getTableCellEditorComponent(JTable table, Object value, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelected, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        JPanel panel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+        panel.add(editor.getTableCellEditorComponent(table, value, isSelected, row, column)); 
+        panel.add(customEditorButton, BorderLayout.EAST); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.table = table; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.row = row; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.column = column; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> panel; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getCellEditorValue(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> editor.getCellEditorValue(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isCellEditable(EventObject anEvent){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> editor.isCellEditable(anEvent); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> shouldSelectCell(EventObject anEvent){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> editor.shouldSelectCell(anEvent); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> stopCellEditing(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> editor.stopCellEditing(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> cancelCellEditing(){ 
+        editor.cancelCellEditing(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addCellEditorListener(CellEditorListener l){ 
+        editor.addCellEditorListener(l); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeCellEditorListener(CellEditorListener l){ 
+        editor.removeCellEditorListener(l); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        editor.cancelCellEditing(); 
+        editCell(table, row, column); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> editCell(JTable table, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column); 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">ActionTableCellEditor wraps a given TableCellEditor. This class itself 
+implements TableCellEditor and delegates all methods to the given 
+TableCellEditor. </font> </p>
+<p><font size="2" face="Verdana">in <font style="font-family: monospaced" color="#000000">
+getTableCellEditorComponent method</font>, we add custom editor button to the 
+existing TableCellEditor component and return. it. When custom editor button is 
+clicked, we cancel the cell editing and call the method editCell which is 
+abstract. Subclasses override editCell method to show a dialog and call 
+JTable.setValueAt(...) when [OK] button of dialog is pressed.</font></p>
+<p><font size="2" face="Verdana">Let us write simple subclass of ActionCellEditor called 
+StringActionTableCellEditor. StringActionTableCellEditor is used to edit string 
+values (possible lengthy or multi-line strings)</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> StringActionTableCellEditor </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> ActionTableCellEditor{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> StringActionTableCellEditor(TableCellEditor editor){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(editor); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> editCell(JTable table, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        JTextArea textArea = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextArea(</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">50</font><font style="font-family: monospaced;" color="#000000">); 
+        Object value = table.getValueAt(row, column); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(value!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            textArea.setText((String)value); 
+            textArea.setCaretPosition(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> result = JOptionPane.showOptionDialog(table 
+                , </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(textArea), (String)table.getColumnName(column) 
+                , JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(result==JOptionPane.OK_OPTION) 
+            table.setValueAt(textArea.getText(), row, column); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">In this class we simple use JTextArea inside JOptionPane. We initialize 
+textarea value from cell value and when JOptionPane's [OK] is pressed, we commit 
+the new value into table.</font></p>
+<p><font size="2" face="Verdana">I created a simple webstart demo to show it in action.</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/CustomEditor1.gif" width="349" height="136"></p>
+<p><font size="2" face="Verdana">The first column uses DefaultTableCellEditor. Second column contains 
+description of book which can be lengthy or multiline. So I used the same 
+DefaultTableCellEditor instance wrapped inside StringActionTableCellEditor. On 
+clicking [...] button following custom editor is shown:</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/customEditor2.gif" width="380" height="255"></p>
+<p><font size="2" face="Verdana">You can view the source of webstart demo's main-class
+<a href="http://jroller.com/resources/s/santhosh/CustomEditorDemo.java">here</a>.</font></p>
+<p><a href="http://jroller.com/resources/s/santhosh/CustomEditor.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">ActionTableCellEditor is very easy to implement as you don't need to discard 
+your already implemented TableCellEditors. One can create 
+HashtableActionTableCellEditor, PropertiesActionTableCellEditor etc in the same 
+way as StringActionTableCellEditor.</font></p>
+<p><font size="2" face="Verdana">Your comments are appreciated</font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Wed Jul 20 01:28:13 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           HyperLinks.jar
+# Target Jar file for obfuscated code: HyperLinks_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# Memory in use after class data structure built: 421864 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 3 times	(75%)
+#  'b'   	used 1 times	(25%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (0%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/HyperLinksDemo
+.method santhosh/HyperLinksDemo/main ([Ljava/lang/String;)V
+.class santhosh/SelectPeopleAction
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/HyperlinkActivator a
+.method_map santhosh/HyperlinkActivator/hyperlinkUpdate (Ljavax/swing/event/HyperlinkEvent;)V hyperlinkUpdate
+.class_map santhosh/ActionBasedHyperlinkListener b
+.field_map santhosh/ActionBasedHyperlinkListener/actionMap a
+.method_map santhosh/ActionBasedHyperlinkListener/hyperlinkUpdate (Ljavax/swing/event/HyperlinkEvent;)V hyperlinkUpdate
+.field_map santhosh/SelectPeopleAction/people a
+.method_map santhosh/SelectPeopleAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed

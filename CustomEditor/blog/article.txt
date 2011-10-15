@@ -1,0 +1,149 @@
+JTable allows editing with TableCellEditor. Sometimes the table might contain some complex objects, whose editing may not fit it the small area allocated to TableCellEditor. In such case it is good idea to add custom-editor button to TableCellEditor. CustomEditor is a button with icon [...]. On clicking this button, a more sofisticated UI in a dialog will popup. This is very common in PropertySheets.
+
+Today I tried doing this. Instead of throwing already implemented TableCellEditors, what I did is, reuse them by adding custom-editor button. Here is the class which allows such reusability:
+[code]
+/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * <p/> 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * <p/> 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */ 
+public abstract class ActionTableCellEditor implements TableCellEditor, ActionListener{ 
+    public final Icon DOTDOTDOT_ICON = new ImageIcon(getClass().getResource("dotdotdot.gif")); 
+ 
+    private TableCellEditor editor; 
+    private JButton customEditorButton = new JButton(DOTDOTDOT_ICON); 
+ 
+    protected JTable table; 
+    protected int row, column; 
+ 
+    public ActionTableCellEditor(TableCellEditor editor){ 
+        this.editor = editor; 
+        customEditorButton.addActionListener(this); 
+ 
+        // ui-tweaking 
+        customEditorButton.setFocusable(false); 
+        customEditorButton.setFocusPainted(false); 
+        customEditorButton.setMargin(new Insets(0, 0, 0, 0)); 
+    } 
+ 
+    public Component getTableCellEditorComponent(JTable table, Object value
+                    , boolean isSelected, int row, int column){ 
+        JPanel panel = new JPanel(new BorderLayout()); 
+        panel.add(editor.getTableCellEditorComponent(table, value, isSelected, row, column)); 
+        panel.add(customEditorButton, BorderLayout.EAST); 
+        this.table = table; 
+        this.row = row; 
+        this.column = column; 
+        return panel; 
+    } 
+ 
+    public Object getCellEditorValue(){ 
+        return editor.getCellEditorValue(); 
+    } 
+ 
+    public boolean isCellEditable(EventObject anEvent){ 
+        return editor.isCellEditable(anEvent); 
+    } 
+ 
+    public boolean shouldSelectCell(EventObject anEvent){ 
+        return editor.shouldSelectCell(anEvent); 
+    } 
+ 
+    public boolean stopCellEditing(){ 
+        return editor.stopCellEditing(); 
+    } 
+ 
+    public void cancelCellEditing(){ 
+        editor.cancelCellEditing(); 
+    } 
+ 
+    public void addCellEditorListener(CellEditorListener l){ 
+        editor.addCellEditorListener(l); 
+    } 
+ 
+    public void removeCellEditorListener(CellEditorListener l){ 
+        editor.removeCellEditorListener(l); 
+    } 
+ 
+    public final void actionPerformed(ActionEvent e){ 
+        editor.cancelCellEditing(); 
+        editCell(table, row, column); 
+    } 
+ 
+    protected abstract void editCell(JTable table, int row, int column); 
+}
+[/code]
+
+ActionTableCellEditor wraps a given TableCellEditor. This class itself implements TableCellEditor and delegates all methods to the given TableCellEditor.
+in getTableCellEditorComponent method, we add custom editor button to the existing TableCellEditor component and return. it. When custom editor button is clicked, we cancel the cell editing and call the method editCell which is abstract. Subclasses override editCell method to show a dialog and call JTable.setValueAt(...) when [OK] button of dialog is pressed.
+
+Let us write simple subclass of ActionCellEditor called StringActionTableCellEditor. StringActionTableCellEditor is used to edit string values (possible lengthy or multi-line strings)
+
+[code]
+/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * <p/> 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * <p/> 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */ 
+public class StringActionTableCellEditor extends ActionTableCellEditor{ 
+    public StringActionTableCellEditor(TableCellEditor editor){ 
+        super(editor); 
+    } 
+ 
+    protected void editCell(JTable table, int row, int column){ 
+        JTextArea textArea = new JTextArea(10, 50); 
+        Object value = table.getValueAt(row, column); 
+        if(value!=null){ 
+            textArea.setText((String)value); 
+            textArea.setCaretPosition(0); 
+        } 
+        int result = JOptionPane.showOptionDialog(table 
+                , new JScrollPane(textArea), (String)table.getColumnName(column) 
+                , JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null); 
+        if(result==JOptionPane.OK_OPTION) 
+            table.setValueAt(textArea.getText(), row, column); 
+    } 
+} 
+[/code]
+
+In this class we simple use JTextArea inside JOptionPane. We initialize textarea value from cell value and when JOptionPane's [OK] is pressed, we commit the new value into table.
+
+I created a simple webstart demo to show it in action.
+
+<img border="0" src="http://jroller.com/resources/s/santhosh/CustomEditor1.gif" width="349" height="136">
+
+The first column uses DefaultTableCellEditor. Second column contains description of book which can be lengthy or multiline. So I used the same DefaultTableCellEditor instance wrapped inside StringActionTableCellEditor. On clicking [...] button following custom editor is shown:
+
+<img border="0" src="http://jroller.com/resources/s/santhosh/customEditor2.gif" width="380" height="255">
+
+You can view the source of webstart demo's main-class <a href="http://jroller.com/resources/s/santhosh/CustomEditorDemo.java">here</a>.
+
+<a href="http://jroller.com/resources/s/santhosh/CustomEditor.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+ActionTableCellEditor is very easy to implement as you don't need to discard your already implemented TableCellEditors. One can create HashtableActionTableCellEditor, PropertiesActionTableCellEditor etc in the same way as StringActionTableCellEditor.
+
+Your comments are appreciated
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+Contributing Editor - santhosh@javalobby.org
+MySwing Project     - https://myswing.dev.java.net/
+Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+Sr. Software Eng    - http://www.fiorano.com

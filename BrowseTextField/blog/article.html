@@ -1,0 +1,239 @@
+<html>
+
+<body>
+<p><font size="2" face="Verdana">Following is the screenshot from
+<a href="http://java.sun.com/products/jlf/at/book/Titlepage.html">Java<sup>TM</sup> 
+Look and Design Guidelines</a> which talks about
+<a href="http://java.sun.com/products/jlf/at/book/Idioms2.html">Browse Idiom</a>:</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jlf/at/book/images/browse_cmyk.gif" width="400" height="41"></font></p>
+<p><font size="2" face="Verdana">There are some problems in this:</font></p>
+<ul>
+  <li><font size="2" face="Verdana">Height of the button will be more than that 
+  of text field. so it creates some odd look.</font></li>
+  <li><font size="2" face="Verdana">If your panel, contains some text fields 
+  along with the above, you need to spend some time in laying out them.</font></li>
+  <li><font size="2" face="Verdana">The code you add to handle Browse button 
+  will get replicated, whenever you want use this idiom in many dialogs/panels.</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">My Solution is :</font></b></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/BrowseTextField.gif" width="268" height="126"></font></p>
+<p><font size="2" face="Verdana">In the above screenshot, first one is text 
+field with browse button, and second one is just text field. You will notice 
+that height of both text fields are same. User can see the tooltip on [...] 
+button.</font></p>
+<p><b><font size="2" face="Verdana">Now step into coding:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>     // @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">12   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> BrowseButton </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JButton{ 
+<font style="font-style: normal;" color="#000000">13   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JTextComponent textComp; 
+<font style="font-style: normal;" color="#000000">14   </font> 
+<font style="font-style: normal;" color="#000000">15   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> BrowseButton(JTextComponent textComp, Action a){ 
+<font style="font-style: normal;" color="#000000">16   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(a); 
+<font style="font-style: normal;" color="#000000">17   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.textComp = textComp; 
+<font style="font-style: normal;" color="#000000">18   </font> 
+<font style="font-style: normal;" color="#000000">19   </font>        setText(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">20   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(getToolTipText()==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">21   </font>            setToolTipText((String)a.getValue(Action.NAME)); 
+<font style="font-style: normal;" color="#000000">22   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(getIcon()==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">23   </font>            setIcon(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ImageIcon(BrowseButton.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">.getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;dotdotdot.gif&quot;</b></font><font style="font-family: monospaced;" color="#000000">))); 
+<font style="font-style: normal;" color="#000000">24   </font> 
+<font style="font-style: normal;" color="#000000">25   </font>        textComp.registerKeyboardAction(a, 
+<font style="font-style: normal;" color="#000000">26   </font>                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED); 
+<font style="font-style: normal;" color="#000000">27   </font> 
+<font style="font-style: normal;" color="#000000">28   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// when textfield is diabled browsebutton should also gets disabled and vice versa</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">29   </font>        textComp.addPropertyChangeListener(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;enabled&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener(){ 
+<font style="font-style: normal;" color="#000000">30   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+<font style="font-style: normal;" color="#000000">31   </font>                setEnabled(BrowseButton.</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.textComp.isEnabled()); 
+<font style="font-style: normal;" color="#000000">32   </font>            } 
+<font style="font-style: normal;" color="#000000">33   </font>        }); 
+<font style="font-style: normal;" color="#000000">34   </font>    } 
+<font style="font-style: normal;" color="#000000">35   </font> 
+<font style="font-style: normal;" color="#000000">36   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// overriden to make it not to occupy more height than textfield</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">37   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Dimension getPreferredSize(){ 
+<font style="font-style: normal;" color="#000000">38   </font>        Dimension size = </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.getPreferredSize(); 
+<font style="font-style: normal;" color="#000000">39   </font>        size.height = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>// trick</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">40   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> size; 
+<font style="font-style: normal;" color="#000000">41   </font>    } 
+<font style="font-style: normal;" color="#000000">42   </font> 
+<font style="font-style: normal;" color="#000000">43   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// overridden to change the action source to text component</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">44   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireActionPerformed(ActionEvent event){ 
+<font style="font-style: normal;" color="#000000">45   </font>        Object[] listeners = listenerList.getListenerList(); 
+<font style="font-style: normal;" color="#000000">46   </font>        ActionEvent e = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">47   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = listeners.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; i&gt;=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i -= </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">48   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(listeners[i]==ActionListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">49   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">50   </font>                    String actionCommand = event.getActionCommand(); 
+<font style="font-style: normal;" color="#000000">51   </font>                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(actionCommand==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">52   </font>                        actionCommand = getActionCommand(); 
+<font style="font-style: normal;" color="#000000">53   </font>                    e = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(textComp, 
+<font style="font-style: normal;" color="#000000">54   </font>                            ActionEvent.ACTION_PERFORMED, 
+<font style="font-style: normal;" color="#000000">55   </font>                            actionCommand, 
+<font style="font-style: normal;" color="#000000">56   </font>                            event.getWhen(), 
+<font style="font-style: normal;" color="#000000">57   </font>                            event.getModifiers()); 
+<font style="font-style: normal;" color="#000000">58   </font>                } 
+<font style="font-style: normal;" color="#000000">59   </font>                ((ActionListener)listeners[i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]).actionPerformed(e); 
+<font style="font-style: normal;" color="#000000">60   </font>            } 
+<font style="font-style: normal;" color="#000000">61   </font>        } 
+<font style="font-style: normal;" color="#000000">62   </font>    } 
+<font style="font-style: normal;" color="#000000">63   </font> 
+<font style="font-style: normal;" color="#000000">64   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ usage ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">65   </font> 
+<font style="font-style: normal;" color="#000000">66   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JComponent createBrowsePanel(JTextComponent tf, Action browseAction){ 
+<font style="font-style: normal;" color="#000000">67   </font>        JPanel panel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+<font style="font-style: normal;" color="#000000">68   </font>        panel.setBorder(UIManager.getBorder(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;ComboBox.border&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">69   </font>        Insets insets = tf.getMargin(); 
+<font style="font-style: normal;" color="#000000">70   </font>        tf.setBorder(BorderFactory.createEmptyBorder(insets.top, insets.left, insets.bottom, insets.right)); 
+<font style="font-style: normal;" color="#000000">71   </font>        panel.add(tf, BorderLayout.CENTER); 
+<font style="font-style: normal;" color="#000000">72   </font>        JButton button = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BrowseButton(tf, browseAction); 
+<font style="font-style: normal;" color="#000000">73   </font>        button.setMargin(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">74   </font>        button.setDefaultCapable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">75   </font>        button.setFocusPainted(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">76   </font>        button.setFocusable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">77   </font>        panel.add(button, BorderLayout.EAST); 
+<font style="font-style: normal;" color="#000000">78   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> panel; 
+<font style="font-style: normal;" color="#000000">79   </font>    } 
+<font style="font-style: normal;" color="#000000">80   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Some highlights in above source code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">Line Numbers</font></td>
+    <td width="89%"><font size="2" face="Verdana">Highlights</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">12</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;we create a special 
+    JButton extension called BrowseButton</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">15</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;takes action that should 
+    be invoked on pressing browse button</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">19-21</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;browse button doesn't 
+    show text, the action's name is shown in tooltip</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">22-23</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;user can customize the 
+    icon by setting icon to action. If no icon was set, it defaults to [...]</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">25-26</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;user can invoke browse 
+    action just by pressing CRTL+SPACE even without using mouse</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">29-33</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;the enabled status of 
+    both text field and browse button are kept in sync</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">37-41</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;ensures that height of 
+    text field + browse button never exceeds normal text field height</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">44-62</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;The ActionEvent passed 
+    to the action will contain the text component as source.</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">66</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;method to create browse 
+    component (a combination of text field + browse button). Note that the 
+    constructor of BrowseButton is made private</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">68</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;use proper border</font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">69-70</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;don't let the text 
+    field's margin lost </font></td>
+  </tr>
+  <tr>
+    <td width="11%"><font size="2" face="Verdana">73-76</font></td>
+    <td width="89%"><font size="2" face="Verdana">&nbsp;button doesn't accept 
+    focus + tweaked to fit in text field's height</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">A pre-implemented BrowseFileAction to make life 
+easier:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> BrowseFileAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    FileFilter filters[], defaultFilter; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> selectionMode, dialogType; 
+    String dialogTitle; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> BrowseFileAction(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Browse...&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> BrowseFileAction(FileFilter[] filters, FileFilter defaultFilter, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> selectionMode, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> dialogType, String dialogTitle){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Browse...&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.filters = filters; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.defaultFilter = defaultFilter; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.selectionMode = selectionMode; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.dialogType = dialogType; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.dialogTitle = dialogTitle; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae){ 
+        JTextComponent tcomp = (JTextComponent)ae.getSource(); 
+        JFileChooser chooser = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFileChooser(); 
+        String text = tcomp.getText().trim(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(text.length()&gt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">){ 
+            File dir = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> File(text).getParentFile(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(dir!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                chooser.setCurrentDirectory(dir); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(filters!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;filters.length; i++) 
+                chooser.addChoosableFileFilter(filters[i]); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(defaultFilter!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            chooser.setFileFilter(defaultFilter); 
+        chooser.setFileSelectionMode(selectionMode); 
+        chooser.setDialogType(dialogType); 
+        chooser.setDialogTitle(dialogTitle); 
+        chooser.setMultiSelectionEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(chooser.showDialog(tcomp, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">)==JFileChooser.APPROVE_OPTION){ 
+            tcomp.setText(chooser.getSelectedFile().toString()); 
+            tcomp.setCaretPosition(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">How to use it:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre>instead of saying <font style="font-family: monospaced" color="#000000">JTextField</font><font style="font-family: monospaced;" color="#000000">
+  somePanel.add(textField); 
+do like this:
+  somePanel.add(BrowseButton.createBrowsePanel(textField, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BrowseFileAction()));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/BrowseTextField.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Yours comments are appreciated.</font></p>
+
+</body>
+
+</html>

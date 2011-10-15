@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="http://www.javalobby.org/resources/santhosh/postings">
+  <information>
+    <title>XML Viewer with Swing</title>
+    <vendor>Santhosh Kumar T - santhosh@in.fiorano.com</vendor>
+    <offline-allowed/>
+  </information>  
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.4+" />
+    <jar href="XMLViewer/XMLViewer4.jar"/>
+  </resources>
+  <application-desc main-class="santhosh.XMLTreeDemo"/>
+</jnlp>

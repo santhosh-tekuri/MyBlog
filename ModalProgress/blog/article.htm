@@ -1,0 +1,336 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">You can find all my postings in categorized tree
+<a href="https://myswing.dev.java.net/MyBlog/MySwingTree.html">here</a>. <br>
+The title of my page &quot;Santhosh Kumar's Weblog&quot; now has hyperlink to this URL. 
+You can also find this URL in sidebar with name &quot;MyBlog&quot; under &quot;My Bookmarks&quot; 
+Category.</font></p>
+<p><font size="2" face="Verdana">Let us first create a model for progress of task.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ProgressMonitor{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> total, current=-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> indeterminate; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> milliSecondsToWait = </font><font style="font-family: monospaced;" color="#0000ff">500</font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>// half second</i></font><font style="font-family: monospaced;" color="#000000"> 
+    String status; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ProgressMonitor(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> total, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> indeterminate, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> milliSecondsToWait){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.total = total; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.indeterminate = indeterminate; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.milliSecondsToWait = milliSecondsToWait; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ProgressMonitor(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> total, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> indeterminate){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.total = total; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.indeterminate = indeterminate; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getTotal(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> total; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> start(String status){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(current!=-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalStateException(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;not started yet&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.status = status; 
+        current = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        fireChangeEvent(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getMilliSecondsToWait(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> milliSecondsToWait; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getCurrent(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> current; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> String getStatus(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> status; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isIndeterminate(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> indeterminate; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setCurrent(String status, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> current){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(current==-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalStateException(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;not started yet&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.current = current; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(status!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.status = status; 
+        fireChangeEvent(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*--------------------------------[ ListenerSupport ]--------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Vector listeners = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Vector(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> ChangeEvent ce = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ChangeEvent(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addChangeListener(ChangeListener listener){ 
+        listeners.add(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeChangeListener(ChangeListener listener){ 
+        listeners.remove(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireChangeEvent(){ 
+        ChangeListener listener[] = 
+                (ChangeListener[])listeners.toArray(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ChangeListener[listeners.size()]); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;listener.length; i++) 
+            listener[i].stateChanged(ce); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">progress always starts from zero. user specified the total units and whether 
+it is indeterminate or not. The arguments milliSecondsToWait tells, after how 
+much time after the task started, the progress dialog should be shown. This 
+value defaults to half second. Because if GUI doesn't respond within half 
+second, user will clearly fees that GUI is slow. If the task completes before 
+the milliSecondsToWait is elapsed, then progress dialog is not shown.</font></p>
+<p><font size="2" face="Verdana">ProgressMonitor fires ChangeEvent which can be listened by some other class 
+to show progress dialog. Thus GUI is decoupled from model. </font> </p>
+<p><font size="2" face="Verdana">Now create a ProgressDialog class:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ProgressDialog </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JDialog </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ChangeListener{ 
+    JLabel statusLabel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(); 
+    JProgressBar progressBar; 
+    ProgressMonitor monitor; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ProgressDialog(Frame owner, ProgressMonitor monitor) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> HeadlessException{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(owner, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Progress&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        init(monitor); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ProgressDialog(Dialog owner, ProgressMonitor monitor) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> HeadlessException{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(owner); 
+        init(monitor); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> init(ProgressMonitor monitor){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.monitor = monitor; 
+ 
+        progressBar = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JProgressBar(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, monitor.getTotal()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(monitor.isIndeterminate()) 
+            progressBar.setIndeterminate(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            progressBar.setValue(monitor.getCurrent()); 
+        statusLabel.setText(monitor.getStatus()); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">)); 
+        contents.add(statusLabel, BorderLayout.NORTH); 
+        contents.add(progressBar); 
+ 
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE); 
+        monitor.addChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stateChanged(</font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> ChangeEvent ce){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// to ensure EDT thread</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!SwingUtilities.isEventDispatchThread()){ 
+            SwingUtilities.invokeLater(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Runnable(){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> run(){ 
+                    stateChanged(ce); 
+                } 
+            }); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(monitor.getCurrent()!=monitor.getTotal()){ 
+            statusLabel.setText(monitor.getStatus()); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!monitor.isIndeterminate()) 
+                progressBar.setValue(monitor.getCurrent()); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            dispose(); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">ProgressDialog has a JLabel which shows the status message and JProgressBar 
+to show amount of progress done. It listens to ChangeEvents from ProgressMonitor 
+and updates the JLabel and JProgressBar. When ProgressMonitor's value hits its 
+total value, dialog is disposed. It ensures that GUI is updated in EDT thread, 
+because ChangeEvents from ProgressMonitor are always fired in Non-EDT thread 
+(see stateChanged method).</font></p>
+<p><font size="2" face="Verdana">ProgressMonitor can be used to show a modal progress dialog or event show the 
+progress in status bar of the application, because we decoupled how progress is 
+shown from its model. Now let us see how to create a ProgressMonitor which shows 
+modal progress dialog:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ProgressUtil{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MonitorListener </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ChangeListener, ActionListener{ 
+        ProgressMonitor monitor; 
+        Window owner; 
+        Timer timer; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> MonitorListener(Window owner, ProgressMonitor monitor){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.owner = owner; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.monitor = monitor; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stateChanged(ChangeEvent ce){ 
+            ProgressMonitor monitor = (ProgressMonitor)ce.getSource(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(monitor.getCurrent()!=monitor.getTotal()){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(timer==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                    timer = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Timer(monitor.getMilliSecondsToWait(), </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+                    timer.setRepeats(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                    timer.start(); 
+                } 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(timer!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; timer.isRunning()) 
+                    timer.stop(); 
+                monitor.removeChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+            monitor.removeChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            ProgressDialog dlg = owner </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> Frame 
+                    ? </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ProgressDialog((Frame)owner, monitor) 
+                    : </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ProgressDialog((Dialog)owner, monitor); 
+            dlg.pack(); 
+            dlg.setLocationRelativeTo(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+            dlg.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> ProgressMonitor createModalProgressMonitor(Component owner, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> total, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> indeterminate, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> milliSecondsToWait){ 
+        ProgressMonitor monitor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ProgressMonitor(total, indeterminate, milliSecondsToWait); 
+        Window window = owner </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> Window 
+                ? (Window)owner 
+                : SwingUtilities.getWindowAncestor(owner); 
+        monitor.addChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MonitorListener(window, monitor)); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> monitor; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">User creates a ProgressMonitor using createModalProgressMonitor(...) method. 
+The first argument owner is used to find the owner window for ProgressDialog. We 
+create a MonitorListener and register with ProgressMonitor. When 
+ProgressMonitor.start(...) is called, MonitorListener starts a timer with 
+milliSecondsToWait time. When timer hits its finish time, we show ProgressDialog, 
+We also ensure that MonitorListener is unregistered from ProgressMonitor when 
+its job is complete.</font></p>
+<p><font size="2" face="Verdana">Following is the sample application to show the usage of ProgressMonitor:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ModalProgressDemo{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JFrame frame; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Runnable heavyRunnable = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Runnable(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> run(){ 
+            ProgressMonitor monitor = ProgressUtil.createModalProgressMonitor(frame, </font><font style="font-family: monospaced;" color="#0000ff">100</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">1000</font><font style="font-family: monospaced;" color="#000000">); 
+            monitor.start(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Fetching 1 of 10 records from database...&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">; i+=</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">){ 
+                    fetchRecord(i); 
+                    monitor.setCurrent(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Fetching &quot;</b></font><font style="font-family: monospaced;" color="#000000">+(i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)+</font><font style="font-family: monospaced;" color="#008000"><b>&quot; of 10 records from database&quot;</b></font><font style="font-family: monospaced;" color="#000000">, (i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)*</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">); 
+                } 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>finally</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// to ensure that progress dlg is closed in case of any exception</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(monitor.getCurrent()!=monitor.getTotal()) 
+                    monitor.setCurrent(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, monitor.getTotal()); 
+            } 
+            heavyAction.setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fetchRecord(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                Thread.sleep(</font><font style="font-family: monospaced;" color="#0000ff">1000</font><font style="font-family: monospaced;" color="#000000">); 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(InterruptedException e){ 
+                e.printStackTrace(); 
+            } 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Action heavyAction = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Databse Query&quot;</b></font><font style="font-family: monospaced;" color="#000000">){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+            setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Thread(heavyRunnable).start(); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String args[]){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+        frame = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Modal Progress Dialog - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        frame.getContentPane().setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FlowLayout()); 
+        frame.getContentPane().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(heavyAction)); 
+        frame.setSize(</font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">200</font><font style="font-family: monospaced;" color="#000000">); 
+        frame.setLocationRelativeTo(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">You must ensure that, ProgressMonitor's value always hits its total value, 
+otherwise ProgressDialog will never get disposed. We ensure this using 
+try...finally block.</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/ModalProgress.gif" width="300" height="200"></p>
+<p><a href="http://jroller.com/resources/s/santhosh/ModalProgress.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

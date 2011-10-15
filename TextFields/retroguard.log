@@ -1,0 +1,67 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Thu Jul 28 23:16:32 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           TextFields.jar
+# Target Jar file for obfuscated code: TextFields_obfsucated.jar
+# RetroGuard Script file used:         retroguard.txt
+#
+#
+# Memory in use after class data structure built: 439368 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 7 times	(58%)
+#  'c'   	used 1 times	(8%)
+#  'd'   	used 1 times	(8%)
+#  'e'   	used 1 times	(8%)
+#  'f'   	used 1 times	(8%)
+#  'b'   	used 1 times	(8%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (2%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/TextFieldsDemo
+.method santhosh/TextFieldsDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/CutAction a
+.field_map santhosh/CutAction/comp a
+.method_map santhosh/CutAction/isEnabled ()Z isEnabled
+.method_map santhosh/CutAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/MyEventQueue b
+.method_map santhosh/MyEventQueue/dispatchEvent (Ljava/awt/AWTEvent;)V dispatchEvent
+.class_map santhosh/DeleteAction c
+.field_map santhosh/DeleteAction/comp a
+.method_map santhosh/DeleteAction/isEnabled ()Z isEnabled
+.method_map santhosh/DeleteAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/TextFieldsDemo$2 2
+.field_map santhosh/TextFieldsDemo$2/this$0 this$0
+.method_map santhosh/TextFieldsDemo$2/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/TextFieldsDemo$1 1
+.field_map santhosh/TextFieldsDemo$1/this$0 this$0
+.method_map santhosh/TextFieldsDemo$1/showPopup (Ljava/awt/event/MouseEvent;)V a
+.method_map santhosh/TextFieldsDemo$1/mouseReleased (Ljava/awt/event/MouseEvent;)V mouseReleased
+.method_map santhosh/TextFieldsDemo$1/mousePressed (Ljava/awt/event/MouseEvent;)V mousePressed
+.class_map santhosh/SelectAllAction d
+.field_map santhosh/SelectAllAction/comp a
+.method_map santhosh/SelectAllAction/isEnabled ()Z isEnabled
+.method_map santhosh/SelectAllAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/PasteAction e
+.field_map santhosh/PasteAction/comp a
+.method_map santhosh/PasteAction/isEnabled ()Z isEnabled
+.method_map santhosh/PasteAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/CopyAction f
+.field_map santhosh/CopyAction/comp a
+.method_map santhosh/CopyAction/isEnabled ()Z isEnabled
+.method_map santhosh/CopyAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed

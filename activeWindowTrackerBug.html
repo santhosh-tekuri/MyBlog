@@ -1,0 +1,43 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">ActiveWindowTracker which was introduced in
+<a href="http://www.jroller.com/page/santhosh/20050702#find_current_last_active_window">
+Find Current/Last Active Window</a> returns wrong window in a special scenario. 
+The scenario is as follows:</font></p>
+<ul>
+  <li><font size="2" face="Verdana">Let us say the application's main window is 
+  called MainFrame. When the application is launched MainFrame is shown and 
+  KeyboardFocusManager fires a property change for &quot;activeWindow&quot;.</font></li>
+  <li><font size="2" face="Verdana">The ActiveWindowTracker which is registered 
+  to KeyboardFocusManager gets the event and updates the variable activeWindow 
+  to MainFrame.</font></li>
+  <li><font size="2" face="Verdana">Let us say user performs a action which 
+  results in displaying a ProgressDialog.</font></li>
+  <li><font size="2" face="Verdana">When the ProgressDialog shows up, 
+  ActiveWindowTracker receives property change event from KeyboardFocusManager 
+  and updates the variable to activeWindow to ProgressDialog.</font></li>
+  <li><font size="2" face="Verdana">Let us say, you switched to some other 
+  application. Then ActiveWindowTracker receives a property change event saying 
+  that currentActiveWindow is null. But ActiveWindowTracker does nothing on this 
+  event.</font></li>
+  <li><font size="2" face="Verdana">Let us assume that, While you are in some 
+  other application, the progress dialog is closed, then ActiveWindowTracker 
+  receives a windowClosingEvent and makes the variable activeWindow to null. 
+  (NOTE: KeyboardFocusManager doesn't fire any event for this, because still 
+  there is no active window).</font></li>
+  <li><font size="2" face="Verdana">Let us say, after ProgressDialog gets 
+  closed, another dialog say StausDialog shows up saying that the task is 
+  completed.</font></li>
+  <li><font size="2" face="Verdana">Now if StatusDialog asks ActiveWindowTracker 
+  for current active window (to set owner window), it returns the shared frame 
+  instance rather than MainFrame. This is the BUG.</font></li>
+</ul>
+<p><font size="2" face="Verdana">This bug can be fixed, by changing the 
+ActiveWindowTracker to store stack of last active windows rather than just one.</font></p>
+<p><font size="2" face="Verdana">I hope my explanation is understandable to you.</font></p>
+
+</body>
+
+</html>

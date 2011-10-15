@@ -1,0 +1,19 @@
+From the screenshots, you might have understood what "Incremental Search" mean and how powerful my implementation could be ?
+
+    * The implementation should be flexible enough to add incremental search to any Swing Component.
+    * No sub classing of Swing Components. It should be easily pluggable to any Swing Component.
+    * Incremental Search is invoked using shortcut keys. I am using following shortcuts.
+         CTRL+I              = Case Sensitive Search
+         CTRL+SHIFT+I    = Case Insensitive Search
+    * The search text field should be clearly distinguishable from normal Text Field, Otherwise user may confuse it as cell editor for example in JTree. I made the search text field's background to match tooltip's background and prefixed by "Search for:" label for more clarity.
+    * As the user types in textfield the must selection should keep changing to matching occurrence.
+    * When there is no matching found, the search string should become red to indicate it.
+    * The width of search popup should increase as the user types in text and decrease as the user deletes text.
+    * The width of search popup should not be limited by the width of the window.
+    * Pressing up/down arrow key should change the selection to next or previous matching occurrence.
+    * The searching direction should be rotated automatically. i.e. search will be started from current selection and if there is no match found, then it should start searching from beginning.
+    * Pressing up/down arrow key while holding key, should allow multiple selection of matching occurrences.
+    * ESC should close the search popup. Note: If the dialog has registered ESC key for closing the dialog, then search popup should be closed if visible otherwise dialog should be closed.
+    * Should allow copy, cut, paste and delete in search text field.
+
+Wow, so many features. But I am not exposing my implementation in this post. I want you give a try, before looking into my implementation.

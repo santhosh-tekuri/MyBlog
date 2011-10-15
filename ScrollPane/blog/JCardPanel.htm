@@ -1,0 +1,206 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">Almost all IDE's today have multiple views. 
+Netbeans3.6 didn't had multiple views. They are introduced in 4.0;</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JCardPanel.gif" width="463" height="323"></font></p>
+<p><font size="2" face="Verdana">It is not just for showing text document in 
+multiple ways. It can be useful at many places in normal swing applications.</font></p>
+<p><font face="Verdana"><font size="2">In the above screenshot you will see 
+three buttons to the left or horizontal scrollbar, which lets user to switch the 
+views. The scrollpane here uses MyScrollPaneLayout from my previous post: </font>
+<a href="http://www.jroller.com/page/santhosh/20050605#enhancing_jscrollpane">
+<font size="2">Enhancing JScollPane</font></a></font></p>
+<p><font size="2" face="Verdana">This is nicely fitted into a new Component 
+called <b>&quot;JCardPanel&quot;</b>. As the name tells, it uses CardLayout to manage 
+multiple views.&nbsp; But it uses a modified CardLayout. You can find the 
+reasons why I chose to modify CardLayout in my source code comments.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> JCardPanel </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JComponent </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener{ 
+    JToolBar toolbar = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JToolBar(); 
+    ButtonGroup bgroup = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ButtonGroup(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> JCardPanel(){ 
+        setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MyCardLayout()); 
+        toolbar.setRollover(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        toolbar.setFloatable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        toolbar.setMargin(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+        toolbar.setBorder(BorderFactory.createMatteBorder(</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, Color.gray)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Containment ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addImpl(Component comp, Object constraints, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index){ 
+        JToggleButton button = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JToggleButton((String)constraints); 
+        button.addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        button.setMargin(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+        bgroup.add(button); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(getComponentCount()!=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            toolbar.addSeparator(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            button.setSelected(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        toolbar.add(button, index); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addImpl(comp, constraints, index); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> remove(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index){ 
+        JToggleButton button = (JToggleButton)toolbar.getComponent(index+</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+        button.removeActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        toolbar.remove(button); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(index!=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            toolbar.remove(index*</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.remove(index); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> remove(Component comp){ 
+        remove(Arrays.asList(getComponents()).indexOf(comp)*</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeAll(){ 
+        toolbar.removeAll(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeAll(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        ((CardLayout)getLayout()).show(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, e.getActionCommand()); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Realization ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addNotify() { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addNotify(); 
+        configureEnclosingScrollPane(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeNotify() { 
+        unconfigureEnclosingScrollPane(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeNotify(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ JScrollPane Related ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> configureEnclosingScrollPane() { 
+        Container p = getParent(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (p </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JViewport) { 
+            Container gp = p.getParent(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (gp </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane) { 
+                JScrollPane scrollPane = (JScrollPane)gp; 
+                scrollPane.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MyScrollPaneLayout()); 
+                JViewport viewport = scrollPane.getViewport(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (viewport == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || viewport.getView() != </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+                scrollPane.add(MyScrollPaneLayout.HORIZONTAL_LEFT, toolbar); 
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS); 
+                scrollPane.getHorizontalScrollBar().setPreferredSize(toolbar.getPreferredSize()); 
+ 
+                Border border = scrollPane.getBorder(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (border == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || border </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> UIResource) { 
+                    scrollPane.setBorder(BorderFactory.createLineBorder(Color.gray)); 
+                } 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> unconfigureEnclosingScrollPane() { 
+        Container p = getParent(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (p </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JViewport) { 
+            Container gp = p.getParent(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (gp </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane) { 
+                JScrollPane scrollPane = (JScrollPane)gp; 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Make certain we are the viewPort's view and not, for</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// example, the rowHeaderView of the scrollPane -</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// an implementor of fixed columns might do this.</i></font><font style="font-family: monospaced;" color="#000000"> 
+                JViewport viewport = scrollPane.getViewport(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (viewport == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || viewport.getView() != </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+                scrollPane.setColumnHeaderView(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ CardLayout ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// why we need to subclass CardLayout</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// 1. we want to update the button selection when card is switched</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// 2. cardpanel's preferred size is maximum of all components preferred size</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>//    in our implementation we want it to be same as the visible card's preferred</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>//    size</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyCardLayout </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> CardLayout{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> show(Container parent, String name){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.show(parent, name); 
+            updateToolbar(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> first(Container parent){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.first(parent); 
+            updateToolbar(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> next(Container parent){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.next(parent); 
+            updateToolbar(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> previous(Container parent){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.previous(parent); 
+            updateToolbar(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> last(Container parent){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.last(parent); 
+            updateToolbar(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> updateToolbar(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> count = getComponentCount(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;count; i++){ 
+                Component comp = getComponent(i); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(comp.isVisible()){ 
+                    JToggleButton button = (JToggleButton)toolbar.getComponent(i*</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+                    button.setSelected(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Dimension preferredLayoutSize(Container parent){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> count = getComponentCount(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;count; i++){ 
+                Component comp = getComponent(i); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(comp.isVisible()) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> comp.getPreferredSize(); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension(</font><font style="font-family: monospaced;" color="#0000ff">100</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">100</font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>// fallback</i></font><font style="font-family: monospaced;" color="#000000"> 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How to use it ??</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JCardPanel cardPanel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JCardPanel(); 
+ 
+cardPanel.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Design&quot;</b></font><font style="font-family: monospaced;" color="#000000">, editorPane1); 
+cardPanel.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Source&quot;</b></font><font style="font-family: monospaced;" color="#000000">, textArea); 
+cardPanel.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Preview&quot;</b></font><font style="font-family: monospaced;" color="#000000">, editorPane2); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/JCardPanel.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

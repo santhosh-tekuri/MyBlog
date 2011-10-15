@@ -1,0 +1,178 @@
+<html>
+
+<body>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/jtreedrop.gif" width="300" height="300"></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * </i><b>@author</b><i> santhosh kumar T - santhosh@in.fiorano.com 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> TreeDropListener </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> DropTargetListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Component oldGlassPane; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Point from, to; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// glasspane on which visual clues are drawn</i></font><font style="font-family: monospaced;" color="#000000"> 
+    JPanel glassPane = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paint(Graphics g) { 
+            g.setColor(Color.red); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(from==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || to==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> x1 = from.x; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> x2 = to.x; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> y1 = from.y; 
+ 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// line</i></font><font style="font-family: monospaced;" color="#000000"> 
+            g.drawLine(x1+</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, y1, x2-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, y1); 
+            g.drawLine(x1+</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, y1+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, x2-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, y1+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// right</i></font><font style="font-family: monospaced;" color="#000000"> 
+            g.drawLine(x1, y1-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, x1, y1+</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">); 
+            g.drawLine(x1+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, y1-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, x1+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, y1+</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// left</i></font><font style="font-family: monospaced;" color="#000000"> 
+            g.drawLine(x2, y1-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, x2, y1+</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">); 
+            g.drawLine(x2-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, y1-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, x2-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, y1+</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// size of hotspot used to find</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// the whether user wants to insert element</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hotspot = </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// droppath - subclasses can access this in to accept/reject drop</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> TreePath treePath = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// null means replace node at treePath</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// true means insert node before treePath</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// false means insert node after treePath</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// subclasses can access this in drop</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Boolean before = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> updateLine(JTree tree, Point pt){ 
+        treePath = tree.getPathForLocation(pt.x, pt.y); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(treePath==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            from = to = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            before = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            tree.clearSelection(); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Rectangle bounds = tree.getPathBounds(treePath); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(pt.y&lt;=bounds.y+hotspot){ 
+                from = bounds.getLocation(); 
+                to = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Point(from.x+bounds.width, from.y); 
+                before = Boolean.TRUE; 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(pt.y&gt;=bounds.y+bounds.height-hotspot){ 
+                from = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Point(bounds.x, bounds.y+bounds.height); 
+                to = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Point(from.x+bounds.width, from.y); 
+                before = Boolean.FALSE; 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                from = to = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+                before = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(from!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; to!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                from = SwingUtilities.convertPoint(tree, from, glassPane); 
+                to = SwingUtilities.convertPoint(tree, to, glassPane); 
+                tree.clearSelection(); 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                tree.setSelectionPath(treePath); 
+        } 
+        glassPane.getRootPane().repaint(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> dragEnter(DropTargetDragEvent dtde){ 
+        JTree tree = (JTree)dtde.getDropTargetContext().getComponent(); 
+        Point location = dtde.getLocation(); 
+ 
+        JRootPane rootPane = tree.getRootPane(); 
+        oldGlassPane = rootPane.getGlassPane(); 
+        rootPane.setGlassPane(glassPane); 
+        glassPane.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        glassPane.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        updateLine(tree, location); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> dragOver(DropTargetDragEvent dtde){ 
+        JTree tree = (JTree)dtde.getDropTargetContext().getComponent(); 
+        Point location = dtde.getLocation(); 
+        updateLine(tree, location); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> dropActionChanged(DropTargetDragEvent dtde){ 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> resetGlassPane(DropTargetEvent dte){ 
+        JTree tree = (JTree)dte.getDropTargetContext().getComponent(); 
+ 
+        JRootPane rootPane = tree.getRootPane(); 
+        rootPane.setGlassPane(oldGlassPane); 
+        oldGlassPane.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        rootPane.repaint(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> dragExit(DropTargetEvent dte){ 
+        resetGlassPane(dte); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> drop(DropTargetDropEvent dtde){ 
+        resetGlassPane(dtde); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">The code is self explanatory :)</font></p>
+<p><font face="Verdana" size="2">How to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DropTarget(tree2, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreeDropListener(){ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> drop(DropTargetDropEvent dtde){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.drop(dtde); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(treePath==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            dtde.rejectDrop(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+ 
+        JTree tree = (JTree)dtde.getDropTargetContext().getComponent(); 
+        DefaultTreeModel treeModel = (DefaultTreeModel)tree.getModel(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            String data = (String)dtde.getTransferable().getTransferData(DataFlavor.stringFlavor); 
+            DefaultMutableTreeNode dragNode = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultMutableTreeNode(data); 
+            DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode)treePath.getLastPathComponent(); 
+            DefaultMutableTreeNode dropParent = (DefaultMutableTreeNode)dropNode.getParent(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(dropParent==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                dtde.rejectDrop(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> dropIndex = treeModel.getIndexOfChild(dropParent, dropNode); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(before==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                treeModel.removeNodeFromParent(dropNode); 
+                treeModel.insertNodeInto(dragNode, dropParent, dropIndex); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(before.equals(Boolean.TRUE)){ 
+                treeModel.insertNodeInto(dragNode, dropParent, dropIndex); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(dropIndex&lt;dropParent.getChildCount()){ 
+                    treeModel.insertNodeInto(dragNode, dropParent, dropIndex+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">); 
+                }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    dropParent.add(dragNode); 
+                    treeModel.nodesWereInserted(dropParent, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">[dropIndex+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]); 
+                } 
+            } 
+            tree.setSelectionPath(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath(dragNode.getPath())); 
+            dtde.acceptDrop(DnDConstants.ACTION_COPY); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+});</font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://jroller.com/resources/s/santhosh/JTreeDrop.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

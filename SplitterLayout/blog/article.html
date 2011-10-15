@@ -1,0 +1,66 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">Working with Nested JSplitPanes is very 
+difficult, mainly the resizing doesn't behave the way user wants...</font></p>
+<p><font size="2" face="Verdana">Splitter Layout is an alternative to JSplitPane.
+</font><font size="2"><tt><font face="Verdana">SplitterLayout</font></tt></font><font size="2" face="Verdana"> 
+is a simple layout manager that handles segmented displays with optional 
+draggable bars between them.&nbsp; In its simplest use, it's just a nice proportional 
+layout manager.&nbsp; More complex uses can create some interesting GUIs.</font></p>
+<p><tt><font size="2" face="Verdana">SplitterBar</font></tt><font size="2"><font face="Verdana">s 
+are just </font><tt><font face="Verdana">Panel</font></tt><font face="Verdana">s 
+with dragging and painting stuff added.&nbsp; They can contain any other components 
+you want in any layout (even another </font><tt><font face="Verdana">
+SplitterLayout</font></tt></font><font size="2" face="Verdana">!)&nbsp; The following 
+shows a simple &quot;movable status bar&quot; layout:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/SplitterLayout.gif" width="500" height="300"></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">        JPanel contents = (JPanel)getContentPane(); 
+        contents.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> SplitterLayout(SplitterLayout.VERTICAL)); 
+        contents.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;1&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;A (1)&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+ 
+        JSplitterBar b1 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterBar(); 
+        b1.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> GridLayout(</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+        b1.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterSpace()); 
+        b1.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Status&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        b1.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Enter your name&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        b1.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterSpace()); 
+        contents.add(b1); 
+        contents.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;2&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;B (2)&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+ 
+        JSplitterBar b2 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterBar(); 
+        b2.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> SplitterLayout(SplitterLayout.HORIZONTAL)); 
+        b2.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;5&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterSpace()); 
+        b2.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterBar()); 
+        b2.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;10&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Status&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        b2.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitterBar()); 
+        b2.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;40&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Enter your name&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        contents.add(b2); 
+        contents.add(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;4&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;C (4)&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">The original AWT version of this can be found 
+at: <a href="http://www.javadude.com/tools/tabsplitter/splitterlayout.html">
+http://www.javadude.com/tools/tabsplitter/splitterlayout.html</a></font></p>
+<p><font face="Verdana" size="2">I have changed this to SWING. and did some 
+minor changes.
+<a href="http://www.jroller.com/resources/s/santhosh/SplitterLayout.zip">source 
+code</a></font></p>
+<p><font face="Verdana" size="2">
+<a href="http://www.jroller.com/resources/s/santhosh/SplitterLayout.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></font></p>
+<p><font face="Verdana" size="2">the resizing bar while dragging doesn't appear 
+correctly in webstart application.<br>
+you may download the
+<a href="http://www.jroller.com/resources/s/santhosh/SplitterLayout.zip">source 
+code</a> and try it locally if your are interested.</font></p>
+
+</body>
+
+</html>

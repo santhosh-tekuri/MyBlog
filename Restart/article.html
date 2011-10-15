@@ -1,0 +1,92 @@
+<html>
+<body>
+<p><font face="Verdana" size="2">Sometimes it is required to make your 
+application restart on its own. For example, IntelliJ Idea after downloading the 
+new plugins requires to be restarted. But it can't restart itself, so asks the 
+user to restart after its exit.</font></p>
+<p><font face="Verdana" size="2">Let us see how to make you application restart 
+on its own.</font></p>
+<table border="1" width="100%" id="table1" cellspacing="0" cellpadding="0" bordercolor="#000000" style="border-collapse: collapse">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> java.io.*; 
+</font><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> java.awt.event.*; 
+</font><font style="font-family: monospaced" color="#000080"><b>import</b></font><font style="font-family: monospaced" color="#000000"> java.awt.*; 
+ 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> App{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String args[]){ 
+        Action restartAction = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> AbstractAction(</font><font style="font-family: monospaced" color="#008000"><b>&quot;Restart&quot;</b></font><font style="font-family: monospaced" color="#000000">){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> actionPerformed(ActionEvent ae){ 
+                </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+                    </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> File(</font><font style="font-family: monospaced" color="#008000"><b>&quot;restart&quot;</b></font><font style="font-family: monospaced" color="#000000">).createNewFile(); 
+                    System.exit(</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">); 
+                }</font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(Exception ex){ 
+                    ex.printStackTrace(); 
+                } 
+            } 
+        }; 
+ 
+        JFrame frame = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JFrame(</font><font style="font-family: monospaced" color="#008000"><b>&quot;App&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+        JMenuBar menubar = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JMenuBar(); 
+        JMenu menu = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JMenu(</font><font style="font-family: monospaced" color="#008000"><b>&quot;File&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+        menu.add(restartAction); 
+        menubar.add(menu); 
+        frame.setJMenuBar(menubar); 
+        frame.setSize(</font><font style="font-family: monospaced" color="#0000ff">100</font><font style="font-family: monospaced" color="#000000">, </font><font style="font-family: monospaced" color="#0000ff">100</font><font style="font-family: monospaced" color="#000000">); 
+        frame.setVisible(</font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">); 
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+    } 
+}</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">and the launch script <b>run.bat</b> is as 
+follows:</font></p>
+<table border="1" width="100%" id="table2" cellspacing="0" cellpadding="0" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td><font face="Courier New" size="2">:restart<br>
+		del restart<br>
+		java App<br>
+		if exist restart GOTO restart</font></td>
+	</tr>
+</table>
+<p><font face="Verdana" size="2">The application is run by the script run.bat. 
+When user clicks File&gt;Restart from menubar, it creates a file named restart and 
+exits. the script checks for restart file existance and if it exists, it reruns 
+the entire script again, which results in launching the application again.</font></p>
+<p><font size="2" face="Verdana">This can be changed not to use any file as 
+follows. Change restartAction as follows</font><font face="Courier New" size="2">:</font></p>
+<table border="1" width="100%" id="table3" cellspacing="0" cellpadding="0" bordercolor="#000000" style="border-collapse: collapse">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced" color="#000000">Action restartAction = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> AbstractAction(</font><font style="font-family: monospaced" color="#008000"><b>&quot;Restart&quot;</b></font><font style="font-family: monospaced" color="#000000">){ 
+     </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> actionPerformed(ActionEvent ae){ 
+         </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+             System.exit(</font><font style="font-family: monospaced" color="#0000FF">100</font><font style="font-family: monospaced" color="#000000">); 
+         }</font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(Exception ex){ 
+             ex.printStackTrace(); 
+         } 
+      } 
+}; </font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">Here the program exits with value 100 
+indicating restart. and run.bat is changed to:</font></p>
+<table border="1" width="100%" id="table4" cellspacing="0" cellpadding="0" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td><font face="Courier New" size="2">:restart<br>
+		java App<br>
+		if %errorlevel%==100 GOTO restart</font></td>
+	</tr>
+</table>
+<p><font face="Verdana" size="2">These tricks are not just applicable to java 
+applications. These tricks will be very useful to restart a sever which is 
+running on a remote machine. implement restart() in server as explained and 
+expose it to clients using RMI, JMX or by any other means.</font></p>
+<p><font face="Verdana" size="2">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

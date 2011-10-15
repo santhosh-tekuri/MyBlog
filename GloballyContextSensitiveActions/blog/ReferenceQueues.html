@@ -1,0 +1,118 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">Sometimes it is desired to know when an object 
+gets garbage collected, so that we can do some additional resource cleanup. In 
+the last
+<a href="http://www.jroller.com/page/santhosh/20050711#use_weak_listeners_to_avoid">
+tip</a>, we learnt how to use weak listeners to avoid memory leaks. The 
+WeakPropertyChangeListener unregisters itself from the source, when a change is 
+notified and weakReference is referring to null. i.e, there is a delay in the 
+cleanup. for example: the frequency of change notifications from source may be 
+very rare.</font></p>
+<p><font face="Verdana"><font size="2">Is it possible to some how know when the 
+weakReference is got garbage collected and unregister the listener immediately. 
+Java provides this feature using </font>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/ref/ReferenceQueue.html">
+<font size="2">ReferenceQueue</font></a></font></p>
+<p><font size="2" face="Verdana">We create a subclass of ReferenceQueue, which 
+will help us in performing such resource cleanup very easily:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ActiveReferenceQueue </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> ReferenceQueue </font><font style="font-family: monospaced" color="#000080"><b>implements</b></font><font style="font-family: monospaced" color="#000000"> Runnable{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> ActiveReferenceQueue singleton = </font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> ActiveReferenceQueue getInstance(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(singleton==</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+            singleton = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> ActiveReferenceQueue(); 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> singleton; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> ActiveReferenceQueue(){ 
+        Thread t = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Thread(</font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">, </font><font style="font-family: monospaced" color="#008000"><b>&quot;ActiveReferenceQueue&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+        t.setDaemon(</font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">); 
+        t.start(); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> run(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>for</b></font><font style="font-family: monospaced" color="#000000">(;;){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+                Reference ref = </font><font style="font-family: monospaced" color="#000080"><b>super</b></font><font style="font-family: monospaced" color="#000000">.remove(</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">); 
+                </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(ref </font><font style="font-family: monospaced" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced" color="#000000"> Runnable){ 
+                    </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+                        ((Runnable)ref).run(); 
+                    } </font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(Exception e){ 
+                        e.printStackTrace(); 
+                    } 
+                } 
+            } </font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(InterruptedException e){ 
+                e.printStackTrace(); 
+            } 
+        } 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">ActiveReferenceQueue is a singleton class, and 
+starts a thread when it is instantiated. This thread keeps polling for 
+weakReferences that are eligible for garbage collection, and if those 
+weakReferences implement Runnable interface, it executes them. </font></p>
+<p><font size="2" face="Verdana">To use this, we can create a subclass of 
+WeakReference implementing Runnable interface, which does the cleanup it run() 
+method.</font></p>
+<p><font size="2" face="Verdana">Let us see how we will change the 
+WeakPropertyChangeListener to use the above reference queue:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> WeakPropertyChangeListener </font><font style="font-family: monospaced" color="#000080"><b>implements</b></font><font style="font-family: monospaced" color="#000000"> PropertyChangeListener{ 
+    WeakReference listenerRef; 
+    Object src; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> WeakPropertyChangeListener(PropertyChangeListener listener, Object src){ 
+        listenerRef = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> ListenerReference(listener, </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">); 
+        </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">.src = src; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+        PropertyChangeListener listener = (PropertyChangeListener)listenerRef.get(); 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(listener!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+            listener.propertyChange(evt); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> removeListener(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+            Method method = src.getClass().getMethod(</font><font style="font-family: monospaced" color="#008000"><b>&quot;removePropertyChangeListener&quot;</b></font><font style="font-family: monospaced" color="#000000"> 
+                    , </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Class[] {PropertyChangeListener.</font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000">}); 
+            method.invoke(src, </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> Object[]{ </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000"> }); 
+        } </font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ListenerReference </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> WeakReference{ 
+        WeakPropertyChangeListener listener; 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> ListenerReference(Object ref, WeakPropertyChangeListener listener){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>super</b></font><font style="font-family: monospaced" color="#000000">(ref, ActiveReferenceQueue.getInstance()); 
+            </font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">.listener = listener; 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> run(){ 
+            listener.removeListener(); 
+            listener = </font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">; 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+
+</body>
+
+</html>

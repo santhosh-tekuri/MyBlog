@@ -1,0 +1,44 @@
+When developers tries to convert a file which contains special characters like spaces or exclamation mark in their filepath to url, they face some problems.
+
+Here is sample snippet which tries to convert file to url:
+[code]
+public class FileToURL{
+    public static void main(String[] args) throws Exception{
+        File file = new File("C:\\Documents and Settings\\administrator\\Desktop\\xsl\\test.xsl");
+        System.out.println("file.toURL() ----> "+file.toURL());
+        System.out.println("file.toURI().toURL() ----> "+file.toURI().toURL());
+    }
+}
+[/code]
+
+when you run the program it prints the following output:
+
+[code]
+file.toURL() ----> file:/C:/Documents and Settings/administrator/Desktop/xsl/test.xsl
+file.toURI().toURL() ----> file:/C:/Documents%20and%20Settings/administrator/Desktop/xsl/test.xsl
+[/code]
+
+<b>File.toURL()</b>:
+   it just preppends "file:/" to the filepath. it doesn't try to escape any special characters in the filepath
+   
+<b>File.toURI().toURL()</b>:
+   it gives correct output, escaping any special characters in the filepath.
+
+there are actualy bugs for this in Sun's bugzilla.
+
+<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4273532">4273532</a>: toURL() method in File class needs to escape excluded URL characters
+this bug is closed by saying <b>won't fix</b>. The reason it says is, it breaks backward compatibility and suggests to use URI class which was introduced in JDK 1.4
+
+<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179468">6179468</a>: File.toURL should be @deprecated
+this is fixed for mustang release (b39)
+
+so, be careful when converting File to URL.
+
+Enjoy!
+
+Santhosh Kumar T 
+Contributing Editor
+santhosh@javalobby.org
+santhosh@in.fiorano.com
+http://www.jroller.com/page/santhosh
+http://www.fiorano.com

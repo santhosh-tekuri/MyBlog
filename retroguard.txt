@@ -1,0 +1,2 @@
+.class santhosh/${ant.project.name}Demo
+.method santhosh/${ant.project.name}Demo/main ([Ljava/lang/String;)V

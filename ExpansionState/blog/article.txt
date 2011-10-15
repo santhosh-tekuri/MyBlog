@@ -1,0 +1,59 @@
+There are many use-cases in which retaining the expansion state of JTree improves the usability. I will introduce you to one such use case.
+
+We have a JTree in which user can move the tree nodes from one place to another using drag-n-drop. When a non-leaf node is moved from one place to another, it looses its expansion state. It is very irritating from user point of view and becomes a usability issue. Today I will introduce a trick that can be used to store the expansion state and retain it later when required.
+[code]
+// @author santhosh kumar T - santhosh@in.fiorano.com
+public class TreeUtil{
+
+    // is path1 descendant of path2
+    public static boolean isDescendant(TreePath path1, TreePath path2){
+        int count1 = path1.getPathCount();
+        int count2 = path2.getPathCount();
+        if(count1<=count2)
+            return false;
+        while(count1!=count2){
+            path1 = path1.getParentPath();
+            count1--;
+        }
+        return path1.equals(path2);
+    }
+
+    public static String getExpansionState(JTree tree, int row){
+        TreePath rowPath = tree.getPathForRow(row);
+        StringBuffer buf = new StringBuffer();
+        int rowCount = tree.getRowCount();
+        for(int i=row; i<rowCount; i++){
+            TreePath path = tree.getPathForRow(i);
+            if(i==row || isDescendant(path, rowPath)){
+                if(tree.isExpanded(path))
+                    buf.append(","+String.valueOf(i-row));
+            }else
+                break;
+        }
+        return buf.toString();
+    }
+
+    public static void restoreExpanstionState(JTree tree, int row, String expansionState){
+        StringTokenizer stok = new StringTokenizer(expansionState, ",");
+        while(stok.hasMoreTokens()){
+            int token = row + Integer.parseInt(stok.nextToken());
+            tree.expandRow(token);
+        }
+    }
+}
+[/code]
+getExpanstionState(...) returns the current expansion state of the given row, and restoreExpansionState(....) restores the expansion state of a row from specified status.
+
+ExpansionState of a row is the list of descendant rows that are expanded. Note that here is row is counted from the row for which expansion state is calculated.
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/expansionState.gif" width="212" height="276">
+
+For example in the above screen shot the expansion state of the selected node is 0, 2
+
+during drag-n-drop, get the expansion state of the dragged node before moving and restore the expansion state after drop.
+
+In the webstart demo, you can unselect the checkbox, to see how loosing expansion state irritates user.
+
+<a href="http://www.jroller.com/resources/s/santhosh/ExpansionState.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your comments are appreciated.

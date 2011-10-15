@@ -1,0 +1,57 @@
+<html>
+<body>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/IncrementalSearchCombo.gif" width="346" height="210"><br>
+&nbsp;</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ComboFindAction </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> ListModelFindAction{ 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> changed(JComponent comp, String searchString, Position.Bias bias){ 
+        JComboBox combo = (JComboBox)comp; 
+        </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> startingFromSelection = </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> max = combo.getModel().getSize(); 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> increment = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(bias!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+            increment = (bias == Position.Bias.Forward) ? </font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000"> : -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> startingRow = (combo.getSelectedIndex() + increment + max) % max; 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000"> (startingRow &lt; </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000"> || startingRow &gt;= combo.getModel().getSize()) { 
+            startingFromSelection = </font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">; 
+            startingRow = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> index = getNextMatch(combo.getModel(), searchString, startingRow, bias); 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000"> (index != -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">) { 
+            combo.setSelectedIndex(index); 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+        } </font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000"> (startingFromSelection) { 
+            index = getNextMatch(combo.getModel(), searchString, </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">, bias); 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000"> (index != -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">) { 
+                combo.setSelectedIndex(index); 
+                </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+            } 
+        } 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> ComboFindAction().install(comboBox);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/IncrementalSearch.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

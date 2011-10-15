@@ -1,0 +1,390 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">This is my first post which is not related to 
+Swing.</font></p>
+<p><font size="2" face="Verdana">There are many articles explaining about how to 
+implement Visitor Pattern in Java. Some of them are:</font></p>
+<ol>
+  <li><font face="Verdana">
+  <a href="http://www.javaspecialists.co.za/archive/Issue040.html">
+  <font size="2">Visiting your Collection's Elements</font></a><font size="2"> - 
+  from Java Specialists</font></font></li>
+  <li><font face="Verdana">
+  <a href="http://www.javaworld.com/javaworld/javatips/jw-javatip98.html">
+  <font size="2">Reflect on the Visitor design pattern</font></a><font size="2"> 
+  - from JavaWorld</font></font></li>
+</ol>
+<p><font size="2" face="Verdana">All of the above, follow more or less follow 
+the same approach <b>&quot;heavy use reflection&quot;</b>. and they are non scalable in 
+productive environment.</font></p>
+<p><font size="2" face="Verdana">Let us see how I approached this.</font></p>
+<p><font size="2" face="Verdana">let us say I have following classes:</font></p>
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="24%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> A{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> B </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> A{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> C </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> B{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> D </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> B{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> E </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> A{...}</font></pre>
+    </td>
+    <td width="76%">
+    <img border="0" src="http://www.jroller.com/resources/s/santhosh/classes.gif" width="165" height="120"></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The Visitor interface is as shown below:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>interface</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj); 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">&nbsp;My initial implementation of Visitor was 
+like this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyVisitor1 </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> E) 
+            visit((E)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> C) 
+            visit((C)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> D) 
+            visit((D)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> B) 
+            visit((B)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> A) 
+            visit((A)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalArgumentException(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(A a){ 
+        ... 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(B b){ 
+        ... 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(C c){ 
+        ... 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(D d){ 
+        .... 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(E e){ 
+        ... 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">in the above code,</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">There is visit method for each class type, 
+  which accepts that class as argument.</font></li>
+  <li><font size="2" face="Verdana">The private visit method is called only if 
+  the object is exactly instance of that the class<br>
+  i.e, visit(A) is called only for instances of class A, but not for class B, C, 
+  D or E</font></li>
+  <li><font size="2" face="Verdana">the public visit(Object) method checks for 
+  the object type and calls the corresponding private visit(...) method.</font></li>
+  <li><font size="2" face="Verdana">note that if conditions are written in depth 
+  first search of the inherence tree. i.e, C and D must be checked before B</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">DrawBacks:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">The order of IF conditions is more 
+  important. Let us say B is checked before C and D. what will happen??<br>
+  visit(C) and visit(D) are never called. If you are using a clever IDE, it can 
+  report such mistakes.</font></li>
+  <li><font size="2" face="Verdana">Thus this approach is more error prone.</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">Next approach to remove this drawback:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyVisitor2 </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> A) 
+            visit((A)obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalArgumentException(); 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(A a){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(a </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> B) 
+            visit((B)a); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(a </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> E) 
+            visit((E)a); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            .... 
+        } 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(B b){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(b </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> C) 
+            visit((C)b); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(b </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> D) 
+            visit((D)b); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            ..... 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(C c){ 
+        ... 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(D d){ 
+        .... 
+    } 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(E e){ 
+        ..... 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">This is more cleaner than previous but still, 
+one should have a look at inherence tree of classes while coding this class.</font></p>
+<p><b><font size="2" face="Verdana">Now the actual implementation starts. </font>
+</b></p>
+<p><font size="2" face="Verdana">First thing is instead of having private 
+visit(...) method create separate classes for each of them.</font></p>
+<p><font size="2" face="Verdana">Here we are modifying MyVisitor1:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> AVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> BVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> DVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{...} 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> EVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{...} 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyVisitor3 </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Map visitors = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> HashMap(); 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000">{ 
+        visitors.put(A.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AVisitor()); 
+        visitors.put(B.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BVisitor()); 
+        visitors.put(C.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CVisitor()); 
+        visitors.put(D.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DVisitor()); 
+        visitors.put(E.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> EVisitor()); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> E) 
+            ((Visitor)visitors.get(E.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">)).visit(obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> C) 
+            ((Visitor)visitors.get(C.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">)).visit(obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> D) 
+            ((Visitor)visitors.get(D.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">)).visit(obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> B) 
+            ((Visitor)visitors.get(B.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">)).visit(obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> A) 
+            ((Visitor)visitors.get(A.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">)).visit(obj); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalArgumentException(); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana"><font size="2">Now it seems little better. The only ugly 
+part left here is </font><b><font size="2">&quot;jungle of IF conditions&quot; :)</font></b></font></p>
+<p><font size="2" face="Verdana">How do I avoid these IF conditions. Now we go 
+one step ahead in our implementation:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber6">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Class classes[] = {  
+        E.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, 
+        C.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, 
+        D.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, 
+        B.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">,  
+        A.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> 
+    }; 
+     
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;classes.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(classes[i].isInstance(obj)){ 
+                ((Visitor)visitors.get(classes[i])).visit(obj); 
+                </font><b><font style="font-family: monospaced;" color="#000080">return;</font></b><font style="font-family: monospaced;" color="#000000">
+</font><font style="font-family: monospaced;" color="#000000">            } 
+</font><font style="font-family: monospaced;" color="#000000">        } 
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">So IF conditions are gone. You just list the 
+classes in the array, in the same order in which it have to be checked.</font></p>
+<p><font size="2" face="Verdana">If we think further, is it possible to compute 
+the classes array, given the list of classes.</font></p>
+<p><font size="2" face="Verdana">i,e. How do find the order of classes if I have 
+given set of classes A, B, C, D and E.</font></p>
+<p><font size="2" face="Verdana">Idea.... Sorting and Comparators :)</font></p>
+<p><font size="2" face="Verdana">we can say that a subclass is less than any of 
+its super classes. We can write a simple comparator for this. But there are lot 
+more .</font></p>
+<p><font size="2" face="Verdana">compare(Vector.class, File.class) ---&gt; what is 
+the result ???</font></p>
+<p><font size="2" face="Verdana">here Vector and File are no way related to each 
+other???. It doesn't matter which comes first after sorting for our visitor 
+pattern.</font></p>
+<p><font size="2" face="Verdana">compare(Collection.class, Vector.class) ----&gt; 
+what is the result???</font></p>
+<p><font size="2" face="Verdana">we can't say which is less?? but 99% case we 
+want use VectorVisitor rather than CollectionVisitor for an object of type 
+Vector. Why ???</font></p>
+<p><font size="2" face="Verdana">let us say the VectorVisitor might take 
+adavtange of RandomAccess interface and might want to use methods that are 
+specific to Vector such as trimSize etc.</font></p>
+<p><font size="2" face="Verdana">Here is that Comparator implementation:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber7">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.util.*; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * Comparator that can compare classes. 
+ * A Class is greater than its superClasses. 
+ * 
+ * Note: this comparator must be used only 
+ * with insertion sort 
+ * 
+ * </i><b>@author</b><i> Santhosh Kumar T - santhosh@in.fiorano.com 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ClassComparator </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Comparator{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> subclassLess, interfaceLess; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+     * Creates a new Class Comparator with given options 
+     * </i><b>@param</b><i> subclassLess    true -&gt; subclass &lt; superclass 
+     * </i><b>@param</b><i> interfaceLess   true -&gt; interface &lt; class 
+     */</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ClassComparator(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> subclassLess, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> interfaceLess){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.subclassLess = subclassLess ? +</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> : -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.interfaceLess = interfaceLess ? +</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> : -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> compare(Object o1, Object o2){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(o1==o2) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        Class class1 = (Class)o1; 
+        Class class2 = (Class)o2; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> interface1 = class1.isInterface(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> interface2 = class2.isInterface(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(interface1 ^ interface2)   </font><font style="font-family: monospaced;" color="#808080"><i>// one of them is interface</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> (interface1 ? -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> : +</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> ) * interfaceLess; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ </font><font style="font-family: monospaced;" color="#808080"><i>// both of them are either interfaces or classes</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSuperClass = class1.isAssignableFrom(class2); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSubClass = class2.isAssignableFrom(class1); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isSuperClass || isSubClass) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> (isSubClass ? -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> : +</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) * subclassLess; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> subclassLess; </font><font style="font-family: monospaced;" color="#808080"><i>// trick</i></font><font style="font-family: monospaced;" color="#000000"> 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana"><b>Note: </b>This comparator works only with 
+insertion sort.</font></p>
+<p><font size="2" face="Verdana">Now we create a generic and reusable visitor 
+using the above comparator:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber8">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> AllInOneVisitor </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Visitor{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Map map = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> HashMap(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> ArrayList classes = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ArrayList(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Comparator cmp = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> AllInOneVisitor(Comparator classComparator){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.cmp = classComparator; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> AllInOneVisitor(){ 
+        cmp = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ClassComparator(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addVisitor(Class clazz, Visitor visitor){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(map.put(clazz, visitor)!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;classes.size(); i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> result = cmp.compare(clazz, classes.get(i)); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(result==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(result&lt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">){ 
+                classes.add(i, clazz); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+        classes.add(clazz); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> visit(Object obj){ 
+        Iterator iter = classes.iterator(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(iter.hasNext()){ 
+            Class clazz = (Class)iter.next(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(clazz.isInstance(obj)){ 
+                ((Visitor)map.get(clazz)).visit(obj); 
+                </font><b><font style="font-family: monospaced;" color="#000080">return;
+</font></b><font style="font-family: monospaced;" color="#000000">            }</font><font style="font-family: monospaced;" color="#000000">
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> IllegalArgumentException(); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">How do I use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber9">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        AllInOneVisitor visitor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AllInOneVisitor(); 
+        visitor.addVisitor(A.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AVisitor()); 
+        visitor.addVisitor(B.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BVisitor()); 
+        visitor.addVisitor(C.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CVisitor()); 
+        visitor.addVisitor(D.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DVisitor()); 
+        visitor.addVisitor(E.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> EVisitor()); 
+         
+        visitor.visit(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> C()); 
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">Advantages over other implementations:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">Object Oriented</font></li>
+  <li><font size="2" face="Verdana">More Scalable (Almost no reflection except 
+  in comparator), You can create an AllInOneVisitor just once for a set of 
+  visitors, and use it as many times as you want. If you use one of the other 
+  solutions of JavaSpecialists or JavaWorld, let us say say there are 10000 
+  elements in a collection which needs to be visited, it does 10000 method calls 
+  using reflection which is no longer scalable.</font></li>
+</ul>
+<p><font size="2" face="Verdana">I hope you enjoyed this post, in the same way 
+as you enjoy with my swing posts.</font></p>
+<p><font size="2" face="Verdana">Your comments are most welcome.</font></p>
+
+</body>
+</html>

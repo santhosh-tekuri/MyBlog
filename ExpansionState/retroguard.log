@@ -1,0 +1,75 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Thu Jul 28 03:46:18 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           ExpansionState.jar
+# Target Jar file for obfuscated code: ExpansionState_obfsucated.jar
+# RetroGuard Script file used:         retroguard.txt
+#
+#
+# WARNING - Methods are called which may unavoidably break in obfuscated
+# version at runtime. Please review your source code to ensure that these
+# methods are not intended to act on classes within the obfuscated Jar file.
+#      Your class santhosh/ExpansionStateDemo uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/ObjectFlavor uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/TreeTransferHandler uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#
+# Memory in use after class data structure built: 312392 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 10 times	(62%)
+#  'if'   	used 2 times	(12%)
+#  'c'   	used 1 times	(6%)
+#  'd'   	used 1 times	(6%)
+#  'b'   	used 1 times	(6%)
+#  'do'   	used 1 times	(6%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (2%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/ExpansionStateDemo
+.method santhosh/ExpansionStateDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/TreeUtil a
+.method_map santhosh/TreeUtil/getExpansionState (Ljavax/swing/JTree;I)Ljava/lang/String; a
+.method_map santhosh/TreeUtil/isDescendant (Ljavax/swing/tree/TreePath;Ljavax/swing/tree/TreePath;)Z a
+.method_map santhosh/TreeUtil/restoreExpanstionState (Ljavax/swing/JTree;ILjava/lang/String;)V a
+.class_map santhosh/ObjectFlavor b
+.field_map santhosh/ObjectFlavor/class$java$lang$Object class$java$lang$Object
+.field_map santhosh/ObjectFlavor/representationClass a
+.method_map santhosh/ObjectFlavor/equals (Ljava/awt/datatransfer/DataFlavor;)Z equals
+.method_map santhosh/ObjectFlavor/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.class_map santhosh/ExpansionStateDemo$1 1
+.field_map santhosh/ExpansionStateDemo$1/val$tree val$tree
+.method_map santhosh/ExpansionStateDemo$1/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.field_map santhosh/ExpansionStateDemo/id a
+.method_map santhosh/ExpansionStateDemo/createNode (I)Ljavax/swing/tree/DefaultMutableTreeNode; a
+.method_map santhosh/ExpansionStateDemo/applyDNDHack (Ljavax/swing/JTree;)V a
+.class_map santhosh/ObjectTransferable c
+.field_map santhosh/ObjectTransferable/flavor a
+.field_map santhosh/ObjectTransferable/obj if
+.method_map santhosh/ObjectTransferable/getTransferDataFlavors ()[Ljava/awt/datatransfer/DataFlavor; getTransferDataFlavors
+.method_map santhosh/ObjectTransferable/isDataFlavorSupported (Ljava/awt/datatransfer/DataFlavor;)Z isDataFlavorSupported
+.method_map santhosh/ObjectTransferable/getTransferData (Ljava/awt/datatransfer/DataFlavor;)Ljava/lang/Object; getTransferData
+.class_map santhosh/TreeTransferHandler d
+.field_map santhosh/TreeTransferHandler/t a
+.field_map santhosh/TreeTransferHandler/retainExpansionState if
+.field_map santhosh/TreeTransferHandler/class$javax$swing$tree$DefaultMutableTreeNode class$javax$swing$tree$DefaultMutableTreeNode
+.field_map santhosh/TreeTransferHandler/expansionState do
+.method_map santhosh/TreeTransferHandler/canImport (Ljavax/swing/JComponent;[Ljava/awt/datatransfer/DataFlavor;)Z canImport
+.method_map santhosh/TreeTransferHandler/createTransferable (Ljavax/swing/JComponent;)Ljava/awt/datatransfer/Transferable; createTransferable
+.method_map santhosh/TreeTransferHandler/getSourceActions (Ljavax/swing/JComponent;)I getSourceActions
+.method_map santhosh/TreeTransferHandler/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.method_map santhosh/TreeTransferHandler/importData (Ljavax/swing/JComponent;Ljava/awt/datatransfer/Transferable;)Z importData

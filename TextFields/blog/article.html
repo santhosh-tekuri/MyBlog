@@ -1,0 +1,221 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">In Windows, it is very common to show context 
+menu (with cut, copy, paste etc) on textfields, textareas. I don't know about 
+other operating systems. So any windows user using a swing application expects a 
+popup menu on right click of text components.</font></p>
+<p><font size="2" face="Verdana">When I am in doubt whether this application is 
+swing or not, what I do is find any textfield and right click. if no popup 
+appears then I conclude it as swing application.</font></p>
+<p><b><font size="2" face="Verdana">How do I provide context menu for text 
+components ?</font></b></p>
+<p><font face="Verdana"><b><font size="2">Solution1:</font></b><font size="2"> 
+Create a subclass for each text component (JTextField, JPasswordField etc) and 
+implement the logic inside these subclasses.<br>
+<b>Solution2:</b> Create a mouse listener which does the work of showing popup 
+and add this to all text components of your applications.</font></font></p>
+<p><b><font size="2" face="Verdana">Each of the above solutions have their own 
+drawbacks:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">Changing the complete swing application to 
+  use our subclass is a tedious job</font></li>
+  <li><font size="2" face="Verdana">If we use mouse listener, then it is also 
+  tedious job to ensure that this mouse listener is registered to all text 
+  components of you application</font></li>
+  <li><font size="2" face="Verdana">There is no way to make this work for text 
+  components that are not created by the user code such as JTextField in 
+  JOptionPane.showInputDialog(...) or JFileChooser dialog.</font></li>
+  <li><font size="2" face="Verdana">If the applications tries to show its own 
+  popup menu for a text component we will run into problems</font></li>
+</ul>
+<p><font face="Verdana"><b><font size="2">I found a very clean solution for this 
+problem:</font></b><font size="2"> We install our implmentation of EventQueue.</font></font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> MyEventQueue </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> EventQueue{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> dispatchEvent(AWTEvent event){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>super</b></font><font style="font-family: monospaced" color="#000000">.dispatchEvent(event); 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// interested only in mouseevents</i></font><font style="font-family: monospaced" color="#000000"> 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!(event </font><font style="font-family: monospaced" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced" color="#000000"> MouseEvent)) 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000">; 
+ 
+        MouseEvent me = (MouseEvent)event; 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// interested only in popuptriggers</i></font><font style="font-family: monospaced" color="#000000"> 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!me.isPopupTrigger()) 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// me.getComponent(...) retunrs the heavy weight component on which event occured</i></font><font style="font-family: monospaced" color="#000000"> 
+        Component comp = SwingUtilities.getDeepestComponentAt(me.getComponent(), me.getX(), me.getY()); 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// interested only in textcomponents</i></font><font style="font-family: monospaced" color="#000000"> 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!(comp </font><font style="font-family: monospaced" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced" color="#000000"> JTextComponent)) 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// no popup shown by user code</i></font><font style="font-family: monospaced" color="#000000"> 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(MenuSelectionManager.defaultManager().getSelectedPath().length&gt;</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">) 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// create popup menu and show</i></font><font style="font-family: monospaced" color="#000000"> 
+        JTextComponent tc = (JTextComponent)comp; 
+        JPopupMenu menu = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JPopupMenu(); 
+        menu.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> CutAction(tc)); 
+        menu.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> CopyAction(tc)); 
+        menu.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> PasteAction(tc)); 
+        menu.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> DeleteAction(tc)); 
+        menu.addSeparator(); 
+        menu.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> SelectAllAction(tc)); 
+        
+        Point pt = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), tc);
+        menu.show(tc, pt.x, pt.y);
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above class is self-explanatory with 
+comments.</font></p>
+<p><font face="Verdana" size="2">The implementation of the actions is here:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CutAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    JTextComponent comp; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CutAction(JTextComponent comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Cut&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        comp.cut(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> comp.isEditable() 
+                &amp;&amp; comp.isEnabled() 
+                &amp;&amp; comp.getSelectedText()!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> PasteAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    JTextComponent comp; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> PasteAction(JTextComponent comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Paste&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        comp.paste(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (comp.isEditable() &amp;&amp; comp.isEnabled()){ 
+            Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> contents.isDataFlavorSupported(DataFlavor.stringFlavor); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> DeleteAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    JTextComponent comp; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> DeleteAction(JTextComponent comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Delete&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        comp.replaceSelection(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> comp.isEditable() 
+                &amp;&amp; comp.isEnabled() 
+                &amp;&amp; comp.getSelectedText()!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CopyAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    JTextComponent comp; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CopyAction(JTextComponent comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Copy&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        comp.copy(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> comp.isEnabled() 
+                &amp;&amp; comp.getSelectedText()!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> SelectAllAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    JTextComponent comp; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> SelectAllAction(JTextComponent comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Select All&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        comp.selectAll(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> comp.isEnabled() 
+                &amp;&amp; comp.getText().length()&gt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MyEventQueue()); 
+        
+        .....
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">just a single line in the beginning of your 
+application's main method. So simple.</font></p>
+<p><font size="2" face="Verdana">I created a webstart demo to show it in action:</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/TextFields1.gif" width="445" height="142"></font></p>
+<p><font size="2" face="Verdana">There are two textfields in this demo. Second 
+textfield shows a popupmenu in one of its mouse listener</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/TextFields2.gif" width="445" height="142"></font></p>
+<p><font size="2" face="Verdana">When click the button [JOptionPane], it shows a 
+input message dialog which again contains a textfield, which is not created the 
+demo.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/TextFields3.gif" width="445" height="164"></font></p>
+<p><font size="2" face="Verdana">Thus, this approach is very simple to use, and 
+works perfectly, even if the application has its own popup menu on mouse click.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/TextFields.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

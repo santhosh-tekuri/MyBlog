@@ -1,0 +1,72 @@
+In the previous post:<a href="http://www.javalobby.org/java/forums/t19448.html">Globally Context Sensitive Actions</a>, we learned how to wrap an action in GloballyContextSensitiveAction to make it globally context aware.
+
+If you have read the source of GloballyContextSensitiveAction carefully, you will notice that it introduces memory leak into swing applications. Don't worry, If you are not able to find where the memory leak is. I will explain:
+
+GloballyContextSensitiveAction adds a propertyChangeListener to keyboardFocusManager in its constructor to listen for focus changes. But this listener is never unregistered. When all the components (such as JButton, JMenuItem) using this action are garbage collected, we want this action also to be garbage collected. But this won't happen. Because it is always reachable from keyboardFocusManager using its listener list.
+
+In order to avoid this memory leak, we should unregister the propertyChangeListener when this action is no longer reachable by any component. But how do you determine when this action is no longer used by any component. The action is unaware of the components which are using it. It seems to be difficult to avoid this memory leak.
+
+In such cases, weak listeners can be used to solve this memory leak. Here is the source code of a weak property change listener:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class WeakPropertyChangeListener implements PropertyChangeListener{ 
+    WeakReference listenerRef; 
+    Object src; 
+ 
+    public WeakPropertyChangeListener(PropertyChangeListener listener, Object src){ 
+        listenerRef = new WeakReference(listener); 
+        this.src = src; 
+    } 
+ 
+    public void propertyChange(PropertyChangeEvent evt){ 
+        PropertyChangeListener listener = (PropertyChangeListener)listenerRef.get(); 
+        if(listener==null){ 
+            removeListener(); 
+        }else 
+            listener.propertyChange(evt); 
+    } 
+ 
+    private void removeListener(){ 
+        try{ 
+            Method method = src.getClass().getMethod("removePropertyChangeListener" 
+                    , new Class[] {PropertyChangeListener.class}); 
+            method.invoke(src, new Object[]{ this }); 
+        } catch(Exception e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+}
+[/code]
+<b>How to use this:</b>
+[code]
+KeyboardFocusManager focusManager = 
+   KeyboardFocusManager.getCurrentKeyboardFocusManager(); 
+ 
+// instead of registering direclty use weak listener 
+// focusManager.addPropertyChangeListener(focusOwnerListener); 
+ 
+focusManager.addPropertyChangeListener( 
+    new WeakPropertyChangeListener(focusOwnerListener, focusManager));
+[/code]
+<b>How does this work:</b>
+
+Instead of registering propertyChangeListener directly to keyboardFocusManager, we wrap it inside WeakPropertyChangeListener and register this weak listener to keyboardFocusManager. This weak listener acts a delegate. 
+It receives the propertyChangeEvents from keyboardFocusManager and delegates it the wrapped listener.
+
+The interesting part of this weak listener, it hold a weakReference to the original propertyChangeListener. so this delegate is eligible for garbage collection which it is no longer reachable via references. When it gets garbage 
+collection, the weakReference will be pointing to null. On next propertyChangeEvent notification from keyboardFocusManager, it find that the weakReference is pointing to null, and unregisters itself from 
+keyboardFocusManager. Thus the weak listener will also become eligible for garbage collection in next gc cycle.
+
+This concept is not something new. If you have a habit of looking into swing sources, you will find that AbstractButton actually adds a weak listener to its action. The weak listener class used for this is : 
+javax.swing.AbstractActionPropertyChangeListener; This class is package-private, so you don't find it in javadoc.
+
+The full-fledged, generic implementation of weak listeners is available in Netbeans OpenAPI: <a href="http://www.netbeans.org/unbranded-source/browse/*checkout*/openide/util/src/org/openide/util/WeakListeners.java?rev=HEAD&content-type=text/plain">WeakListeners.java</a>. It is worth to have a look at it.
+
+
+Enjoy!
+Santhosh Kumar T 
+Contributing Editor
+santhosh@javalobby.org
+santhosh@in.fiorano.com
+http://www.jroller.com/page/santhosh
+http://www.fiorano.com

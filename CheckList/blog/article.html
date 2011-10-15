@@ -1,0 +1,129 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">We wrap the given ListCellRenderer to add 
+CheckBox. This allows you to reuse existing renderers.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font><font style="font-family: monospaced;" color="#000080"><b>
+public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckListCellRenderer </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JPanel </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ListCellRenderer{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> ListCellRenderer delegate; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> ListSelectionModel selectionModel; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox checkBox = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckListCellRenderer(ListCellRenderer renderer, ListSelectionModel selectionModel){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.delegate = renderer; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.selectionModel = selectionModel; 
+        setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+        setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        checkBox.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Component getListCellRendererComponent(JList list, Object value, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelected, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> cellHasFocus){ 
+        Component renderer = delegate.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); 
+        checkBox.setSelected(selectionModel.isSelectedIndex(index)); 
+        removeAll(); 
+        add(checkBox, BorderLayout.WEST); 
+        add(renderer, BorderLayout.CENTER); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">We use DefaultListCellRenderer to store 
+checkSelection. This allows us to listen for changes in check selection very 
+easily.<br>
+<br>
+Now here is the controller class which is responsible of interpreting mouse 
+events.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a>
+</i></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckListManager </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ListSelectionListener, ActionListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> ListSelectionModel selectionModel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultListSelectionModel(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JList list = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JList(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hotspot = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox().getPreferredSize().width; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckListManager(JList list){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.list = list; 
+        list.setCellRenderer(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckListCellRenderer(list.getCellRenderer(), selectionModel)); 
+        list.registerKeyboardAction(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">), JComponent.WHEN_FOCUSED); 
+        list.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        selectionModel.addListSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ListSelectionModel getSelectionModel(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> selectionModel; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> toggleSelection(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(index&lt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectionModel.isSelectedIndex(index)) 
+            selectionModel.removeSelectionInterval(index, index); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            selectionModel.addSelectionInterval(index, index); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ MouseListener ]-------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent me){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index = list.locationToIndex(me.getPoint()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(index&lt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(me.getX()&gt;list.getCellBounds(index, index).x+hotspot) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        toggleSelection(index); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-----------------------------[ ListSelectionListener ]---------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> valueChanged(ListSelectionEvent e){ 
+        list.repaint(list.getCellBounds(e.getFirstIndex(), e.getLastIndex())); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-----------------------------[ ActionListener ]------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        toggleSelection(list.getSelectedIndex()); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<ul>
+  <li><font size="2" face="Verdana">implements MouseListener to trap mouse click 
+  inside checkbox and toggle selection</font></li>
+  <li><font size="2" face="Verdana">implements ListSelectionListener to update 
+  JList when check selection gets changes</font></li>
+  <li><font size="2" face="Verdana">implements ActionListener to toggle check 
+  selection of selected item when SPACE is pressed.</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">How to use this:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#808080"><i>// make your JList as check list</i></font><font style="font-family: monospaced;" color="#000000"> 
+ CheckListManager checkListManager = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckListManager(yourList); 
+ 
+ </font><font style="font-family: monospaced;" color="#808080"><i>// to get checked items</i></font><font style="font-family: monospaced;" color="#000000"> 
+ checkListManager.getSelectionModel().isSelectedIndex(index);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">So your can convert JList with any model and 
+renderer to CheckList <b>with just one line</b>.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/CheckList.gif" width="142" height="160"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/CheckList.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are welcome.</font></p>
+
+</body>
+
+</html>

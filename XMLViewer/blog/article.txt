@@ -1,0 +1,771 @@
+<b>Which is best suitable swing component to view XML (other than JTextArea)?</b>
+
+The answer is JTree. XML actually has a tree structure. It contains elements, attributes, text. Element can contain attributes, elements and text.
+
+First we need to create a object model before we do anything. We will use DOM (Document Object Model). I guess most of the developers how to parse xml and create a document object. Below is the code which builds the document from xml:
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class DOMUtil{ 
+    public static Document createDocument(InputSource is) throws Exception{ 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
+        DocumentBuilder builder = factory.newDocumentBuilder(); 
+        return builder.parse(is); 
+    } 
+}  
+[/code]
+
+<b>What is InputSource ?</b>
+<br>
+InputSource is the class which acts as source of XML entity. You can create InputSource from File or InputStream or Reader.
+<br><br>
+<b>How to display Document Object in JTree ?</b>
+<br>
+JTree requres a TreeModel and we have Document Object. So we need to somehow create TreeModel from DocumentObject. Most of the swing programmers has a false impression that TreeModel requires TreeNodes. If you give this task to some swing programmers, I bet that most of programmers will do the following:<br><br>
+          Thy traverse the given Document recursively, and create DefaultMustableTreeNode for each dom node. and finally create a DefaultMutableTreeModel with root node.
+<br><br>
+Our approach will be different here: <b>we don't populate the model. we simply implement the model.</b>
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class XMLTreeModel implements TreeModel{ 
+    private Node node; 
+ 
+    public XMLTreeModel(InputSource is,) throws Exception{ 
+        this(DOMUtil.createDocument(is).getDocumentElement()); 
+    } 
+ 
+    public XMLTreeModel(Node node){ 
+        this.node = node; 
+    } 
+ 
+    public Object getRoot(){ 
+        return node; 
+    } 
+ 
+    public Object getChild(Object parent, int index){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        if(index<attrCount) 
+            return attrs.item(index); 
+        NodeList children = node.getChildNodes(); 
+        return children.item(index - attrCount); 
+    } 
+ 
+    public int getChildCount(Object parent){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        NodeList children = node.getChildNodes(); 
+        int childCount = children!=null ? children.getLength() : 0; 
+        return attrCount + childCount; 
+    } 
+ 
+    public boolean isLeaf(Object node){ 
+        return getChildCount(node)==0; 
+    } 
+ 
+    public int getIndexOfChild(Object parent, Object child){ 
+        Node node = (Node)parent; 
+        Node childNode = (Node)child; 
+ 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        if(childNode.getNodeType()==Node.ATTRIBUTE_NODE){ 
+            for(int i=0; i<attrCount; i++){ 
+                if(attrs.item(i)==child) 
+                    return i; 
+            } 
+        }else{ 
+            NodeList children = node.getChildNodes(); 
+            int childCount = children!=null ? children.getLength() : 0; 
+            for(int i=0; i<childCount; i++){ 
+                if(children.item(i)==child) 
+                    return attrCount + i; 
+            } 
+        } 
+        throw new RuntimeException("this should never happen!"); 
+    } 
+ 
+    public void addTreeModelListener(TreeModelListener listener){ 
+        // not editable 
+    } 
+ 
+    public void removeTreeModelListener(TreeModelListener listener){ 
+        // not editable 
+    } 
+ 
+    public void valueForPathChanged(TreePath path, Object newValue){ 
+        // not editable 
+    } 
+}
+[/code]
+<br>
+The base interface of all DOM classes is Node. XMLTreeModel takes the node in the constructor which is the root of the tree. You can get the children of Node with getChildNodes() method. In our tree, we want to treat both attributes and sub-elements as children of a node. But DOM treats them as two different lists. Also note that we assumed that TreeModel is not editable. And the above code almost self-explanatory.
+<br><br>
+Now this is time to test our model. I wrote a webstart demo which can be used to test this with different xml input:
+<br><br>
+<img src="http://www.jroller.com/resources/s/santhosh/XMLEditorTab1.gif" border="0" height="371" width="413">&nbsp;&nbsp;&nbsp;
+<img src="http://www.jroller.com/resources/s/santhosh/XMLTreeTab1.gif" border="0" height="369" width="410">
+<br><br>
+The demo contains two tabs. In Editor Tab, you either type or copy-paste xml from file. when you switch to Tree Tab, it parses the xml, builds the document object and displayed in JTree.
+<br><br>
+You can try with the following xml or your own xml:
+<br><br>
+[xml]
+<?xml version="1.0"?> 
+
+<note from="Santhosh" to="JRoller"> 
+  <heading>Reminder</heading> 
+  <body>Don't forget me this weekend</body> 
+</note>
+[/xml]
+<br><br>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer1.jnlp">
+<font face="Verdana" size="2">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></font></a></p>
+<p>
+
+Let us add life into above JTree by implementing a TreeCellRenderer:
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class XMLTreeCellRenderer extends DefaultTreeCellRenderer{ 
+    Color elementColor = new Color(0, 0, 128); 
+    Color attributeColor = new Color(0, 128, 0); 
+ 
+    public XMLTreeCellRenderer(){ 
+        setOpenIcon(null); 
+        setClosedIcon(null); 
+        setLeafIcon(null); 
+    } 
+ 
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus){ 
+        Node node = (Node)value; 
+        switch(node.getNodeType()){ 
+            case Node.ELEMENT_NODE: 
+                value = '<'+node.getNodeName()+'>'; 
+                break; 
+            case Node.ATTRIBUTE_NODE: 
+                value = '@'+node.getNodeName(); 
+                break; 
+            case Node.TEXT_NODE: 
+                value = node.getNodeValue(); 
+                break; 
+            case Node.COMMENT_NODE: 
+                value = "<!--"+node.getNodeValue()+"-->"; 
+                break; 
+            case Node.DOCUMENT_TYPE_NODE: 
+                DocumentType dtype = (DocumentType)node; 
+                value = "<"+"!DOCTYPE " + dtype.getName() + '>'; 
+                break; 
+            default: 
+                value = node.getNodeName(); 
+        } 
+        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus); 
+        if(!selected){ 
+            switch(node.getNodeType()){ 
+                case Node.ELEMENT_NODE: 
+                    setForeground(elementColor); 
+                    break; 
+                case Node.ATTRIBUTE_NODE: 
+                    setForeground(attributeColor); 
+                    break; 
+            } 
+        } 
+        return this; 
+    } 
+} 
+[/code]
+I don't want to mess the tree with icons, so all icons are set to null in the constructor. I used syntax highlighting for nodes: element with blue and attribute with green.
+<br><br>
+<p>
+<img src="http://www.jroller.com/resources/s/santhosh/WhiteSpaces.gif" border="0" height="309" width="332"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer2.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a>
+<br><br>
+In the above screenshot, you will find that there are some empty nodes also getting displayed. It means the Document Object build actually contains some text nodes with just white space. This is the white space used to indent the xml. These whitespaces actually makes the JTree look larger and ugly. Users won't be mutch intersted in whitespace. If they are interesed in whitespace then they prefer source view rather than JTree, because in JTree they can't count the whitespace. So to make JTree look better, we don't want to show the nodes with just whitespace.
+<br><br>
+<b>How to remove the Text nodes with just whitespace in Document Object ?</b>
+<br>
+one simple solution is travel the document object, and remove any text elements containing whitespace from their parent. One question came into my mind. Why create such text nodes and then remove later.
+<br><br>
+<b>Is it not possible to instruct the parser not to create such text nodes in DOM ?</b>
+<br>
+I was looking to DOM API, and my eyes suddenly stopped at the following method:
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/parsers/DocumentBuilderFactory.html#setIgnoringElementContentWhitespace%28boolean%29">DocumentBuilderFactory.setIgnoringElementContentWhitespace(boolean ignore)</a>
+<br><br>
+I also found another interesting method:
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/parsers/DocumentBuilderFactory.html#setCoalescing%28boolean%29">DocumentBuilderFactory.setCoalscing(boolean coalscing)</a>
+<br><br>
+<b>What does Coelscing mean ?</b>
+<br>
+The XML parser is free create any number Text/CDATA nodes for a single text content of an element. i.e, It can break the text content into multiple dom nodes. This features instructs to convert CDATA nodes to Text nodes and append it to the adjacent (if any) text node. By default the value of this is set to false.
+<br><br>
+So I modified the method in DOMUtil as follows:
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class DOMUtil{ 
+    public static Document createDocument(InputSource is) throws Exception{ 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
+        factory.setIgnoringElementContentWhitespace(true); 
+        factory.setCoalescing(true); 
+        DocumentBuilder builder = factory.newDocumentBuilder(); 
+        return builder.parse(is); 
+    } 
+} 
+[/code]
+<br>
+This is the webstart demo after this change.
+<br><br>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer3.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a></p>
+
+When I tried the above previously mentioned xml, It still shows the whitespace. What the HELL ? Damn, it is not working. I started googling to find the reason, why this instruction doesn't work ? and I got the answer:
+<br><br>
+          The whitespace in xml is treated as ignorable if and only if either its DTD or schema says that.
+<br><br>
+So, let us try with the xml which contains the DTD:   
+<br><br>       
+[xml]
+<?xml version="1.0"?> 
+<!DOCTYPE note [ 
+  <!ELEMENT note (heading,body)> 
+  <!ATTLIST note from CDATA #REQUIRED> 
+  <!ATTLIST note to CDATA #REQUIRED> 
+  <!ELEMENT to      (#PCDATA)> 
+  <!ELEMENT from    (#PCDATA)> 
+  <!ELEMENT heading (#PCDATA)> 
+  <!ELEMENT body    (#PCDATA)> 
+]> 
+<note from="Santhosh" to="JRoller"> 
+  <heading>Reminder</heading> 
+  <body>Don't forget me this weekend</body> 
+</note>
+[/xml]
+<br><br>
+It worked. Does it mean, there is no way to instruct the parser to ignore the whitespace altogether ?
+<br><br>
+Then, XMLFilters came into my mind.
+<br><br>
+<b>What is XMLFilter and what they are useful for ?</b>
+<br><br>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/org/xml/sax/XMLFilter.html">XMLFilter</a> is a part of SAX API. It 
+allows you modify the sax events before delivering them to the application.
+<br><br>
+It looks interseting. Why don't we give a try ?
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class XMLTrimFilter extends XMLFilterImpl{ 
+ 
+    private CharArrayWriter contents = new CharArrayWriter(); 
+ 
+    public XMLTrimFilter(XMLReader parent){ 
+        super(parent); 
+    } 
+ 
+    public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException{ 
+        writeContents(); 
+        super.startElement(uri, localName, qName, atts); 
+    } 
+ 
+    public void characters(char ch[], int start, int length){ 
+        contents.write(ch, start, length); 
+    } 
+ 
+    public void endElement(String uri, String localName, String qName) throws SAXException{ 
+        writeContents(); 
+        super.endElement(uri, localName, qName); 
+    } 
+ 
+    public void ignorableWhitespace(char ch[], int start, int length){} 
+ 
+    private void writeContents() throws SAXException{ 
+        char ch[] = contents.toCharArray(); 
+        if(!isWhiteSpace(ch)) 
+            super.characters(ch, 0, ch.length); 
+        contents.reset(); 
+    } 
+ 
+    private boolean isWhiteSpace(char ch[]){ 
+        for(int i = 0; i<ch.length; i++){ 
+            if(!Character.isWhitespace(ch[i])) 
+                return false; 
+        } 
+        return true; 
+    } 
+} 
+[/code]
+
+XMLFilter is an interface. By luck there exists a class <a href="http://java.sun.com/j2se/1.4.2/docs/api/org/xml/sax/helpers/XMLFilterImpl.html">XMLFilterImpl</a> which makes the job of implementing XMLFilter easier. XMLFilterImpl does all the dirty work of passing on sax events to the application. Now we can override some of its methods and don't call super method, then that event will not be passed to the application.
+<br><br>
+We have overridden the characters(...) method and collect all the text content into a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/io/CharArrayWriter.html">CharArrayWriter</a>. Before any startElement/endElement, we test whether the textcontent collected so for is non-whitespace, if so we generate character(..) event. Note that we need to ignoreWhitespace(...) method and do-nothing, because ignorable whitespaces may be reported by this method rather than characters, according to API Spec.
+<br><br>
+<b>How do we create Document Object from SAX events ?</b>
+<br>
+We have created XMLTrimFilter which is based on SAX. But what we want to build is a document object. We should somehow use this XMLTrimFilter in building doucment object. But DOM API has no API, to build document object from SAX events. The solution is TRAX (Transformation API for XML).
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class DOMUtil{ 
+    public static Document createDocument(InputSource is) throws Exception{ 
+        SAXParserFactory saxFactory = SAXParserFactory.newInstance(); 
+        SAXParser parser = saxFactory.newSAXParser(); 
+        XMLReader reader = new XMLTrimFilter(parser.getXMLReader()); 
+ 
+        TransformerFactory factory = TransformerFactory.newInstance(); 
+        Transformer transformer = factory.newTransformer(); 
+        transformer.setOutputProperty(OutputKeys.INDENT, "no"); 
+        DOMResult result = new DOMResult(); 
+        transformer.transform(new SAXSource(reader, is), result); 
+        return (Document)result.getNode(); 
+    } 
+} 
+[/code]
+<b>NOTE:</b>
+<br>
+here we instructed the transformer not to try indenting XML. Otherwize, whatever we have removed in our filter, they will again come into picture :) But I guess by default transformers don't try to indent xml. But let it be there, to be on safer side.
+<br><br>
+This is the webstart demo after this change.
+<p>
+<img src="http://www.jroller.com/resources/s/santhosh/TrimmedXMLTree.gif" border="0" height="252" width="321">
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer4.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a></p>
+
+If you clearly observe the last webstart demo, you will notice that there is still place to enhance further. The content of attributes and elements is shown as its child. It makes the tree litter bigger and not easy to browse. If the content is somehow shown to the right of its owner (attribute or element), it looks better.
+<br><br>
+This can be easily achieved by using TreeTable. On googling, I found the following implementation of TreeTable:
+<ol>
+  <li><a href="https://swingx.dev.java.net/">SwingX</a></li>
+  <li><a href="http://java.sun.com/products/jfc/tsc/articles/bookmarks/">Sun's Article</a></li>
+</ol>
+The first choice is ruled out as it requires JDK 1.5. We go with Sun's article.
+<br><br>
+<b>Note:</b>
+<br>
+It doesn't mean not to use SwingX. The reason why I ruled out this is, I don't want my webstart demoes require jdk 1.5 and download swingx to run demo. But still you can do whatever we are doing here with JXTreeTable without code changes, as JXTreeTable is actually evolved from this article. (correct me if I am wrong).
+<br><br>
+First create model for JTreeTable. remember the quote:  <b>we don't populate the model. we simply implement the model.</b>
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class XMLTreeTableModel implements TreeTableModel{ 
+    private Node node; 
+ 
+    public XMLTreeTableModel(InputSource is) throws Exception{ 
+        this(DOMUtil.createDocument(is).getDocumentElement()); 
+    } 
+ 
+    public XMLTreeTableModel(Node node){ 
+        this.node = node; 
+    } 
+ 
+    public Object getRoot(){ 
+        return node; 
+    } 
+ 
+    public Object getChild(Object parent, int index){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        if(index<attrCount) 
+            return attrs.item(index); 
+        NodeList children = node.getChildNodes(); 
+        return children.item(index - attrCount); 
+    } 
+ 
+    public int getChildCount(Object parent){ 
+        Node node = (Node)parent; 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        NodeList children = node.getChildNodes(); 
+        int childCount = children!=null ? children.getLength() : 0; 
+        if(childCount==1 && children.item(0).getNodeType()==Node.TEXT_NODE) 
+            return attrCount; 
+        else 
+            return attrCount + childCount; 
+    } 
+ 
+    public boolean isLeaf(Object node){ 
+        return getChildCount(node)==0; 
+    } 
+ 
+    public int getIndexOfChild(Object parent, Object child){ 
+        Node node = (Node)parent; 
+        Node childNode = (Node)child; 
+ 
+        NamedNodeMap attrs = node.getAttributes(); 
+        int attrCount = attrs!=null ? attrs.getLength() : 0; 
+        if(childNode.getNodeType()==Node.ATTRIBUTE_NODE){ 
+            for(int i=0; i<attrCount; i++){ 
+                if(attrs.item(i)==child) 
+                    return i; 
+            } 
+        }else{ 
+            NodeList children = node.getChildNodes(); 
+            int childCount = children!=null ? children.getLength() : 0; 
+            for(int i=0; i<childCount; i++){ 
+                if(children.item(i)==child) 
+                    return attrCount + i; 
+            } 
+        } 
+        throw new RuntimeException("this should never happen!"); 
+    } 
+ 
+    public void addTreeModelListener(TreeModelListener listener){ 
+        // not editable 
+    } 
+ 
+    public void removeTreeModelListener(TreeModelListener listener){ 
+        // not editable 
+    } 
+ 
+    public void valueForPathChanged(TreePath path, Object newValue){ 
+        // not editable 
+    } 
+ 
+    public int getColumnCount(){ 
+        return 2; 
+    } 
+ 
+    public String getColumnName(int column){ 
+        return column==0 ? "Node" : "Value"; 
+    } 
+ 
+    public Class getColumnClass(int column){ 
+        return column==0 ? TreeTableModel.class : String.class; 
+    } 
+ 
+    public Object getValueAt(Object node, int column){ 
+        if(column==0) 
+            return node; 
+        else{ 
+            Node n = (Node)node; 
+            if(n.getNodeType()==Node.ELEMENT_NODE){ 
+                NodeList children = n.getChildNodes(); 
+                int childCount = children!=null ? children.getLength() : 0; 
+                if(childCount==1 && children.item(0).getNodeType()==Node.TEXT_NODE) 
+                    return children.item(0).getNodeValue(); 
+            } 
+            return n.getNodeValue(); 
+        } 
+    } 
+ 
+    public boolean isCellEditable(Object node, int column){ 
+        return false; 
+    } 
+ 
+    public void setValueAt(Object aValue, Object node, int column){ 
+        // not editable 
+    } 
+}
+[/code]
+
+This class is actually implemented by implementing some more methods into the class XMLTreeModel which was developed earlier. Ofcourse class signature is changed.
+<br><br>
+You might have noticed that, getChildCount(node) is little bit modified to make a dom node with just text node as leaf. And some special care is taken in implementing getValueAt(node, column).
+<br><br>
+There are some issues in JTreeTable from Sun's Article. To fix them, I subclassed it:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class MyTreeTable extends JTreeTable{ 
+ 
+    public MyTreeTable(TreeTableModel treeTableModel){ 
+        super(treeTableModel); 
+        setShowGrid(true); 
+        setGridColor(new Color(234, 234, 234)); 
+ 
+        setIntercellSpacing(new Dimension(1, 1)); 
+    } 
+ 
+    public boolean editCellAt(int row, int column, EventObject e){ 
+        if(e instanceof MouseEvent){ 
+            MouseEvent me = (MouseEvent)e; 
+            // If the modifiers are not 0 (or the left mouse button), 
+            // tree may try and toggle the selection, and table 
+            // will then try and toggle, resulting in the 
+            // selection remaining the same. To avoid this, we 
+            // only dispatch when the modifiers are 0 (or the left mouse 
+            // button). 
+            if(me.getModifiers()==0 || 
+                    me.getModifiers()==InputEvent.BUTTON1_MASK){ 
+                for(int counter = getColumnCount()-1; counter>= 0; 
+                    counter--){ 
+                    if(getColumnClass(counter)==TreeTableModel.class){ 
+                        MouseEvent newME = new MouseEvent 
+                                (tree, me.getID(), 
+                                        me.getWhen(), me.getModifiers(), 
+                                        me.getX()-getCellRect(0, counter, true).x, 
+                                        me.getY(), me.getClickCount(), 
+                                        me.isPopupTrigger()); 
+                        tree.dispatchEvent(newME); 
+                        break; 
+                    } 
+                } 
+            } 
+            return false; 
+        } 
+        return super.editCellAt(row, column, e); 
+    } 
+}
+[/code]
+Now it is time to test this.
+<br><br>
+<img src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable5.gif" border="0" height="308" width="469"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer5.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a>
+<br><br>
+The gray area below the treetable is giving its contribution in making the look ugly. This gray area is actually the scrollpane's viewport. 
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class MyTreeTable extends JTreeTable{ 
+ 
+    .....
+
+    // overriden to make the height of scroll match viewpost height if smaller 
+    public boolean getScrollableTracksViewportHeight() { 
+        return getPreferredSize().height < getParent().getHeight(); 
+    } 
+}
+[/code]
+Now let us have a look at the updated demo:
+<br><br>
+<p>
+<img src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable6.gif" border="0" height="306" width="467"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer6.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a>
+<br><br>
+Now it seems, I the table header is removed, it will look more better. Removing table header is very simple:
+     treeTable.setTableHeader(null);
+<br><br>
+But removing table header, introduces another problem. User won't be able to resize the columns any more.
+
+JTable already allows resizing columns of course using JTableHeader. Why not steal that code :)
+[code]
+/** 
+ * Allows table columns to be resized not only using the header but from any 
+ * rows. Based on the BasicTableHeaderUI.MouseInputHandler code. 
+ * 
+ * @author Santhosh Kumar T - santhosh@in.fiorano.com 
+ */ 
+public class TableColumnResizer extends MouseInputAdapter{ 
+    public static Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR); 
+ 
+    private int mouseXOffset; 
+    private Cursor otherCursor = resizeCursor; 
+ 
+    private JTable table; 
+ 
+    public TableColumnResizer(JTable table){ 
+        this.table = table; 
+        table.addMouseListener(this); 
+        table.addMouseMotionListener(this); 
+    } 
+ 
+    private boolean canResize(TableColumn column){ 
+        return column != null 
+                && table.getTableHeader().getResizingAllowed() 
+                && column.getResizable(); 
+    } 
+ 
+    private TableColumn getResizingColumn(Point p){ 
+        return getResizingColumn(p, table.columnAtPoint(p)); 
+    } 
+ 
+    private TableColumn getResizingColumn(Point p, int column){ 
+        if(column == -1){ 
+            return null; 
+        } 
+        int row = table.rowAtPoint(p); 
+        if(row==-1) 
+            return null; 
+        Rectangle r = table.getCellRect(row, column, true); 
+        r.grow( -3, 0); 
+        if(r.contains(p)) 
+            return null; 
+ 
+        int midPoint = r.x + r.width / 2; 
+        int columnIndex; 
+        if(table.getTableHeader().getComponentOrientation().isLeftToRight()) 
+            columnIndex = (p.x < midPoint) ? column - 1 : column; 
+        else 
+            columnIndex = (p.x < midPoint) ? column : column - 1; 
+ 
+        if(columnIndex == -1) 
+            return null; 
+        return table.getTableHeader().getColumnModel().getColumn(columnIndex); 
+    } 
+ 
+    public void mousePressed(MouseEvent e){ 
+        table.getTableHeader().setDraggedColumn(null); 
+        table.getTableHeader().setResizingColumn(null); 
+        table.getTableHeader().setDraggedDistance(0); 
+ 
+        Point p = e.getPoint(); 
+ 
+        // First find which header cell was hit 
+        int index = table.columnAtPoint(p); 
+        if(index==-1) 
+            return; 
+ 
+        // The last 3 pixels + 3 pixels of next column are for resizing 
+        TableColumn resizingColumn = getResizingColumn(p, index); 
+        if(!canResize(resizingColumn)) 
+            return; 
+ 
+        table.getTableHeader().setResizingColumn(resizingColumn); 
+        if(table.getTableHeader().getComponentOrientation().isLeftToRight()) 
+            mouseXOffset = p.x - resizingColumn.getWidth(); 
+        else 
+            mouseXOffset = p.x + resizingColumn.getWidth(); 
+    } 
+ 
+    private void swapCursor(){ 
+        Cursor tmp = table.getCursor(); 
+        table.setCursor(otherCursor); 
+        otherCursor = tmp; 
+    } 
+ 
+    public void mouseMoved(MouseEvent e){ 
+        if(canResize(getResizingColumn(e.getPoint())) 
+           != (table.getCursor() == resizeCursor)){ 
+            swapCursor(); 
+        } 
+    } 
+ 
+    public void mouseDragged(MouseEvent e){ 
+        int mouseX = e.getX(); 
+ 
+        TableColumn resizingColumn = table.getTableHeader().getResizingColumn(); 
+ 
+        boolean headerLeftToRight = 
+                table.getTableHeader().getComponentOrientation().isLeftToRight(); 
+ 
+        if(resizingColumn != null){ 
+            int oldWidth = resizingColumn.getWidth(); 
+            int newWidth; 
+            if(headerLeftToRight){ 
+                newWidth = mouseX - mouseXOffset; 
+            } else{ 
+                newWidth = mouseXOffset - mouseX; 
+            } 
+            resizingColumn.setWidth(newWidth); 
+ 
+            Container container; 
+            if((table.getTableHeader().getParent() == null) 
+               || ((container = table.getTableHeader().getParent().getParent()) == null) 
+                                || !(container instanceof JScrollPane)){ 
+                return; 
+            } 
+ 
+            if(!container.getComponentOrientation().isLeftToRight() 
+               && !headerLeftToRight){ 
+                if(table != null){ 
+                    JViewport viewport = ((JScrollPane)container).getViewport(); 
+                    int viewportWidth = viewport.getWidth(); 
+                    int diff = newWidth - oldWidth; 
+                    int newHeaderWidth = table.getWidth() + diff; 
+ 
+                    /* Resize a table */ 
+                    Dimension tableSize = table.getSize(); 
+                    tableSize.width += diff; 
+                    table.setSize(tableSize); 
+ 
+                    /* 
+                     * If this table is in AUTO_RESIZE_OFF mode and has a horizontal 
+                     * scrollbar, we need to update a view's position. 
+                     */ 
+                    if((newHeaderWidth >= viewportWidth) 
+                       && (table.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF)){ 
+                        Point p = viewport.getViewPosition(); 
+                        p.x = 
+                                Math.max(0, Math.min(newHeaderWidth - viewportWidth, p.x + diff)); 
+                        viewport.setViewPosition(p); 
+ 
+                        /* Update the original X offset value. */ 
+                        mouseXOffset += diff; 
+                    } 
+                } 
+            } 
+        } 
+    } 
+ 
+    public void mouseReleased(MouseEvent e){ 
+        table.getTableHeader().setResizingColumn(null); 
+        table.getTableHeader().setDraggedColumn(null); 
+    } 
+} 
+[/code]
+But there is one problem. When mouse is pressed in JTable, JTable selects the row/column at mouse. We some how put off this, if the mouse press was intended for resizing. I added selection listener to JTable and put a breakpoint in my valueChanged(...) and find out where that selection is changed and how can I put off.
+<br></br>
+MyTreeTable is modified to use TableColumnResizer as follows:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class MyTreeTable extends JTreeTable{ 
+ 
+    public MyTreeTable(TreeTableModel treeTableModel){ 
+        .....
+        new TableColumnResizer(this); 
+    } 
+ 
+    ....
+ 
+    // mouse press intended for resize shouldn't change row/col/cell celection 
+    public void changeSelection(int row, int column, boolean toggle, boolean extend) { 
+        if(getCursor()==TableColumnResizer.resizeCursor) 
+            return; 
+        super.changeSelection(row, column, toggle, extend); 
+    } 
+} 
+[/code]
+Note that you can't do:
+    treeTable.setTableHeader(null);
+<br><br>
+because TableColumnResizer assumes that TableHeader is not null. There are to solutions for this:
+<ol>
+  <li>override configureEnclosedScrollPane() and do nothing</li>
+  <li>use a special subclass of JScrollPane to add MyTreeTable:<br>
+[code]
+    JScrollPane scroll = new JScrollPane(){ 
+        public void setColumnHeaderView(Component view){ 
+        } 
+    };
+[/code]  
+  </li>
+</ol>
+Now here is the final webstart demo:
+<br><br>
+<p><font face="Verdana" size="2">
+<img src="http://www.jroller.com/resources/s/santhosh/XMLTreeTable7.gif" border="0" height="372" width="554"></font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLViewer7.jnlp">
+<img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" border="0" height="20" width="115"></a>
+<br><br>
+If you have sincerely followed this article, who should have learned:
+<br><br>
+<ol>
+  <li>Don't populate the model, instead implement </li>
+  <li>How to create DOM Document.</li>
+  <li>How to configure the DOM Builder</li>
+  <li>How to use XMLFilter to modify events on the fly</li>
+  <li>How to create DOM from SAX Events</li>
+  <li>How to remove ugly gray area of viewport</li>
+  <li>How to make columns resizable without table header</li>
+  <li>and lot more...</li>
+</ol>
+<br><br>
+<b>Your Comments are appreciated.</b>
+<br><br><br>
+Enjoy!
+<br>
+Santhosh Kumar T 
+<br>
+Contributing Editor
+<br>
+santhosh@javalobby.org
+<br>
+santhosh@in.fiorano.com
+<br>
+http://www.jroller.com/page/santhosh
+<br>
+http://www.fiorano.com
+<br>

@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  <title>Sorting Table with Summary Row</title>
+</head>
+
+
+<body>
+
+JTable whose last row shows the sum of the data in other columns is
+called summary row. For example see the following screenshots, in which
+the summary row is rendered with yellow background.<br>
+
+<br>
+
+<img style="width: 250px; height: 250px;" alt="" src="http://jroller.com/santhosh/resource/summarytableascending.png"> &nbsp; &nbsp; &nbsp; &nbsp; <img alt="" src="http://jroller.com/santhosh/resource/summarytabledescending.png"><br>
+
+<br>
+
+Here I want to use the Table Sorting API which is introduced in JDK6. When <a href="http://java.sun.com/javase/6/docs/api/javax/swing/table/TableRowSorter.html">TableRowSorter</a>
+is used with above tables, it sorts the summary row also. Because of
+this summary row becomes the first row when sorted in descening order.<br>
+
+<br>
+
+In this post, I am trying to customize the&nbsp;Table Sorting API, so
+that summary row always stays as last row, irrespective of the data and
+sorting type applied.<br>
+
+<br>
+
+We can set a customized implemntation of comparator using
+&nbsp;setComparator(column, comparator). But the problem is we don't
+know whether the data passed to comparator is from summary column or
+not. This is because in above scenario our data is Integer. i.e even
+summary row contains Integers. So the problems can be solved if we
+somehow know the rows being comared within our comparator.<br>
+
+<br>
+
+I added a breakpoint in my comparator found and found that it is being called from following method:<br>
+
+&nbsp; &nbsp; &nbsp; DefaultRowSorter.compare(int model1, int model2);<br>
+
+<br>
+
+Here model1 and model2 are actually the row indexes being compared; I
+can simply overwrite this and expose the row indexes being comparted as
+getter methods. Oops... this method is private. I went through the
+sorting implentation classes and at last found a simple hook <a href="http://java.sun.com/javase/6/docs/api/javax/swing/DefaultRowSorter.ModelWrapper.html">DefaultRowSorter.ModelWrapper</a>.<br>
+
+<br>
+
+The default row sorter implementation doesn't query the table data from
+the table directly, It uses ModelWrapper interface for this purpose. We
+will provide our own implemantion of ModelWrapper using:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<a href="http://java.sun.com/javase/6/docs/api/javax/swing/DefaultRowSorter.html#setModelWrapper%28javax.swing.DefaultRowSorter.ModelWrapper%29">DefaultRowSorter.setModelWrapper(modelWrapper)</a><br>
+
+<br>
+
+In our implemtation of ModelWrapper, we make our implentation of <a href="http://java.sun.com/javase/6/docs/api/javax/swing/DefaultRowSorter.ModelWrapper.html#getValueAt%28int,%20int%29">getValueAt(row, column)</a>
+return a wrapper object over the actual value which also holds the row
+and column. Let us say the wrapper class is TableCellValue, which has
+three fields named row, column and value. Now our comparator will get
+objects of type TableCellValue. So we can tune our comparator
+implementation to ensure that summary row always remains as last row.<br>
+
+<br>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td>
+      
+      <pre><span class="s1"><a name="l9"><span class="ln">9    </span></a></span><span class="s2">/** <br><a name="l10"><span class="ln">10   </span></a> * MySwing: Advanced Swing Utilites <br><a name="l11"><span class="ln">11   </span></a> * Copyright (C) 2005  Santhosh Kumar T <br><a name="l12"><span class="ln">12   </span></a> * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> <br><a name="l13"><span class="ln">13   </span></a> * This library is free software; you can redistribute it and/or <br><a name="l14"><span class="ln">14   </span></a> * modify it under the terms of the GNU Lesser General Public <br><a name="l15"><span class="ln">15   </span></a> * License as published by the Free Software Foundation; either <br><a name="l16"><span class="ln">16   </span></a> * version 2.1 of the License, or (at your option) any later version. <br><a name="l17"><span class="ln">17   </span></a> * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> <br><a name="l18"><span class="ln">18   </span></a> * This library is distributed in the hope that it will be useful, <br><a name="l19"><span class="ln">19   </span></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of <br><a name="l20"><span class="ln">20   </span></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU <br><a name="l21"><span class="ln">21   </span></a> * Lesser General Public License for more details. <br><a name="l22"><span class="ln">22   </span></a> */</span><span class="s1"> <br><a name="l23"><span class="ln">23   </span></a></span><span class="s0">public class </span><span class="s1">SummaryTableSorter &lt;M </span><span class="s0">extends </span><span class="s1">TableModel&gt; </span><span class="s0">extends </span><span class="s1">TableRowSorter&lt;M&gt;{ <br><a name="l24"><span class="ln">24   </span></a>    </span><span class="s0">public </span><span class="s1">SummaryTableSorter(M model){ <br><a name="l25"><span class="ln">25   </span></a>        </span><span class="s0">super</span><span class="s1">(model); <br><a name="l26"><span class="ln">26   </span></a>    } <br><a name="l27"><span class="ln">27   </span></a> <br><a name="l28"><span class="ln">28   </span></a>    </span><span class="s2">// overridden to use SummaryModelWrapper</span><span class="s1"> <br><a name="l29"><span class="ln">29   </span></a>    </span><span class="s0">public void </span><span class="s1">setModel(M model){ <br><a name="l30"><span class="ln">30   </span></a>        </span><span class="s0">super</span><span class="s1">.setModel(model); <br><a name="l31"><span class="ln">31   </span></a>        setModelWrapper(</span><span class="s0">new </span><span class="s1">SummaryModelWrapper&lt;M&gt;(getModelWrapper())); <br><a name="l32"><span class="ln">32   </span></a>    } <br><a name="l33"><span class="ln">33   </span></a> <br><a name="l34"><span class="ln">34   </span></a>    </span><span class="s2">// overridden to use TableCellValueComparator always</span><span class="s1"> <br><a name="l35"><span class="ln">35   </span></a>    </span><span class="s0">protected boolean </span><span class="s1">useToString(</span><span class="s0">int </span><span class="s1">column){ <br><a name="l36"><span class="ln">36   </span></a>        </span><span class="s0">return false</span><span class="s1">; <br><a name="l37"><span class="ln">37   </span></a>    } <br><a name="l38"><span class="ln">38   </span></a> <br><a name="l39"><span class="ln">39   </span></a>    </span><span class="s2">// overridden to returns TableCellValueComparator</span><span class="s1"> <br><a name="l40"><span class="ln">40   </span></a>    </span><span class="s0">public </span><span class="s1">Comparator&lt;?&gt; getComparator(</span><span class="s0">int </span><span class="s1">column){ <br><a name="l41"><span class="ln">41   </span></a>        Comparator comparator = </span><span class="s0">super</span><span class="s1">.getComparator(column); <br><a name="l42"><span class="ln">42   </span></a>        </span><span class="s0">if</span><span class="s1">(comparator </span><span class="s0">instanceof </span><span class="s1">Collator) <br><a name="l43"><span class="ln">43   </span></a>            comparator = </span><span class="s0">null</span><span class="s1">; <br><a name="l44"><span class="ln">44   </span></a>        </span><span class="s0">return new </span><span class="s1">TableCellValueComparator(comparator); <br><a name="l45"><span class="ln">45   </span></a>    } <br><a name="l46"><span class="ln">46   </span></a> <br><a name="l47"><span class="ln">47   </span></a>    </span><span class="s0">class </span><span class="s1">SummaryModelWrapper&lt;M </span><span class="s0">extends </span><span class="s1">TableModel&gt; </span><span class="s0">extends </span><span class="s1">DefaultRowSorter.ModelWrapper&lt;M, Integer&gt; { <br><a name="l48"><span class="ln">48   </span></a>        </span><span class="s0">private </span><span class="s1">DefaultRowSorter.ModelWrapper&lt;M, Integer&gt; delegate; <br><a name="l49"><span class="ln">49   </span></a> <br><a name="l50"><span class="ln">50   </span></a>        </span><span class="s0">public </span><span class="s1">SummaryModelWrapper(DefaultRowSorter.ModelWrapper&lt;M, Integer&gt; delegate) { <br><a name="l51"><span class="ln">51   </span></a>            </span><span class="s0">this</span><span class="s1">.delegate = delegate; <br><a name="l52"><span class="ln">52   </span></a>        } <br><a name="l53"><span class="ln">53   </span></a> <br><a name="l54"><span class="ln">54   </span></a>        </span><span class="s0">public </span><span class="s1">M getModel() { <br><a name="l55"><span class="ln">55   </span></a>            </span><span class="s0">return </span><span class="s1">delegate.getModel(); <br><a name="l56"><span class="ln">56   </span></a>        } <br><a name="l57"><span class="ln">57   </span></a> <br><a name="l58"><span class="ln">58   </span></a>        </span><span class="s0">public int </span><span class="s1">getColumnCount() { <br><a name="l59"><span class="ln">59   </span></a>            </span><span class="s0">return </span><span class="s1">delegate.getColumnCount(); <br><a name="l60"><span class="ln">60   </span></a>        } <br><a name="l61"><span class="ln">61   </span></a> <br><a name="l62"><span class="ln">62   </span></a>        </span><span class="s0">public int </span><span class="s1">getRowCount() { <br><a name="l63"><span class="ln">63   </span></a>            </span><span class="s0">return </span><span class="s1">delegate.getRowCount(); <br><a name="l64"><span class="ln">64   </span></a>        } <br><a name="l65"><span class="ln">65   </span></a> <br><a name="l66"><span class="ln">66   </span></a>        </span><span class="s0">public </span><span class="s1">String getStringValueAt(</span><span class="s0">int </span><span class="s1">row, </span><span class="s0">int </span><span class="s1">column) { <br><a name="l67"><span class="ln">67   </span></a>            </span><span class="s0">return </span><span class="s1">delegate.getStringValueAt(row, column); <br><a name="l68"><span class="ln">68   </span></a>        } <br><a name="l69"><span class="ln">69   </span></a> <br><a name="l70"><span class="ln">70   </span></a>        </span><span class="s2">// returns TableCellValue instances always</span><span class="s1"> <br><a name="l71"><span class="ln">71   </span></a>        </span><span class="s0">public </span><span class="s1">Object getValueAt(</span><span class="s0">int </span><span class="s1">row, </span><span class="s0">int </span><span class="s1">column){ <br><a name="l72"><span class="ln">72   </span></a>            </span><span class="s0">return new </span><span class="s1">TableCellValue( row, column, delegate.getValueAt(row, column)); <br><a name="l73"><span class="ln">73   </span></a>        } <br><a name="l74"><span class="ln">74   </span></a> <br><a name="l75"><span class="ln">75   </span></a>        </span><span class="s0">public </span><span class="s1">Integer getIdentifier(</span><span class="s0">int </span><span class="s1">row) { <br><a name="l76"><span class="ln">76   </span></a>            </span><span class="s0">return </span><span class="s1">delegate.getIdentifier(row); <br><a name="l77"><span class="ln">77   </span></a>        } <br><a name="l78"><span class="ln">78   </span></a>    } <br><a name="l79"><span class="ln">79   </span></a> <br><a name="l80"><span class="ln">80   </span></a>    </span><span class="s0">class </span><span class="s1">TableCellValue{ <br><a name="l81"><span class="ln">81   </span></a>        </span><span class="s0">public int </span><span class="s1">row; <br><a name="l82"><span class="ln">82   </span></a>        </span><span class="s0">public int </span><span class="s1">column; <br><a name="l83"><span class="ln">83   </span></a>        </span><span class="s0">public </span><span class="s1">Object value; <br><a name="l84"><span class="ln">84   </span></a> <br><a name="l85"><span class="ln">85   </span></a>        </span><span class="s0">public </span><span class="s1">TableCellValue(</span><span class="s0">int </span><span class="s1">row, </span><span class="s0">int </span><span class="s1">column, Object value) { <br><a name="l86"><span class="ln">86   </span></a>            </span><span class="s0">this</span><span class="s1">.row = row; <br><a name="l87"><span class="ln">87   </span></a>            </span><span class="s0">this</span><span class="s1">.column = column; <br><a name="l88"><span class="ln">88   </span></a>            </span><span class="s0">this</span><span class="s1">.value = value; <br><a name="l89"><span class="ln">89   </span></a>        } <br><a name="l90"><span class="ln">90   </span></a>    } <br><a name="l91"><span class="ln">91   </span></a> <br><a name="l92"><span class="ln">92   </span></a>    </span><span class="s0">class </span><span class="s1">TableCellValueComparator </span><span class="s0">implements </span><span class="s1">Comparator&lt;TableCellValue&gt;{ <br><a name="l93"><span class="ln">93   </span></a>        </span><span class="s0">private </span><span class="s1">Comparator delegate; <br><a name="l94"><span class="ln">94   </span></a>        </span><span class="s0">public </span><span class="s1">TableCellValueComparator(Comparator delegate) { <br><a name="l95"><span class="ln">95   </span></a>            </span><span class="s0">this</span><span class="s1">.delegate = delegate; <br><a name="l96"><span class="ln">96   </span></a>        } <br><a name="l97"><span class="ln">97   </span></a> <br><a name="l98"><span class="ln">98   </span></a>        @SuppressWarnings(</span><span class="s4">"unchecked"</span><span class="s1">) <br><a name="l99"><span class="ln">99   </span></a>        </span><span class="s0">public int </span><span class="s1">compare(TableCellValue cell1, TableCellValue cell2) { <br><a name="l100"><span class="ln">100  </span></a>            SortOrder order = SortOrder.ASCENDING; <br><a name="l101"><span class="ln">101  </span></a>            </span><span class="s0">for</span><span class="s1">(SortKey sortKey: getSortKeys()){ <br><a name="l102"><span class="ln">102  </span></a>                </span><span class="s0">if</span><span class="s1">(sortKey.getColumn()==cell1.column){ <br><a name="l103"><span class="ln">103  </span></a>                    order = sortKey.getSortOrder(); <br><a name="l104"><span class="ln">104  </span></a>                    </span><span class="s0">break</span><span class="s1">; <br><a name="l105"><span class="ln">105  </span></a>                } <br><a name="l106"><span class="ln">106  </span></a>            } <br><a name="l107"><span class="ln">107  </span></a>            </span><span class="s0">int </span><span class="s1">modifier = order==SortOrder.ASCENDING ? </span><span class="s5">1 </span><span class="s1">: -</span><span class="s5">1</span><span class="s1">; <br><a name="l108"><span class="ln">108  </span></a>            </span><span class="s0">if</span><span class="s1">(cell1.row == getModelWrapper().getRowCount()-</span><span class="s5">1</span><span class="s1">) <br><a name="l109"><span class="ln">109  </span></a>                </span><span class="s0">return </span><span class="s1">modifier; <br><a name="l110"><span class="ln">110  </span></a>            </span><span class="s0">else if</span><span class="s1">(cell2.row == getModelWrapper().getRowCount()-</span><span class="s5">1</span><span class="s1">) <br><a name="l111"><span class="ln">111  </span></a>                </span><span class="s0">return </span><span class="s1">-modifier; <br><a name="l112"><span class="ln">112  </span></a>            </span><span class="s0">else</span><span class="s1">{ <br><a name="l113"><span class="ln">113  </span></a>                </span><span class="s0">if</span><span class="s1">(delegate!=</span><span class="s0">null</span><span class="s1">) <br><a name="l114"><span class="ln">114  </span></a>                    </span><span class="s0">return </span><span class="s1">delegate.compare(cell1.value, cell2.value); <br><a name="l115"><span class="ln">115  </span></a>                </span><span class="s0">else</span><span class="s1">{ <br><a name="l116"><span class="ln">116  </span></a>                    String v1 = getModelWrapper().getStringValueAt(cell1.row, cell1.column); <br><a name="l117"><span class="ln">117  </span></a>                    String v2 = getModelWrapper().getStringValueAt(cell2.row, cell2.column); <br><a name="l118"><span class="ln">118  </span></a>                    </span><span class="s0">if</span><span class="s1">(v1==</span><span class="s0">null</span><span class="s1">) <br><a name="l119"><span class="ln">119  </span></a>                        </span><span class="s0">return </span><span class="s1">v2==</span><span class="s0">null </span><span class="s1">? </span><span class="s5">0 </span><span class="s1">: -</span><span class="s5">1</span><span class="s1">; <br><a name="l120"><span class="ln">120  </span></a>                    </span><span class="s0">else</span><span class="s1"> <br><a name="l121"><span class="ln">121  </span></a>                        </span><span class="s0">return </span><span class="s1">v2==</span><span class="s0">null </span><span class="s1">? </span><span class="s5">1 </span><span class="s1">: v1.compareTo(v2); <br><a name="l122"><span class="ln">122  </span></a>                } <br><a name="l123"><span class="ln">123  </span></a>            } <br><a name="l124"><span class="ln">124  </span></a>        } <br><a name="l125"><span class="ln">125  </span></a>    } <br><a name="l126"><span class="ln">126  </span></a>} <br><a name="l127"><span class="ln">127  </span></a></span></pre>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+80-90:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;This is the
+class TableCellValue used to wrap the table cell data along with the
+row and column indexes.<br>
+
+<br>
+
+92-124:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;This is a
+comparator implemenation which can compare the objects of type
+TableCellValue.<br>
+
+<br>
+
+94-96:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; The constructor
+takes another comparator named delegate. This is the comparator that
+user would like to use. This will be null, if user hasn't set any
+comparator for sorting table rows.<br>
+
+<br>
+
+100-106:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;finds the sort type currently used ascending/descending.<br>
+
+<br>
+
+107-111:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Here we
+see whether any TableCellValue belongs to the summary row. if so, to
+make sure that it always remains as last row <br>
+
+we return appropriate values 1 or -1.<br>
+
+<br>
+
+113-122:<br>
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; we come here,
+if none of the values passed to comparator belongs to summary row. Here
+if we have delegate set, we use it, otherwize we simply do string
+comparison. Note that we have to use ModelWrapper to get string value
+from the table data.<br>
+<br>
+40-45:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; we always
+return TableCellValueComparator which delgates to the original
+comparator appropriately. This method never returns null in our
+implementation.<br>
+<br>
+35-36:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;This is
+overwritten so that, we aways use comparator even if no comparators
+were set by user. The default implementation uses default string
+convertion for comparing values in such case. We take care of this
+situation in TableCellValueComparator when delegate is null.<br>
+<br>
+29-32:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;here we
+overwrite the defalult ModelWrapper with our implemnation of
+ModelWrapper.<br>
+<br>
+The webstart demo requires JDK6.<br>
+
+<br>
+
+<a href="http://jroller.com/santhosh/resource/SummaryTableSorting.jnlp"><img style="border: 0px solid ; width: 88px; height: 23px;" alt="" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg"></a><br>
+
+<br>
+
+</body>
+</html>

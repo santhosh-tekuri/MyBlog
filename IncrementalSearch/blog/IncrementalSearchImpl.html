@@ -1,0 +1,225 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">This is the framework, using which I 
+implemented Incremental Search to any Swing Component. This framework consists 
+of just a single Action class.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">13   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> FindAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> DocumentListener, KeyListener{ 
+<font style="font-style: normal;" color="#000000">14   </font>    JPanel searchPanel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FlowLayout(FlowLayout.LEFT, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">15   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> JTextField searchField = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(); 
+<font style="font-style: normal;" color="#000000">16   </font>    JPopupMenu popup = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPopupMenu(); 
+<font style="font-style: normal;" color="#000000">17   </font> 
+<font style="font-style: normal;" color="#000000">18   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> FindAction(){ 
+<font style="font-style: normal;" color="#000000">19   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Incremental Search&quot;</b></font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">20   </font>        searchPanel.setBackground(UIManager.getColor(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;ToolTip.background&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">21   </font>        searchField.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">22   </font>        JLabel label = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Search for:&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">23   </font>        label.setFont(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Font(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;DialogInput&quot;</b></font><font style="font-family: monospaced;" color="#000000">, Font.BOLD, </font><font style="font-family: monospaced;" color="#0000ff">12</font><font style="font-family: monospaced;" color="#000000">)); </font><font style="font-family: monospaced;" color="#808080"><i>// for readability</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">24   </font>        searchPanel.add(label); 
+<font style="font-style: normal;" color="#000000">25   </font>        searchPanel.add(searchField); 
+<font style="font-style: normal;" color="#000000">26   </font>        searchField.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">27   </font>        searchPanel.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">28   </font>        popup.setBorder(BorderFactory.createLineBorder(Color.black)); 
+<font style="font-style: normal;" color="#000000">29   </font>        popup.add(searchPanel); 
+<font style="font-style: normal;" color="#000000">30   </font>        searchField.setFont(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Font(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;DialogInput&quot;</b></font><font style="font-family: monospaced;" color="#000000">, Font.PLAIN, </font><font style="font-family: monospaced;" color="#0000ff">12</font><font style="font-family: monospaced;" color="#000000">)); </font><font style="font-family: monospaced;" color="#808080"><i>// for readability</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">31   </font> 
+<font style="font-style: normal;" color="#000000">32   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// when the window containing the &quot;comp&quot; has registered Esc key</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">33   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// then on pressing Esc instead of search popup getting closed</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">34   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// the event is sent to the window. to overcome this we</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">35   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// register an action for Esc.</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">36   </font>        searchField.registerKeyboardAction(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener(){ 
+<font style="font-style: normal;" color="#000000">37   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+<font style="font-style: normal;" color="#000000">38   </font>                popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">39   </font>            } 
+<font style="font-style: normal;" color="#000000">40   </font>        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">), JComponent.WHEN_FOCUSED); 
+<font style="font-style: normal;" color="#000000">41   </font>    } 
+<font style="font-style: normal;" color="#000000">42   </font> 
+<font style="font-style: normal;" color="#000000">43   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> JComponent comp = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">44   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> ignoreCase; 
+<font style="font-style: normal;" color="#000000">45   </font> 
+<font style="font-style: normal;" color="#000000">46   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">47   </font> 
+<font style="font-style: normal;" color="#000000">48   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae){ 
+<font style="font-style: normal;" color="#000000">49   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(ae.getSource() == searchField) 
+<font style="font-style: normal;" color="#000000">50   </font>            popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">51   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+<font style="font-style: normal;" color="#000000">52   </font>            comp = (JComponent)ae.getSource(); 
+<font style="font-style: normal;" color="#000000">53   </font>            ignoreCase = (ae.getModifiers() &amp; ActionEvent.SHIFT_MASK)!=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">54   </font> 
+<font style="font-style: normal;" color="#000000">55   </font>            searchField.removeActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">56   </font>            searchField.removeKeyListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">57   </font>            searchField.getDocument().removeDocumentListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">58   </font>            initSearch(ae); 
+<font style="font-style: normal;" color="#000000">59   </font>            searchField.addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">60   </font>            searchField.addKeyListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">61   </font>            searchField.getDocument().addDocumentListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">62   </font> 
+<font style="font-style: normal;" color="#000000">63   </font>            Rectangle rect = comp.getVisibleRect(); 
+<font style="font-style: normal;" color="#000000">64   </font>            popup.show(comp, rect.x, rect.y - popup.getPreferredSize().height - </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">65   </font>            searchField.requestFocus(); 
+<font style="font-style: normal;" color="#000000">66   </font>        } 
+<font style="font-style: normal;" color="#000000">67   </font>    } 
+<font style="font-style: normal;" color="#000000">68   </font> 
+<font style="font-style: normal;" color="#000000">69   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// can be overridden by subclasses to change initial search text etc.</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">70   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> initSearch(ActionEvent ae){ 
+<font style="font-style: normal;" color="#000000">71   </font>        searchField.setText(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">72   </font>        searchField.setForeground(Color.black); 
+<font style="font-style: normal;" color="#000000">73   </font>    } 
+<font style="font-style: normal;" color="#000000">74   </font> 
+<font style="font-style: normal;" color="#000000">75   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changed(Position.Bias bias){ 
+<font style="font-style: normal;" color="#000000">76   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// note: popup.pack() doesn't work for first character insert</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">77   </font>        popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">78   </font>        popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">79   </font> 
+<font style="font-style: normal;" color="#000000">80   </font>        searchField.requestFocus(); 
+<font style="font-style: normal;" color="#000000">81   </font>        searchField.setForeground(changed(comp, searchField.getText(), bias) ? Color.black : Color.red); 
+<font style="font-style: normal;" color="#000000">82   </font>    } 
+<font style="font-style: normal;" color="#000000">83   </font> 
+<font style="font-style: normal;" color="#000000">84   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// should search for given text and select item and</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">85   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// return true if search is successfull</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">86   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> changed(JComponent comp, String text, Position.Bias bias); 
+<font style="font-style: normal;" color="#000000">87   </font> 
+<font style="font-style: normal;" color="#000000">88   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ DocumentListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">89   </font> 
+<font style="font-style: normal;" color="#000000">90   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> insertUpdate(DocumentEvent e){ 
+<font style="font-style: normal;" color="#000000">91   </font>        changed(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">92   </font>    } 
+<font style="font-style: normal;" color="#000000">93   </font> 
+<font style="font-style: normal;" color="#000000">94   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeUpdate(DocumentEvent e){ 
+<font style="font-style: normal;" color="#000000">95   </font>        changed(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">96   </font>    } 
+<font style="font-style: normal;" color="#000000">97   </font> 
+<font style="font-style: normal;" color="#000000">98   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changedUpdate(DocumentEvent e){} 
+<font style="font-style: normal;" color="#000000">99   </font> 
+<font style="font-style: normal;" color="#000000">100  </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ KeyListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">101  </font> 
+<font style="font-style: normal;" color="#000000">102  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> shiftDown = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">103  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> controlDown = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">104  </font> 
+<font style="font-style: normal;" color="#000000">105  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyPressed(KeyEvent ke){ 
+<font style="font-style: normal;" color="#000000">106  </font>        shiftDown = ke.isShiftDown(); 
+<font style="font-style: normal;" color="#000000">107  </font>        controlDown = ke.isControlDown(); 
+<font style="font-style: normal;" color="#000000">108  </font> 
+<font style="font-style: normal;" color="#000000">109  </font>        </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(ke.getKeyCode()){ 
+<font style="font-style: normal;" color="#000000">110  </font>            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_UP: 
+<font style="font-style: normal;" color="#000000">111  </font>                changed(Position.Bias.Backward); 
+<font style="font-style: normal;" color="#000000">112  </font>                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">113  </font>            </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_DOWN: 
+<font style="font-style: normal;" color="#000000">114  </font>                changed(Position.Bias.Forward); 
+<font style="font-style: normal;" color="#000000">115  </font>                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">116  </font>        } 
+<font style="font-style: normal;" color="#000000">117  </font>    } 
+<font style="font-style: normal;" color="#000000">118  </font> 
+<font style="font-style: normal;" color="#000000">119  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyTyped(KeyEvent e){} 
+<font style="font-style: normal;" color="#000000">120  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyReleased(KeyEvent e){} 
+<font style="font-style: normal;" color="#000000">121  </font> 
+<font style="font-style: normal;" color="#000000">122  </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Installation ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">123  </font> 
+<font style="font-style: normal;" color="#000000">124  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> install(JComponent comp){ 
+<font style="font-style: normal;" color="#000000">125  </font>        comp.registerKeyboardAction(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, KeyStroke.getKeyStroke(</font><font style="font-family: monospaced;" color="#008000"><b>'I'</b></font><font style="font-family: monospaced;" color="#000000">, KeyEvent.CTRL_MASK), JComponent.WHEN_FOCUSED); 
+<font style="font-style: normal;" color="#000000">126  </font>        comp.registerKeyboardAction(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, KeyStroke.getKeyStroke(</font><font style="font-family: monospaced;" color="#008000"><b>'I'</b></font><font style="font-family: monospaced;" color="#000000">, KeyEvent.CTRL_MASK|KeyEvent.SHIFT_MASK), JComponent.WHEN_FOCUSED); 
+<font style="font-style: normal;" color="#000000">127  </font>    } 
+<font style="font-style: normal;" color="#000000">128  </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">Source Code Highlights:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="8%" bgcolor="#C0C0C0"><b><font size="2" face="Verdana">Lines</font></b></td>
+    <td width="92%" bgcolor="#C0C0C0"><b><font size="2" face="Verdana">
+    Description</font></b></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">13</font></td>
+    <td width="92%"><font size="2" face="Verdana">&nbsp;I used Action Subclass 
+    for as the base. It allows you to use it very flexibly. for example changing 
+    keystrokes, enabling/disabling etc.</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">14-16</font></td>
+    <td width="92%"><font size="2" face="Verdana">The search panel is actually a 
+    JPopupMenu, which contains a label with text &quot;Search for:&quot; and a JTextField</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">20-30</font></td>
+    <td width="92%"><font size="2" face="Verdana">creates search popup. I used 
+    tooltip background, to distinguish it from celleditors. Font is changed to 
+    make it more readable.</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">36-40</font></td>
+    <td width="92%"><font size="2" face="Verdana">Use escape to close the popup. 
+    It is taken care that Esc keystroke doesn't close the dialog by registering 
+    it as keyboardAction</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">124-127</font></td>
+    <td width="92%"><font size="2" face="Verdana">This is the method used to 
+    install Incremental Search to a SwingComponent.<br>
+    By default this action is registered for two KeyStrokes: <br>
+    CRTL+I = case sensitive search<br>
+    CTRL+SHIFT+I = case insensitive search<br>
+    <br>
+    subclasses can override this to add more shortcuts. For example, for 
+    JTextComponent we may want to add CTRL+ALT+I - for incremental search by 
+    regular expressions.<br>
+&nbsp;</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">48-67</font></td>
+    <td width="92%"><font size="2" face="Verdana">adds various listeners and 
+    initializes the search - calls initSearch() method<br>
+    Popup is shown 5 pixels above the component.</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">70-73</font></td>
+    <td width="92%"><font size="2" face="Verdana">initializes the search. 
+    Subclasses may override this to do some extra work.<br>
+    for example: for JTextComponent, when incremental search is invoked we might 
+    want the search text field to be pre-filled by the selected text.</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">75-82</font></td>
+    <td width="92%"><font size="2" face="Verdana">this is the method that gets 
+    called as the user types in text in search text field or presses UP/DOWN 
+    arrow keys. Note: this is private method. It actually calls another abstract 
+    method changed(...) which needs to be implemented by subclasses. <br>
+    The argument bias can be Forward or Backward or null. It tells the direction 
+    in which search to be performed. If it is null, the subclasses are free to 
+    choose either forward or backward (but mostly null is taken as forward)</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">86</font></td>
+    <td width="92%"><font size="2" face="Verdana">This is the only abstract 
+    method that needs to be implemented by the subclasses. This should returns 
+    true, if an item is found on search. This return value is used to change the 
+    foreground color of search textfield to red if no item matches.</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">90-98</font></td>
+    <td width="92%"><font size="2" face="Verdana">There are document listener 
+    methods which call chaged(...) on any change</font></td>
+  </tr>
+  <tr>
+    <td width="8%"><font size="2" face="Verdana">105-120</font></td>
+    <td width="92%"><font size="2" face="Verdana">Listens for up/down arrow keys 
+    in textfield and calls changed(....). it stores the current modifiers 
+    (control/shift pressed) in protected variables which can be used by 
+    subclasses to effect the type of selection</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">This class does all the important work of 
+showing/hiding popup, initiate/perform search etc...</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/IncrementalSearch.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font face="Verdana" size="2">Yours comments are appreciated.</font></p>
+
+</body>
+
+</html>

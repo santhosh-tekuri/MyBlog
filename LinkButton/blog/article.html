@@ -1,0 +1,75 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">How to create a Swing Component that looks like 
+Hyper-Link of a WebBrowser.</font></p>
+<p><font size="2" face="Verdana">It is very simple to do this in swing. It is 
+just a matter of changing borders:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Color LINK_COLOR = Color.blue; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Border LINK_BORDER = BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Border HOVER_BORDER = BorderFactory.createMatteBorder(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, LINK_COLOR); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> LinkMouseListener </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseEntered(MouseEvent e){ 
+            ((JComponent)e.getComponent()).setBorder(HOVER_BORDER); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseReleased(MouseEvent e){ 
+            ((JComponent)e.getComponent()).setBorder(LINK_BORDER); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseExited(MouseEvent e){ 
+            ((JComponent)e.getComponent()).setBorder(LINK_BORDER); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JButton makeLink(JButton button){ 
+        button.setBorder(LINK_BORDER); 
+        button.setForeground(LINK_COLOR); 
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
+        button.setFocusPainted(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        button.setRequestFocusEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000000">button.setContentAreaFilled(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">);
+        button.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> LinkMouseListener()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> button; 
+    }  </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">How to use it:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre>button = makeLink(button); // very simple</pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">the makeLink(...) method actually returns the 
+button again:</font></p>
+<p><font size="2" face="Verdana">so instead of writing:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">challenge.getContentPane().add(button);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">just change it to:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">challenge.getContentPane().add(makeLink(button));</font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/LinkButton.gif" width="178" height="75"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/LinkButton.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are welcome.</font></p>
+
+</body>
+
+</html>

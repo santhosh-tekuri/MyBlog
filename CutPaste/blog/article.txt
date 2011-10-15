@@ -1,0 +1,314 @@
+<b>How cut/copy/paste works?</b>
+When you copy something from a component, it creates a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html">transferable</a> object and places it in <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Clipboard.html">clipboard</a>. When user tries to paste on another component, the target component fetches the transferable object from clipboard and <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html#getTransferData(java.awt.datatransfer.DataFlavor)"> gets the actual data from transferable</a> and does its job. Thus there is a data transfer between the source and target component via clipboard.
+
+<b>Why not place the actual data in clipboard rather than transferable ?</b>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html"><font size="2">Transferable</font></a><font size="2"> is an interface which lets you define the data being transferred. The advantage of transferable is it supports <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/DataFlavor.html">dataflavors</a>. Depending on the target component, the data getting transferred might be different. For example, let us say you copied some text from a web-browser, now if you try to paste in a notepad, it inserts only text, but if you try to paste in a html aware editor such as DreamWeaver or FrontPage, it inserts html snippet. i.e. the transferable created by the web-browser supports two dataflavors: simple text flavor and html flavor. Another advantage of dataflavors is delayed construction of data.
+
+In this article, I am concentrating on cut/paste operation. There are two ways to implement cut/paste:
+
+<b>Immediate cut/paste:</b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When you issue a cut command, the data immediately gets removed from the source component. For example text editor use this approach. When you cut some text from an editor, it immediately gets 
+removed.
+
+<b>Deferred cut/paste:</b>
+&nbsp;&nbsp;&nbsp;&nbsp; The actual data that is being cut won't be removed from source component, until you paste it somewhere. For example windows explorer use this approach. When you cut a file from windows explorer, the file won't be removed immediately, rather its icon is shown in dim color. When you paste it in some other folder, it is removed from original folder and added to the target folder, and the icon changes from normal to dim. One interesting thing to note here is highlighting the object being cut in dim color. When you cut two files one after another, only the recently cut file will be highlighted in dim color. Because only one transferable can be placed in clipboard.
+
+In this article, I will be concentrating on how to implement Deferred cut/paste. because you can find implementation of Immediate cut/paste in swing text components.
+
+First we will see how to create a dim image using Java2D:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class ImageUtil{ 
+    private static JLabel imgObserver = new JLabel(); 
+
+    public static Image createGhostImage(Image img){ 
+        BufferedImage ghost = new BufferedImage(img.getWidth(imgObserver) 
+                , img.getHeight(imgObserver), BufferedImage.TYPE_INT_ARGB_PRE); 
+        Graphics2D g2 = ghost.createGraphics(); 
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 0.5f)); 
+        g2.drawImage(img, 0, 0, ghost.getWidth(), ghost.getHeight(), imgObserver); 
+        g2.dispose(); 
+        return ghost; 
+    } 
+}
+[/code]
+In my example, I am using JList to make explanation more clear. Now let us jump into highlighting. When user cuts an item in JList, it places a transferable in clipboard and displays that item's icon in dim color (we need a special ListCellRender for this). This item has to be displayed in dim color as long as the transferable created by this JList is in clipboard. If user copies something let us say some text from notepad, JList should immediately display the item with normal icon. That is we need some sort of Listener to clipboard so that we know when our transferable object is removed from clipboard. We have such listener called <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/ClipboardOwner.html">ClipboardOwner</a>.
+
+A transferable object is placed in clipboard as follows:
+[code]
+Cliboard.setContents(Transferable contents,  ClipboardOwner owner)
+[/code]
+The second argument is the clipboard owner. when the transferable is removed from the clipboard, it calls lostOwnership(...) method in clipboard owner.
+
+Thus the above interface is enough to handle the highlighting of the item being cut. Now let us see how to implement Deferred cut/paste.
+
+When user cuts an item in JList, it just places a transferable in the clipboard but doesn't remove it from list. When user pastes it somewhere then the item has to be removed from JList. Now the problem, How does JList know when user tried to paste it somewhere. Let us see whether ClipboardOwner can help us to track this. Using ClipboardOwner, we can just know that. our transferable object is removed from the clipboard. But it doesn't tell 
+whether the transferable is removed because of whether clipboard content is replaced by some other transferable, or because of some paste operation. Truly saying, Java lack an API for this.
+
+At first I tried I could create a special transferable subclass:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public interface XTransferable extends Transferable{ 
+    public void transferAccepted(); 
+    public void transferRejected(); 
+}
+[/code]
+Now, JList can place a transferable object implementing XTransferable in clipboard, which removes the item from list in transferAccepted() method. When user pastes in some other component, the target component can check if the transferable is an instanceof XTransferable, if so, call transferAccepted() method after the data is pasted.
+
+The above solution seems to be excellent for me and tried to implement this. But it didn't work. On debugging, I found that, the transferable fetched at target component is not the same transferable placed by the source component. You can confirm this, by executing the following snippet:
+[code]
+Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); 
+StringSelection transferable = new StringSelection("data"); 
+System.out.println("transferable placed: "+transferable); 
+clipboard.setContents(transferable, null); 
+System.out.println("transferable fetched: "+clipboard.getContents(null));
+[/code]
+The output of the above snippet is as follows:
+[code]
+transferable placed: java.awt.datatransfer.StringSelection@87a5cc
+transferable fetched: sun.awt.datatransfer.TransferableProxy@18fb1f7
+[/code]
+The acutal transferable object is wrapped in sun.awt.datatransfer.TransferableProxy object, which is a proprietary class of Sun JVM.
+
+So I started trying to find is there any way to implement this ? and finally I found one approach: using dataflavors.
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public interface TransferNotifier{ 
+    public static DataFlavor NOTIFICATION_FLAVOR = 
+            new DataFlavor(TransferNotifier.class, TransferNotifier.class.getName()); 
+ 
+    public void transferAccepted(); 
+    public void transferRejected(); 
+} 
+[/code]
+JList creates a transferable object which supports two flavors: the original dataflavor and notification flavor. In TransferNotifier implementation, we can take care of removing item from JList.
+
+To make usage of TransferNotifier usage easier, I created a special delegating Transferable in which user can wrap his/her original transferable object very easily.
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public abstract class TransferNotifierProxy implements Transferable, TransferNotifier{ 
+    Transferable delegate; 
+ 
+    public TransferNotifierProxy(Transferable delegate){ 
+        this.delegate = delegate; 
+    } 
+ 
+    public DataFlavor[] getTransferDataFlavors(){ 
+        DataFlavor delegateFlavors[] = delegate.getTransferDataFlavors(); 
+        DataFlavor flavors[] = new DataFlavor[delegateFlavors.length + 1]; 
+        System.arraycopy(delegateFlavors, 0, flavors, 0, delegateFlavors.length); 
+        flavors[flavors.length-1] = NOTIFICATION_FLAVOR; 
+        return flavors; 
+    } 
+ 
+    public boolean isDataFlavorSupported(DataFlavor flavor){ 
+        return flavor.equals(NOTIFICATION_FLAVOR) 
+                || delegate.isDataFlavorSupported(flavor); 
+    } 
+ 
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException{ 
+        return flavor.equals(NOTIFICATION_FLAVOR) 
+                ? this 
+                : delegate.getTransferData(flavor); 
+    } 
+ 
+    protected void clearClipBoard(){ 
+        // how to clear the clipboard contents ? 
+        Toolkit.getDefaultToolkit().getSystemClipboard() 
+                .setContents(new StringSelection(""), null); 
+    } 
+ 
+    public void transferAccepted(){ 
+        clearClipBoard(); 
+    } 
+ 
+    public void transferRejected(){ 
+        clearClipBoard(); 
+    } 
+}
+[/code]
+Now let us create a sample application using the above technique:
+
+Follwing is the transferable placed in clipboard when an item is cut from JList:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class ListItemSelection extends TransferNotifierProxy{ 
+    private JList list; 
+    private int index; 
+ 
+    public ListItemSelection(JList list){ 
+        super(new StringSelection((String)list.getSelectedValue())); 
+        this.list = list; 
+        index = list.getSelectedIndex(); 
+    } 
+ 
+    public void transferAccepted(){ 
+        DefaultListModel model = (DefaultListModel)list.getModel(); 
+        model.removeElementAt(index); 
+        super.transferAccepted(); 
+    } 
+} 
+[/code]
+Following is the ClipboardOwner implementation, which updates the JList item's display:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class ListClipboardOwner implements ClipboardOwner{ 
+    // used as JList's client property 
+    public static final String CLIP_BOARD_OWNER = "ClipBoardOwner"; 
+ 
+    private JList list; 
+    private int index; 
+ 
+    public ListClipboardOwner(JList list){ 
+        this.list = list; 
+        index = list.getSelectedIndex(); 
+        list.putClientProperty(CLIP_BOARD_OWNER, this); 
+        list.paintImmediately(list.getCellBounds(index, index)); 
+    } 
+ 
+    public int getIndex(){ 
+        return index; 
+    } 
+ 
+    public void lostOwnership(Clipboard clipboard, Transferable contents){ 
+        if(list.getClientProperty(CLIP_BOARD_OWNER)==this) 
+            list.putClientProperty(CLIP_BOARD_OWNER, null); 
+        list.paintImmediately(list.getCellBounds(index, index)); 
+    } 
+}
+[/code]
+Here is the ListCellRenderer implementation which takes care of dim highlighting:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class MyListCellRenderer extends DefaultListCellRenderer{ 
+    ImageIcon icon = new ImageIcon(getClass().getResource("user.gif")); 
+    Icon ghostIcon = new ImageIcon(ImageUtil.createGhostImage(icon.getImage())); 
+ 
+    public Component getListCellRendererComponent(JList list, Object value 
+                                                  , int index, boolean isSelected 
+                                                  , boolean cellHasFocus){ 
+        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); 
+        ListClipboardOwner owner = (ListClipboardOwner)list.getClientProperty(ListClipboardOwner.CLIP_BOARD_OWNER); 
+        setIcon(owner!=null && owner.getIndex()==index ? ghostIcon : icon); 
+ 
+        return this; 
+    } 
+} 
+[/code]
+Here is the Swing's TransferHandler, which tells you to copy data to and from JList:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class ListTransferHandler extends TransferHandler{ 
+    protected Transferable createTransferable(JComponent c){ 
+        JList list = (JList)c; 
+        return new ListItemSelection(list); 
+    } 
+ 
+    public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException{ 
+        int clipboardAction = getSourceActions(comp) & action; 
+        if(clipboardAction!=NONE){ 
+            Transferable t = createTransferable(comp); 
+            if(t!=null){ 
+                try{ 
+                    clip.setContents(t, new ListClipboardOwner((JList)comp)); 
+                    exportDone(comp, t, clipboardAction); 
+                    return; 
+                } catch(IllegalStateException ise){ 
+                    exportDone(comp, t, NONE); 
+                    throw ise; 
+                } 
+            } 
+        } 
+        exportDone(comp, null, NONE); 
+    } 
+ 
+    public int getSourceActions(JComponent c){ 
+        return MOVE; 
+    } 
+ 
+    public boolean canImport(JComponent comp, DataFlavor[] transferFlavors){ 
+        for(int i = 0; i<transferFlavors.length; i++){ 
+            if(transferFlavors[i].equals(DataFlavor.stringFlavor)) 
+                return true; 
+        } 
+        return false; 
+    } 
+ 
+    public boolean importData(JComponent comp, Transferable t){ 
+        try{ 
+            String data = String.valueOf(t.getTransferData(DataFlavor.stringFlavor)); 
+            JList list = (JList)comp; 
+            ((DefaultListModel)list.getModel()).addElement(data); 
+            acceptOrReject(t, true); 
+            return true; 
+        } catch(Exception e){ 
+            acceptOrReject(t, false); 
+            return false; 
+        } 
+    } 
+ 
+    private void acceptOrReject(Transferable t, boolean accept){ 
+        try{ 
+            if(t.isDataFlavorSupported(TransferNotifier.NOTIFICATION_FLAVOR)){ 
+                TransferNotifier notifier = (TransferNotifier)t.getTransferData(TransferNotifier.NOTIFICATION_FLAVOR); 
+                if(accept) 
+                    notifier.transferAccepted(); 
+                else 
+                    notifier.transferRejected(); 
+            } 
+        } catch(UnsupportedFlavorException e){ 
+            e.printStackTrace(); // impossible 
+        } catch(IOException e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+}
+[/code]
+Finally here is the main application's class:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com
+public class CutPasteTest{ 
+    private static JScrollPane createList(int from, int to){ 
+        DefaultListModel model1 = new DefaultListModel(); 
+        for(int i = from; i<=to; i++) 
+            model1.addElement("User "+i); 
+ 
+        JList list = new JList(model1); 
+        list.setTransferHandler(new ListTransferHandler()); 
+        list.setCellRenderer(new MyListCellRenderer()); 
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); 
+ 
+        JScrollPane scroll = new JScrollPane(list); 
+        scroll.setBorder(BorderFactory.createEmptyBorder()); 
+        return scroll; 
+    } 
+ 
+    public static void main(String[] args){ 
+        JFrame frame = new JFrame("Deferred Cut/Paste - santhosh@in.fiorano.com"); 
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT 
+                , createList(1, 5) 
+                , createList(6, 10)); 
+        split.setResizeWeight(0.5d); 
+        frame.getContentPane().add(split); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setSize(200, 200); 
+        frame.setLocationRelativeTo(null); 
+        frame.setVisible(true); 
+    } 
+} 
+[/code]
+
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/CutPaste.gif" width="200" height="200">
+
+Try to cut/paste items from one list to another in demo.
+
+<a href="http://www.jroller.com/resources/s/santhosh/CutPaste.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your Comments are appreciated.
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+<br>Contributing Editor - santhosh@javalobby.org
+<br>MySwing Project     - https://myswing.dev.java.net/
+<br>Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+<br>Sr. Software Eng    - http://www.fiorano.com

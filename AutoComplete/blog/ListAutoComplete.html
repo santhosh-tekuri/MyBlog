@@ -1,0 +1,120 @@
+<html>
+<body>
+
+<p><font face="Verdana"><a href="mailto:cotfessi@gmail.com"><font size="2">Scott 
+Presley</font></a><font size="2"> has tried to implement List based auto 
+completion extending AutoCompleter from one of my previous posts:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.jroller.com/page/santhosh/20050620#file_path_autocompletion">
+File Path AutoCompletion</a><br>
+<br>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/ListAutoCompleter.gif" width="268" height="115"></font></font></p>
+<p><font size="2" face="Verdana">Advantages of using this over JComboBox with 
+AutoCompletion:</font></p>
+<ol>
+  <li><font size="2" face="Verdana">The Popup list gets narrowed down on user 
+  input</font></li>
+  <li><font size="2" face="Verdana">Works for any JTextComponent for ex: 
+  JTextArea, JTextField</font></li>
+  <li><font size="2" face="Verdana">The list can be dynamically computed 
+  depending on user input</font></li>
+</ol>
+<p><font size="2" face="Verdana">The code send by Scott Presley has been 
+modified little bit.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ListAutoCompleter </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AutoCompleter{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> List completionList; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> ignoreCase; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ListAutoCompleter(JTextComponent comp, List completionList, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> ignoreCase){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(comp); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.completionList = completionList; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.ignoreCase = ignoreCase; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// update classes model depending on the data in textfield</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> updateListData(){ 
+        String value = textComp.getText(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> substringLen = value.length(); 
+ 
+        List possibleStrings = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ArrayList(); 
+        Iterator iter = completionList.iterator(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(iter.hasNext()){ 
+            String listEntry = (String)iter.next(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(substringLen&gt;=listEntry.length()) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>continue</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(ignoreCase){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(value.equalsIgnoreCase(listEntry.substring(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, substringLen))) 
+                    possibleStrings.add(listEntry); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(listEntry.startsWith(value)) 
+                possibleStrings.add(listEntry); 
+        } 
+ 
+        list.setListData(possibleStrings.toArray()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// user has selected some item in the classes. update textfield accordingly...</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> acceptedListItem(String selected){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selected==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> prefixlen = textComp.getDocument().getLength(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            textComp.getDocument().insertString(textComp.getCaretPosition(), selected.substring(prefixlen), </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException e){ 
+            e.printStackTrace(); 
+        } 
+ 
+        popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Example Usage:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JTextField tf = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(); 
+</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ListAutoCompleter(tf, Arrays.asList(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> String[]{</font><font style="font-family: monospaced;" color="#008000"><b>&quot;JFC&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;JSF&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;JSP&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;JAXP&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;JDBC&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;J2EE&quot;</b></font><font style="font-family: monospaced;" color="#000000">}), </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+JOptionPane.showMessageDialog(frame, tf, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Choose Java Technology&quot;</b></font><font style="font-family: monospaced;" color="#000000">, JOptionPane.INFORMATION_MESSAGE); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above class assumes that the list data is 
+static, and allows you to specify case-sensitivity also.</font></p>
+<p><font size="2" face="Verdana">There is once small addition done to 
+AutoCompleter from my previous post, which allows to select an item from the 
+list by mouse click:</font></p>
+<p><font size="2" face="Verdana">Add the following snippet to the end of 
+AutoCompleter constructor.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// Add mouse listener to allow user to make selection with the mouse</i></font><font style="font-family: monospaced;" color="#000000"> 
+list.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter(){ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent arg0){ 
+        popup.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        acceptedListItem((String)list.getSelectedValue()); 
+    } 
+});</font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<a href="http://www.jroller.com/resources/s/santhosh/ListAutoComplete.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font face="Verdana"><b><font size="2">NOTE:</font></b><font size="2"> I have 
+updated the jar file used in previous post's webstart application. If you face 
+any problems, delete it from webstart cache and click the above link.</font></font></p>
+
+</body>
+
+</html>

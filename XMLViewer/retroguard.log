@@ -1,0 +1,214 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Sun Jul 17 23:57:39 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           XMLViewer.jar
+# Target Jar file for obfuscated code: XMLViewer_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# WARNING - Methods are called which may unavoidably break in obfuscated
+# version at runtime. Please review your source code to ensure that these
+# methods are not intended to act on classes within the obfuscated Jar file.
+#      Your class santhosh/JTreeTable uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/MyTreeTable uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/XMLTreeTableDemo uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/XMLTreeTableModel uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#
+# Memory in use after class data structure built: 957296 bytes
+# Total memory available                        : 2187264 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 25 times	(64%)
+#  'if'   	used 6 times	(15%)
+#  'do'   	used 2 times	(5%)
+#  'b'   	used 1 times	(2%)
+#  'c'   	used 1 times	(2%)
+#  'd'   	used 1 times	(2%)
+#  'e'   	used 1 times	(2%)
+#  'for'   	used 1 times	(2%)
+#  'f'   	used 1 times	(2%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (4%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/XMLTreeDemo
+.field santhosh/XMLTreeDemo/tree Ljavax/swing/JTree;
+.field santhosh/XMLTreeDemo/editor Ljavax/swing/JTextArea;
+.method santhosh/XMLTreeDemo/main ([Ljava/lang/String;)V
+.class santhosh/XMLTreeTableCellRenderer
+.field santhosh/XMLTreeTableCellRenderer/attributeColor Ljava/awt/Color;
+.field santhosh/XMLTreeTableCellRenderer/elementColor Ljava/awt/Color;
+.field santhosh/XMLTreeTableDemo$1/this$0 Lsanthosh/XMLTreeTableDemo;
+.class santhosh/XMLTreeTableDemo
+.field santhosh/XMLTreeTableDemo/scroll Ljavax/swing/JScrollPane;
+.field santhosh/XMLTreeTableDemo/editor Ljavax/swing/JTextArea;
+.method santhosh/XMLTreeTableDemo/main ([Ljava/lang/String;)V
+.class santhosh/TreeTableModelAdapter
+.field santhosh/TreeTableModelAdapter/tree Ljavax/swing/JTree;
+.field santhosh/TreeTableModelAdapter/treeTableModel Lsanthosh/TreeTableModel;
+.class santhosh/JTreeTable$ListToTreeSelectionModelWrapper
+.field santhosh/JTreeTable$ListToTreeSelectionModelWrapper/this$0 Lsanthosh/JTreeTable;
+.field santhosh/JTreeTable$ListToTreeSelectionModelWrapper/updatingListSelectionModel Z
+.class santhosh/JTreeTable$TreeTableTextField
+.field santhosh/JTreeTable$TreeTableTextField/offset I
+.class santhosh/JTreeTable$TreeTableCellEditor
+.field santhosh/JTreeTable$TreeTableCellEditor/this$0 Lsanthosh/JTreeTable;
+.class santhosh/JTreeTable$TreeTableCellRenderer
+.field santhosh/JTreeTable$TreeTableCellRenderer/this$0 Lsanthosh/JTreeTable;
+.field santhosh/JTreeTable$TreeTableCellRenderer/visibleRow I
+.field santhosh/JTreeTable$TreeTableCellRenderer/highlightBorder Ljavax/swing/border/Border;
+.class santhosh/JTreeTable
+.field santhosh/JTreeTable/tree Lsanthosh/JTreeTable$TreeTableCellRenderer;
+.class santhosh/MyTreeTable
+.class santhosh/XMLTreeCellRenderer
+.field santhosh/XMLTreeCellRenderer/attributeColor Ljava/awt/Color;
+.field santhosh/XMLTreeCellRenderer/elementColor Ljava/awt/Color;
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/XMLTreeDemo$1 1
+.field_map santhosh/XMLTreeDemo$1/this$0 this$0
+.field_map santhosh/XMLTreeDemo$1/val$tabPane val$tabPane
+.method_map santhosh/XMLTreeDemo$1/stateChanged (Ljavax/swing/event/ChangeEvent;)V stateChanged
+.method_map santhosh/XMLTreeDemo/updateTree ()V a
+.method_map santhosh/XMLTreeDemo/access$000 (Lsanthosh/XMLTreeDemo;)V access$000
+.method_map santhosh/XMLTreeTableCellRenderer/getTreeCellRendererComponent (Ljavax/swing/JTree;Ljava/lang/Object;ZZZIZ)Ljava/awt/Component; getTreeCellRendererComponent
+.class_map santhosh/XMLTreeTableDemo$2 2
+.field_map santhosh/XMLTreeTableDemo$2/this$0 this$0
+.field_map santhosh/XMLTreeTableDemo$2/val$tabPane val$tabPane
+.method_map santhosh/XMLTreeTableDemo$2/stateChanged (Ljavax/swing/event/ChangeEvent;)V stateChanged
+.class_map santhosh/XMLTreeTableDemo$1 1
+.method_map santhosh/XMLTreeTableDemo$1/setColumnHeaderView (Ljava/awt/Component;)V setColumnHeaderView
+.field_map santhosh/XMLTreeTableDemo/class$santhosh$TreeTableModel class$santhosh$TreeTableModel
+.method_map santhosh/XMLTreeTableDemo/updateTree ()V a
+.method_map santhosh/XMLTreeTableDemo/createTreeTable (Lsanthosh/XMLTreeTableModel;)Lsanthosh/MyTreeTable; a
+.method_map santhosh/XMLTreeTableDemo/access$000 (Lsanthosh/XMLTreeTableDemo;)V access$000
+.method_map santhosh/XMLTreeTableDemo/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.class_map santhosh/DOMUtil a
+.method_map santhosh/DOMUtil/createDocument (Lorg/xml/sax/InputSource;Z)Lorg/w3c/dom/Document; a
+.method_map santhosh/DOMUtil/createTrimmedDocument (Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document; a
+.method_map santhosh/DOMUtil/createDocument (Lorg/xml/sax/InputSource;)Lorg/w3c/dom/Document; if
+.class_map santhosh/TreeTableModelAdapter$3 3
+.field_map santhosh/TreeTableModelAdapter$3/this$0 this$0
+.method_map santhosh/TreeTableModelAdapter$3/run ()V run
+.class_map santhosh/TreeTableModelAdapter$2 2
+.field_map santhosh/TreeTableModelAdapter$2/this$0 this$0
+.method_map santhosh/TreeTableModelAdapter$2/treeNodesInserted (Ljavax/swing/event/TreeModelEvent;)V treeNodesInserted
+.method_map santhosh/TreeTableModelAdapter$2/treeStructureChanged (Ljavax/swing/event/TreeModelEvent;)V treeStructureChanged
+.method_map santhosh/TreeTableModelAdapter$2/treeNodesChanged (Ljavax/swing/event/TreeModelEvent;)V treeNodesChanged
+.method_map santhosh/TreeTableModelAdapter$2/treeNodesRemoved (Ljavax/swing/event/TreeModelEvent;)V treeNodesRemoved
+.class_map santhosh/TreeTableModelAdapter$1 1
+.field_map santhosh/TreeTableModelAdapter$1/this$0 this$0
+.method_map santhosh/TreeTableModelAdapter$1/treeExpanded (Ljavax/swing/event/TreeExpansionEvent;)V treeExpanded
+.method_map santhosh/TreeTableModelAdapter$1/treeCollapsed (Ljavax/swing/event/TreeExpansionEvent;)V treeCollapsed
+.method_map santhosh/TreeTableModelAdapter/getColumnName (I)Ljava/lang/String; getColumnName
+.method_map santhosh/TreeTableModelAdapter/getColumnClass (I)Ljava/lang/Class; getColumnClass
+.method_map santhosh/TreeTableModelAdapter/delayedFireTableDataChanged ()V a
+.method_map santhosh/TreeTableModelAdapter/getColumnCount ()I getColumnCount
+.method_map santhosh/TreeTableModelAdapter/nodeForRow (I)Ljava/lang/Object; a
+.method_map santhosh/TreeTableModelAdapter/getValueAt (II)Ljava/lang/Object; getValueAt
+.method_map santhosh/TreeTableModelAdapter/getRowCount ()I getRowCount
+.method_map santhosh/TreeTableModelAdapter/setValueAt (Ljava/lang/Object;II)V setValueAt
+.method_map santhosh/TreeTableModelAdapter/isCellEditable (II)Z isCellEditable
+.class_map santhosh/TableColumnResizer b
+.field_map santhosh/TableColumnResizer/otherCursor a
+.field_map santhosh/TableColumnResizer/table if
+.field_map santhosh/TableColumnResizer/mouseXOffset do
+.field_map santhosh/TableColumnResizer/resizeCursor for
+.method_map santhosh/TableColumnResizer/getResizingColumn (Ljava/awt/Point;I)Ljavax/swing/table/TableColumn; a
+.method_map santhosh/TableColumnResizer/canResize (Ljavax/swing/table/TableColumn;)Z a
+.method_map santhosh/TableColumnResizer/mouseDragged (Ljava/awt/event/MouseEvent;)V mouseDragged
+.method_map santhosh/TableColumnResizer/mouseReleased (Ljava/awt/event/MouseEvent;)V mouseReleased
+.method_map santhosh/TableColumnResizer/mouseMoved (Ljava/awt/event/MouseEvent;)V mouseMoved
+.method_map santhosh/TableColumnResizer/mousePressed (Ljava/awt/event/MouseEvent;)V mousePressed
+.method_map santhosh/TableColumnResizer/getResizingColumn (Ljava/awt/Point;)Ljavax/swing/table/TableColumn; a
+.method_map santhosh/TableColumnResizer/swapCursor ()V a
+.class_map santhosh/XMLTrimFilter c
+.field_map santhosh/XMLTrimFilter/contents a
+.method_map santhosh/XMLTrimFilter/isWhiteSpace ([C)Z a
+.method_map santhosh/XMLTrimFilter/endElement (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V endElement
+.method_map santhosh/XMLTrimFilter/characters ([CII)V characters
+.method_map santhosh/XMLTrimFilter/startElement (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V startElement
+.method_map santhosh/XMLTrimFilter/writeContents ()V a
+.method_map santhosh/XMLTrimFilter/ignorableWhitespace ([CII)V ignorableWhitespace
+.class_map santhosh/XMLTreeTableModel d
+.field_map santhosh/XMLTreeTableModel/class$santhosh$TreeTableModel class$santhosh$TreeTableModel
+.field_map santhosh/XMLTreeTableModel/class$java$lang$String class$java$lang$String
+.field_map santhosh/XMLTreeTableModel/node a
+.method_map santhosh/XMLTreeTableModel/getColumnClass (I)Ljava/lang/Class; a
+.method_map santhosh/XMLTreeTableModel/getColumnName (I)Ljava/lang/String; if
+.method_map santhosh/XMLTreeTableModel/valueForPathChanged (Ljavax/swing/tree/TreePath;Ljava/lang/Object;)V valueForPathChanged
+.method_map santhosh/XMLTreeTableModel/getColumnCount ()I a
+.method_map santhosh/XMLTreeTableModel/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.method_map santhosh/XMLTreeTableModel/getChildCount (Ljava/lang/Object;)I getChildCount
+.method_map santhosh/XMLTreeTableModel/getChild (Ljava/lang/Object;I)Ljava/lang/Object; getChild
+.method_map santhosh/XMLTreeTableModel/setValueAt (Ljava/lang/Object;Ljava/lang/Object;I)V a
+.method_map santhosh/XMLTreeTableModel/getValueAt (Ljava/lang/Object;I)Ljava/lang/Object; a
+.method_map santhosh/XMLTreeTableModel/isCellEditable (Ljava/lang/Object;I)Z if
+.method_map santhosh/XMLTreeTableModel/getIndexOfChild (Ljava/lang/Object;Ljava/lang/Object;)I getIndexOfChild
+.method_map santhosh/XMLTreeTableModel/getRoot ()Ljava/lang/Object; getRoot
+.method_map santhosh/XMLTreeTableModel/isLeaf (Ljava/lang/Object;)Z isLeaf
+.method_map santhosh/XMLTreeTableModel/addTreeModelListener (Ljavax/swing/event/TreeModelListener;)V addTreeModelListener
+.method_map santhosh/XMLTreeTableModel/removeTreeModelListener (Ljavax/swing/event/TreeModelListener;)V removeTreeModelListener
+.class_map santhosh/TreeTableModel e
+.method_map santhosh/TreeTableModel/getValueAt (Ljava/lang/Object;I)Ljava/lang/Object; a
+.method_map santhosh/TreeTableModel/getColumnClass (I)Ljava/lang/Class; a
+.method_map santhosh/TreeTableModel/getColumnName (I)Ljava/lang/String; if
+.method_map santhosh/TreeTableModel/isCellEditable (Ljava/lang/Object;I)Z if
+.method_map santhosh/TreeTableModel/setValueAt (Ljava/lang/Object;Ljava/lang/Object;I)V a
+.method_map santhosh/TreeTableModel/getColumnCount ()I a
+.class_map santhosh/XMLTreeModel f
+.field_map santhosh/XMLTreeModel/node a
+.method_map santhosh/XMLTreeModel/getRoot ()Ljava/lang/Object; getRoot
+.method_map santhosh/XMLTreeModel/valueForPathChanged (Ljavax/swing/tree/TreePath;Ljava/lang/Object;)V valueForPathChanged
+.method_map santhosh/XMLTreeModel/getChild (Ljava/lang/Object;I)Ljava/lang/Object; getChild
+.method_map santhosh/XMLTreeModel/addTreeModelListener (Ljavax/swing/event/TreeModelListener;)V addTreeModelListener
+.method_map santhosh/XMLTreeModel/getIndexOfChild (Ljava/lang/Object;Ljava/lang/Object;)I getIndexOfChild
+.method_map santhosh/XMLTreeModel/isLeaf (Ljava/lang/Object;)Z isLeaf
+.method_map santhosh/XMLTreeModel/getChildCount (Ljava/lang/Object;)I getChildCount
+.method_map santhosh/XMLTreeModel/removeTreeModelListener (Ljavax/swing/event/TreeModelListener;)V removeTreeModelListener
+.class_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper$ListSelectionHandler a
+.field_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper$ListSelectionHandler/this$1 this$1
+.method_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper$ListSelectionHandler/valueChanged (Ljavax/swing/event/ListSelectionEvent;)V valueChanged
+.method_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper/updateSelectedPathsFromSelectedRows ()V a
+.method_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper/resetRowSelection ()V resetRowSelection
+.method_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper/getListSelectionModel ()Ljavax/swing/ListSelectionModel; if
+.method_map santhosh/JTreeTable$ListToTreeSelectionModelWrapper/createListSelectionListener ()Ljavax/swing/event/ListSelectionListener; do
+.method_map santhosh/JTreeTable$TreeTableTextField/reshape (IIII)V reshape
+.method_map santhosh/JTreeTable$TreeTableCellEditor/getTableCellEditorComponent (Ljavax/swing/JTable;Ljava/lang/Object;ZII)Ljava/awt/Component; getTableCellEditorComponent
+.method_map santhosh/JTreeTable$TreeTableCellEditor/isCellEditable (Ljava/util/EventObject;)Z isCellEditable
+.method_map santhosh/JTreeTable$TreeTableCellRenderer/setRowHeight (I)V setRowHeight
+.method_map santhosh/JTreeTable$TreeTableCellRenderer/updateUI ()V updateUI
+.method_map santhosh/JTreeTable$TreeTableCellRenderer/paint (Ljava/awt/Graphics;)V paint
+.method_map santhosh/JTreeTable$TreeTableCellRenderer/setBounds (IIII)V setBounds
+.method_map santhosh/JTreeTable$TreeTableCellRenderer/getTableCellRendererComponent (Ljavax/swing/JTable;Ljava/lang/Object;ZZII)Ljava/awt/Component; getTableCellRendererComponent
+.field_map santhosh/JTreeTable/class$santhosh$TreeTableModel class$santhosh$TreeTableModel
+.method_map santhosh/JTreeTable/getEditingRow ()I getEditingRow
+.method_map santhosh/JTreeTable/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.method_map santhosh/JTreeTable/updateUI ()V updateUI
+.method_map santhosh/JTreeTable/setRowHeight (I)V setRowHeight
+.method_map santhosh/JTreeTable/editCellAt (IILjava/util/EventObject;)Z editCellAt
+.method_map santhosh/JTreeTable/getTree ()Ljavax/swing/JTree; a
+.method_map santhosh/JTreeTable/realEditingRow ()I if
+.method_map santhosh/JTreeTable/sizeColumnsToFit (I)V sizeColumnsToFit
+.method_map santhosh/JTreeTable/access$000 (Lsanthosh/JTreeTable;)I access$000
+.field_map santhosh/MyTreeTable/class$santhosh$TreeTableModel class$santhosh$TreeTableModel
+.method_map santhosh/MyTreeTable/editCellAt (IILjava/util/EventObject;)Z editCellAt
+.method_map santhosh/MyTreeTable/changeSelection (IIZZ)V changeSelection
+.method_map santhosh/MyTreeTable/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.method_map santhosh/MyTreeTable/getScrollableTracksViewportHeight ()Z getScrollableTracksViewportHeight
+.method_map santhosh/XMLTreeCellRenderer/getTreeCellRendererComponent (Ljavax/swing/JTree;Ljava/lang/Object;ZZZIZ)Ljava/awt/Component; getTreeCellRendererComponent
+# MapClassString (full) in class santhosh/JTreeTable: santhosh/TreeTableModel -> santhosh/e
+# MapClassString (full) in class santhosh/MyTreeTable: santhosh/TreeTableModel -> santhosh/e
+# MapClassString (full) in class santhosh/XMLTreeTableDemo: santhosh/TreeTableModel -> santhosh/e
+# MapClassString (full) in class santhosh/d: santhosh/TreeTableModel -> santhosh/e

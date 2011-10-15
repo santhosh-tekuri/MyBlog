@@ -1,0 +1,131 @@
+<html>
+<body>
+<p><font face="Verdana" size="2">In response to my old entry
+<a href="http://www.jroller.com/page/santhosh/20050610#jtree_with_checkboxes">
+JTree with CheckBoxes</a>, many developers asked me the following question ?<br>
+&nbsp;&nbsp;&nbsp; How do I show checkboxes only for specific tree nodes ?</font></p>
+<p><font face="Verdana" size="2">This is my solution to that.<br>
+<br>
+I created a new Interface, which encloses the criteria for <b>Whether a tree 
+node is selectable or not ?</b></font></p>
+<table border="1" width="100%" id="table1" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>package</b></font><font style="font-family: monospaced;" color="#000000"> skt.swing.tree.check; 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.tree.TreePath; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * </i><b><i>@author</i></b><i> Santhosh Kumar T 
+ * </i><b><i>@email</i></b><i>  santhosh@in.fiorano.com 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>interface</b></font><font style="font-family: monospaced;" color="#000000"> TreePathSelectable{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelectable(TreePath path); 
+}</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">This will be a GUI Trick. i,e 
+CheckTreeSelectionModel doesn't know about this interface. <br>
+Only CheckTreeManager, CheckTreeCellRenderer knows about TreePathSelectable.<br>
+<br>
+TreePathSelectable can be specified as null, which means all nodes are 
+selectable.<br>
+<br>
+<b>Changes to CheckTreeCellRenderer:</b><br>
+<br>
+CheckTreeCellRenderer takes TreePathSelectable in its constructor and it makes 
+checkbox invisble if it is not supposed to be shown:</font></p>
+<table border="1" width="100%" id="table2" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#000000">checkBox.setVisible(path==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || selectable==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> || selectable.isSelectable(path));</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font face="Verdana"><b><font size="2">Changes to CheckTreeManager:<br>
+</font></b><font size="2"><br>
+CheckTreeManager also takes TreePathSelectable in its constructor.<br>
+It does following extra in its constructor:</font></font></p>
+<table border="1" width="100%" id="table3" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#808080"><i>// note: if largemodel is not set</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#808080"><i>// then treenodes are getting truncated.</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#808080"><i>// need to debug further to find the problem</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectable!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+   tree.setLargeModel(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">);</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">mouseClicked(MouseEvent) should not repond to 
+mouse clicks if there is no checkbox:</font></p>
+<table border="1" width="100%" id="table4" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectable!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; !selectable.isSelectable(path)) 
+    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">;</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">Because model doesn't know about 
+TreePathSelectable. it is free to say a non-selectable node as selected or 
+unselected. So you have to first ask the TreePathSelectable, whether a treenode 
+is selectable or not and then ask the model whether it is selected or not.</font></p>
+<table border="1" width="100%" id="table5" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td width="353">
+		<pre><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePathSelectable(){ 
+ </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelectable(TreePath path){ 
+  </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> path.getPathCount()==</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">; 
+ } 
+}</font></pre>
+		</td>
+		<td>
+		<p align="center">
+		<img border="0" src="http://jroller.com/resources/s/santhosh/LeafSelectable.png" width="229" height="332"></td>
+	</tr>
+</table>
+<table border="1" width="100%" id="table6" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td width="353">
+		<pre><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePathSelectable(){ 
+ </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelectable(TreePath path){ 
+  </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> path.getPathCount()!=</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">; 
+ } 
+}</font></pre>
+		</td>
+		<td>
+		<p align="center">
+		<img border="0" src="http://jroller.com/resources/s/santhosh/NonLeafSelectable.png" width="229" height="332"></td>
+	</tr>
+</table>
+<p align="center">
+<a href="https://myswing.dev.java.net/webstart/CheckTree.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="88" height="23" align="left"></a></p>
+<font face="Verdana" size="2"><br>
+<br>
+<br>
+This is now committed to
+<a href="https://myswing.dev.java.net/">MySwing</a> Project. You can download 
+sources and example from there.</font><p><font size="2" face="Verdana">Your 
+comments are appreciated.</font></p>
+
+</body>
+
+</html>

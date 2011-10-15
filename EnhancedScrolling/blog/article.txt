@@ -1,0 +1,218 @@
+Today, I read an interesting entry from Patrick's weblog:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://jroller.com/page/pago?entry=improving_jscrollpane_with_mouse_based">Improving JScrollPane with mouse based scrolling</a>
+
+This is very common technique used in web browsers.
+
+<img src="http://www.jroller.com/resources/s/santhosh/FireFoxScrolling.gif"/>
+
+<b>Let us define the problem:</b>
+
+    * When user clicks on any component inside scrollpane with middle button, a scroll icon appears at that location
+    * When the user moves the mouse to any side of the scroll icon, the scrolling starting in that direction.
+    * The speed of scrolling depends on how much distance the mouse is from the scroll icon.
+
+<b>Let us see Patrick's approach:</b>
+
+    * The mouse scrolling is enabled for a given JScrollPane as follows:
+             [code]MouseScrollHandler.enableMouseScrolling(scrollPane)[/code]
+    * The above methods replace the current viewport of scrollpane with MouseScrollViewport and the view is removed from original viewport and added to this new viewport.
+    * This viewport listens for mouse events.
+    * MouseScrollViewport paints scroll icon when scrolling initialized.
+    * When mouse pressed, it starts a timer and it scrolls the view when timer hits.
+    * mouseMoved(...) & mouseDragged(...) will keep collecting the current mouse location.
+
+<b>Problems in Pattrick's approach:</b>
+
+    * Replaces the original viewport with MouseScrollViewport
+    * Fails to work, if the component in scrollpane is a container. let us say the html page displayed contains buttons, tables.
+    * Scroll Icon doesn't update its position as fast as the scrolling. So it looks flickering & some times moves in the scrolling direction.
+    * Requires some effort to use. as enableMouseScrolling(...) must be called on each scrollpane of your application.
+
+We had enough discussion. Let us get into work.
+
+AWT provides a way to listen to all mouse events that are dispatched to a java application by a class : <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/event/AWTEventListener.html" >AWTEventListener</a>
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+10   public class ScrollGestureRecognizer implements AWTEventListener{ 
+11       private static ScrollGestureRecognizer instance = new ScrollGestureRecognizer(); 
+12    
+13       private ScrollGestureRecognizer(){ 
+14           start(); 
+15       } 
+16    
+17       public static ScrollGestureRecognizer getInstance(){ 
+18           return instance; 
+19       } 
+20    
+21       void start(){ 
+22           Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK); 
+23       } 
+24    
+25       void stop(){ 
+26           Toolkit.getDefaultToolkit().removeAWTEventListener(this); 
+27       } 
+28    
+29       public void eventDispatched(AWTEvent event){ 
+30           MouseEvent me = (MouseEvent)event; 
+31           boolean isGesture = SwingUtilities.isMiddleMouseButton(me) 
+                                   && me.getID()==MouseEvent.MOUSE_PRESSED; 
+32           if(!isGesture) 
+33               return; 
+34    
+35           JViewport viewPort = (JViewport)SwingUtilities.
+                                   getAncestorOfClass(JViewport.class, me.getComponent()); 
+36           if(viewPort==null) 
+37               return; 
+38           JRootPane rootPane = SwingUtilities.getRootPane(viewPort); 
+39           if(rootPane==null) 
+40               return; 
+41    
+42           Point location = SwingUtilities.convertPoint(me.getComponent()
+                               , me.getPoint(), rootPane.getGlassPane()); 
+43           ScrollGlassPane glassPane = new ScrollGlassPane(rootPane.getGlassPane()
+                                             , viewPort, location); 
+44           rootPane.setGlassPane(glassPane); 
+45           glassPane.setVisible(true); 
+46       } 
+47   }
+[/code]
+
+11-19:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is a singleton class.
+
+21-27:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The start(...) & stop(...) will start & stop listening for mouse events happing in your application. Note that these methods are in default scope and shouldn't be used by your application.
+
+31-33:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If the mouse event is not middle button press, we do nothing.
+
+35-37:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We test whether the middle button press happened on a component which is in viewport, if not we do nothing.
+
+38-40:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We check whether the component is a descendant of rootpane, if not we do nothing. Note that JFrame & JDialog contain rootpane. We need rootpane because we are going to use glasspane.
+
+42-45:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We convert the current mouse location to glasspane and replace the current glasspane with our own glasspane which does the rest of the work. 
+
+<b>Let us see the glasspane implementation:</b>
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+10   public class ScrollGlassPane extends JPanel
+                              implements ActionListener, MouseInputListener, SwingConstants{ 
+11       private static final Image img = Toolkit.getDefaultToolkit()
+                                    .createImage(EnhancedScrollingDemo.class.getResource("mouse.gif")); 
+12    
+13       Component oldGlassPane = null; 
+14       public Point location = null; 
+15    
+16       private Timer movingTimer; 
+17       private Point mouseLocation; 
+18       private JViewport viewport; 
+19    
+20       public ScrollGlassPane(Component oldGlassPane, JViewport viewport, Point location){ 
+21           this.oldGlassPane = oldGlassPane; 
+22           this.viewport = viewport; 
+23           this.location = mouseLocation = location; 
+24    
+25           setOpaque(false); 
+26    
+27           ScrollGestureRecognizer.getInstance().stop(); 
+28           addMouseListener(this); 
+29           addMouseMotionListener(this); 
+30    
+31           movingTimer = new Timer(100, this); 
+32           movingTimer.setRepeats(true); 
+33           movingTimer.start(); 
+34       } 
+35    
+36       protected void paintComponent(Graphics g){ 
+37           g.drawImage(img, location.x-15, location.y-15, this); 
+38       } 
+39    
+40       /*---------------------[ ActionListener ]----------------------*/ 
+41    
+42       public void actionPerformed(ActionEvent e) { 
+43           int deltax = (mouseLocation.x - location.x)/4; 
+44           int deltay = (mouseLocation.y - location.y)/4; 
+45    
+46    
+47           Point p = viewport.getViewPosition(); 
+48           p.translate(deltax, deltay); 
+49    
+50           if(p.x<0) 
+51               p.x=0; 
+52           else if(p.x>=viewport.getView().getWidth()-viewport.getWidth()) 
+53               p.x = viewport.getView().getWidth()-viewport.getWidth(); 
+54    
+55           if(p.y<0) 
+56               p.y = 0; 
+57           else if(p.y>=viewport.getView().getHeight()-viewport.getHeight()) 
+58               p.y = viewport.getView().getHeight()-viewport.getHeight(); 
+59    
+60           viewport.setViewPosition(p); 
+61       } 
+62    
+63       /*----------------------[ MouseListener ]-----------------------*/ 
+64        
+65       public void mousePressed(MouseEvent e) { 
+66           movingTimer.stop(); 
+67           setVisible(false); 
+68           JRootPane rootPane = SwingUtilities.getRootPane(this); 
+69           rootPane.setGlassPane(oldGlassPane); 
+70           ScrollGestureRecognizer.getInstance().start(); 
+71       } 
+72    
+73       public void mouseClicked(MouseEvent e){ 
+74           mousePressed(me); 
+75       } 
+76    
+77       public void mouseMoved(MouseEvent e) { 
+78           mouseLocation = e.getPoint(); 
+79       } 
+80    
+81       public void mouseDragged(MouseEvent e){} 
+82       public void mouseEntered(MouseEvent e){} 
+83       public void mouseExited(MouseEvent e){} 
+84       public void mouseReleased(MouseEvent e){} 
+85   }
+[/code]
+
+20-23:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The original glasspane, viewport and location at which scrolling are initiated are taken in the constructor.
+
+27-29:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stops the ScrollGestureRecognizer, because ScrollGestureRecognizer is just meant to know when and where scrolling gesture is recognized. List for mouse events on itself.
+
+31-33:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Starts a timer. when the timer hits we scroll the view.
+
+36-38:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Paints the scroll icon. I used a image here. I am bit lazy in writing painting code :)
+
+42-61:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We calculate the delta between current mouse position and the location of scroll icon. and scroll the viewport's view accordingly. Note that you shouldn't scroll in such a way that view's bounds are crossed.
+
+65-73:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When mouse is pressed or clicked, we finish the scrolling. i.e, stop the timer, restore the original glasspane, and start the ScrollGestureRecognizer.
+
+77-79:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Used to collection the current location of mouse.
+
+<b>How to use this:</b>
+[code]
+   public static void main(String[] args){ 
+        // initializes and installs enhanced scrolling 
+        ScrollGestureRecognizer.getInstance();
+        
+        .....
+   }
+[/code]
+
+Add the above as first line of you application. <b>You simply get the enhanced scrolling to all JScrollPanes of your application with just single line.</b>
+
+<img src="http://www.jroller.com/resources/s/santhosh/EnhancedScrolling.gif"/>
+
+<a href="http://www.jroller.com/resources/s/santhosh/EnhancedScrolling.jnlp"><img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg"/></a>
+

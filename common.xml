@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO :: specify project name here -->
+<project basedir="." default="make" name="common">
+  <property file="../keystore.properties"/>
+  <property file="article.properties"/>
+  
+  <target name="init">
+    <mkdir dir="classes"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src" destdir="classes" debug="true" deprecation="false" nowarn="false"/>
+  </target>
+
+  <target name="archive">
+    <jar compress="true" jarfile="${ant.project.name}.jar">
+      <fileset dir="classes"/>
+      <fileset dir="src">
+      	<exclude name="**/*.java"/>
+       </fileset>
+    </jar>
+  </target>
+  
+  <target name="sign">
+    <delete file="keystore.ks"/>
+    <genkey keystore="keystore.ks" alias="${keystore.alias}" storepass="${keystore.password}">
+    	<dname>
+	   <param name="CN" value="${keystore.commonName}"/>
+	   <param name="OU" value="${keystore.organizationUnit}"/>
+	   <param name="O"  value="${keystore.organization}"/>
+	   <param name="L"  value="${keystore.locality}"/>
+	   <param name="S"  value="${keystore.state}"/>
+	   <param name="C"  value="${keystore.country}"/>
+	 </dname>
+     </genkey>
+     <signjar jar="${ant.project.name}.jar" keystore="keystore.ks" alias="${keystore.alias}" storepass="${keystore.password}"/>
+
+  </target>
+
+  <target name="obfuscate">
+    <java classname="RetroGuard" fork="true">
+    	<classpath>
+	    <pathelement location="d:/fioranodev/HEAD/3rdparty/retroguard/retroguard.jar"/>
+    	</classpath>
+	<arg value="${ant.project.name}.jar"/>
+	<arg value="${ant.project.name}_obfsucated.jar"/>
+	<arg value="retroguard.txt"/>
+	<arg value="retroguard.log"/>
+    </java>
+    <move file="${ant.project.name}_obfsucated.jar" tofile="${ant.project.name}.jar"/>
+  </target>
+
+  <target name="cleanup">
+    <delete file="${ant.project.name}.jar"/>
+    <delete file="${ant.project.name}.jnlp"/>
+    <delete file="_${ant.project.name}.jnlp"/>
+    <delete file="retroguard.txt"/>
+    <delete dir="classes"/>
+  </target>
+
+  <target name="make" depends="compile,archive,sign">
+    <copy file="../jroller.jnlp" tofile="${ant.project.name}.jnlp" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+    </copy>
+    <copy file="../javalobby.jnlp" tofile="_${ant.project.name}.jnlp" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+    </copy>
+    <copy file="../retroguard.txt" tofile="retroguard.txt" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+    </copy>
+  </target>
+  <target name="rebuild" depends="cleanup,make"/>
+
+</project>

@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title></title>
+
+
+</head>
+<body>
+
+<span style="font-family: Verdana;"><br>
+
+<br>
+
+Some solutions which I found, suggest to add a combobox item
+"Separator", and the renderer finds it and renders it as JSeparator.
+But as per my opinion Polluting model data in order to get separators
+in UI is bad approach. It also has a drawback. because model contains a
+specific list item for separator, it can be selectable by user.<br>
+
+<br>
+
+Today I spend some time on this aspect and found an elegant solution
+(as far as I,m aware):<br>
+
+<br>
+
+</span>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td><span style="font-family: monospace;">/**</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+MySwing: Advanced Swing Utilites</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+Copyright (C) 2005&nbsp; Santhosh Kumar T</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+&lt;p/&gt;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+This library is free software; you can redistribute it and/or</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+modify it under the terms of the GNU Lesser General Public</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+License as published by the Free Software Foundation; either</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+version 2.1 of the License, or (at your option) any later version.</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+&lt;p/&gt;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+This library is distributed in the hope that it will be useful,</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&nbsp; See the
+GNU</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+Lesser General Public License for more details.</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*/</span><br style="font-family: monospace;">
+
+      <br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">import
+javax.swing.*;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">import
+java.awt.*;</span><br style="font-family: monospace;">
+
+      <br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">/**</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+@author Santhosh Kumar T</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*
+@email santhosh.tekuri@gmail.com</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;*/</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">public
+abstract class ComboSeparatorsRenderer implements ListCellRenderer{</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+private ListCellRenderer delegate;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+private JPanel separatorPanel = new JPanel(new BorderLayout());</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+private JSeparator separator = new JSeparator();</span><br style="font-family: monospace;">
+
+      <br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+public ComboSeparatorsRenderer(ListCellRenderer delegate){</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.delegate = delegate;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+}</span><br style="font-family: monospace;">
+
+      <br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+public Component getListCellRendererComponent(JList list, Object value,
+int index, boolean isSelected, boolean cellHasFocus){</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Component comp = delegate.getListCellRendererComponent(list, value,
+index, isSelected, cellHasFocus);</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if(index!=-1 &amp;&amp; addSeparatorAfter(list, value, index)){
+// index==1 if renderer is used to paint current value in combo</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+separatorPanel.removeAll();</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+separatorPanel.add(comp, BorderLayout.CENTER);</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+separatorPanel.add(separator, BorderLayout.SOUTH);</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return separatorPanel;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}else</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return comp;</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+}</span><br style="font-family: monospace;">
+
+      <br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+protected abstract boolean addSeparatorAfter(JList list, Object value,
+int index);</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">}</span></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<span style="font-family: Verdana;"><br>
+
+</span><span style="font-family: Verdana;">We will
+use ComboSeparatorsRender as renderer for combobox. This class is an
+abstract class, where user has to implement a method:<br>
+
+<br>
+
+</span><span style="font-family: monospace;">protected
+abstract boolean addSeparatorAfter(JList list, Object value, int index);</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+</span><br>
+
+<span style="font-family: Verdana;">This method
+implemenation will return true, if you want a separator after the given
+item.<br>
+
+<br>
+
+For example to achieve the following we override it as follows:<br>
+
+</span><img style="width: 290px; height: 215px;" alt="" src="http://jroller.com/santhosh/resource/ComboBoxSeparators1.png"><br>
+
+<br>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td><span style="font-family: monospace;">JComboBox
+comboBox = new JComboBox(new
+String[]{&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+"All", "Unread", "Important", "Work", "Later", "People I Know",
+"Customize..."</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">});&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">comboBox.setRenderer(new
+ComboSeparatorsRenderer(comboBox.getRenderer()){&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+protected boolean addSeparatorAfter(JList list, Object value, int
+index){&nbsp;&nbsp;&nbsp;&nbsp; </span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+return "Unread".equals(value) || "People I
+Know".equals(value);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+
+      <span style="font-family: monospace;">});&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+<span style="font-family: Verdana;">The constructor </span><span style="font-family: Verdana;">ComboSeparatorsRender takes
+the original renderer to be used to render the combobox items. When
+addSeparatorAfter(...) returns true for a specific item, we wrap the
+original renderer in a component which contains JSeparator.<br>
+
+<br>
+
+The method addSeparatorAfter(....) gives freedom to user, to implement
+his/her own logic to find whether to show separator or not, without
+polluting actuall data model.<br>
+
+<br>
+
+If you see implementaiton of </span><span style="font-family: monospace;">ComboSeparatorsRenderer.</span><span style="font-family: monospace;">getListCellRendererComponent(...)
+</span><span style="font-family: Verdana;">, it adds
+separator on a specific condition:<br>
+
+<br>
+
+&nbsp; &nbsp;</span><span style="font-family: monospace;">if(index!=-1
+&amp;&amp; addSeparatorAfter(list, value, index))</span><br>
+
+<span style="font-family: Verdana;"></span><br>
+
+<span style="font-family: Verdana;">Here index==-1 is
+hack. if we dont have this condition, then when user selects an item
+which has separator after it, it will look as beolow:</span><br>
+
+<br>
+
+<img style="width: 586px; height: 221px;" alt="" src="http://jroller.com/santhosh/resource/ComboBoxSeparators2.png"><br>
+
+<span style="font-family: Verdana;">i.e, it renders
+separator in comboBox also. after having a glance at
+BasicComboBoxUI.paintCurrentValue(....), I found that only differece
+when used to get renderer is index==-1.<br>
+
+<br>
+
+The main advantage of this approach is:<br>
+
+&nbsp; &nbsp;As separators are not part of model data, user
+can't select the separators either with mouse or using arrow keys. They
+are purely UI decorations to List items.<br>
+
+<br>
+
+<a href="http://jroller.com/santhosh/resource/ComboBoxSeparators.jnlp"><img style="border: 0px solid ; width: 88px; height: 23px;" alt="" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg"></a><br>
+
+<br>
+
+Your Comments are apperciated.<br>
+
+<br>
+
+</span>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/SyncScrolling.gif" width="500" height="300">
+
+When you move the vertical scrollbar of first textarea, the vertical scrollbar of second text area also moves and vice versa.
+[code]
+  JScrollPane scroll1 = new JScrollPane(textArea1); 
+  JScrollPane scroll2 = new JScrollPane(textArea2); 
+  scroll1.getVerticalScrollBar().setModel(scroll2.getVerticalScrollBar().getModel());
+[/code]
+<b>Assumption:</b>
+&nbsp;&nbsp;&nbsp;&nbsp; the maximum value of both vertical scrollbars are same.
+
+This might even work if we use the maximum value of both vertical scrollbars and use the same for both.
+
+<a href="http://www.jroller.com/resources/s/santhosh/SyncScrolling.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your comments are appreciated.
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+Contributing Editor - santhosh@javalobby.org
+MySwing Project     - https://myswing.dev.java.net/
+Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+Sr. Software Eng    - http://www.fiorano.com

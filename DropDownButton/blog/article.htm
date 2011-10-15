@@ -1,0 +1,144 @@
+<html>
+
+<body>
+<p><font size="2" face="Verdana">In windows, DropDownButtons are very common. 
+See the following screenshot of Windows Explorer:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/windowsExplorerDropDown.gif" width="241" height="147"></p>
+<p><font size="2" face="Verdana">I heard hat Netbeans TaskList module has a 
+dropDownButton from its mailing lists. I tried it. It is called DropDownButton 
+for the name sake, but doesn't feel like dropDownButton. There are many issues 
+involved in implementing a dropDownButton.</font></p>
+<p><font size="2" face="Verdana"><b>Issue 1:</b> ArrowButton width must be very 
+small compared to mainButton<br>
+<b>Issue 2:</b> arrowButton should feel like part of mainButton. When mouse move 
+over either of main 
+button or arrow button, both buttons should show rollover border.<br>
+<b>Issue 3:</b> when arrowbutton pressed, main button should still stay as 
+raised. But when mainButton is pressed arrow button should also be pressed<br>
+<b>Issue 4:</b> when the popup closed either by selecting an action or pressing 
+ESC, both mainButton &amp; arrowButton should clear their borders<br>
+<b>Issue 5:</b> last but not least, when mainButton gets disabled, arrowButton 
+should also get disabled.<br>
+<b>Issue 6:</b> any thing which I might have missed.<br>
+<br>
+Netbeans DropDownButton just implements the first entry in the above list.<br>
+<br>
+Now let us start attacking the problem. First thoroughly understand various 
+states of button such as rollover, armed, pressed etc.<br>
+&nbsp;</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author  santhosh kumar - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> DropDownButton </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JButton </font><font style="font-family: monospaced;" color="#000080"><b>
+                     implements</b></font><font style="font-family: monospaced;" color="#000000"> ChangeListener, PopupMenuListener, ActionListener, PropertyChangeListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JButton mainButton = </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JButton arrowButton = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ImageIcon(getClass().getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;dropdown.gif&quot;</b></font><font style="font-family: monospaced;" color="#000000">))); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> popupVisible = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> DropDownButton(){ 
+        mainButton.getModel().addChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        arrowButton.getModel().addChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        arrowButton.addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        arrowButton.setMargin(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">)); 
+        mainButton.addPropertyChangeListener(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;enabled&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ PropertyChangeListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+        arrowButton.setEnabled(mainButton.isEnabled()); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ ChangeListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stateChanged(ChangeEvent e){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e.getSource()==mainButton.getModel()){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(popupVisible &amp;&amp; !mainButton.getModel().isRollover()){ 
+                mainButton.getModel().setRollover(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+            arrowButton.getModel().setRollover(mainButton.getModel().isRollover()); 
+            arrowButton.setSelected(mainButton.getModel().isArmed() &amp;&amp; mainButton.getModel().isPressed()); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(popupVisible &amp;&amp; !arrowButton.getModel().isSelected()){ 
+                arrowButton.getModel().setSelected(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+            mainButton.getModel().setRollover(arrowButton.getModel().isRollover()); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae){ 
+         JPopupMenu popup = getPopupMenu(); 
+         popup.addPopupMenuListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+         popup.show(mainButton, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, mainButton.getHeight()); 
+     } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ PopupMenuListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuWillBecomeVisible(PopupMenuEvent e){ 
+        popupVisible = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        mainButton.getModel().setRollover(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        arrowButton.getModel().setSelected(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuWillBecomeInvisible(PopupMenuEvent e){ 
+        popupVisible = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        mainButton.getModel().setRollover(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        arrowButton.getModel().setSelected(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        ((JPopupMenu)e.getSource()).removePopupMenuListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); // act as good programmer :)
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuCanceled(PopupMenuEvent e){ 
+        popupVisible = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*------------------------------[ Other Methods ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> JPopupMenu getPopupMenu(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> JButton addToToolBar(JToolBar toolbar){ 
+        toolbar.add(mainButton); 
+        toolbar.add(arrowButton); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> mainButton; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Above DropDownButton implements various event 
+listeners.<br>
+<br>
+<b>ChangeListener:</b> takes care of Issue 2 and Issue 3<br>
+<b>PopupMenuListener:</b> takes care of Issue 4<br>
+<b>PropertyChangeListener:</b> takes care of Issue 5<br>
+<b>Constructor &amp; addToToolBar(..):</b> takes care of Issue1 and Issue 6 </font>
+</p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/dropDownButton.gif" width="194" height="138"></p>
+<p><font size="2" face="Verdana">how to use this: <br>
+&nbsp;&nbsp;&nbsp; try on your own :)</font></p>
+<p><font size="2" face="Verdana">I have extremely taken care of not running into 
+creating custom component and its UI classes (some FAQ suggest to do so) <br>
+<br>
+<b>To Netbeans Team:</b><br>
+&nbsp;&nbsp;&nbsp; Netbeans has many actions in which a list of actions exist. 
+for example:<br>
+&nbsp;&nbsp;&nbsp; NewAction - has a list of NewTypes<br>
+&nbsp;&nbsp;&nbsp; Paste - various ways of pasting.<br>
+&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; when I add such actions to toolbar, they just show the one of 
+its list of action. I suggest Netbeans team to use this, to improve the Lood and 
+Feel.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/dropDownButton.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

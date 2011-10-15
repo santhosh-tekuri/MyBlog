@@ -1,0 +1,140 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">In the previous post
+<a href="http://www.jroller.com/page/santhosh/20050708#context_sensitive_actions">
+Context Sensitive Actions</a>, we learned how to make an action context sensitive 
+to a particular instance of JComponent. Now we will try to make action context 
+sensitive to the current focused component.</font></p>
+<p><font size="2" face="Verdana">Let us say, the application contains a JTable, 
+JList, and JTree. All the three components have &quot;selectAll&quot; action in their 
+action map. Then why don't we have a single action (either in menu or toolbar) 
+which can be used to select all items in the current focused component.</font></p>
+<p><font size="2" face="Verdana">To be precise the action shouldn't be invoked 
+on current focused component. Why ?</font></p>
+<p><font size="2" face="Verdana">let us say user selected a JTable, then the 
+JTable becomes the current focused component. In order to invoke &quot;selectAll&quot; 
+action, user clicks the menu and selects the action. During this process, the 
+current focused component gets changed to JMenuBar, JMenu and JMenuItem, So 
+current focused component will be JMenuItem, but we want the action to be 
+performed on the JTable.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> GloballyContextSensitiveAction </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Action{ 
+    String actionName, shortDescription, longDescription; 
+    Action delegate; 
+    JComponent source; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener focusOwnerListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;focusOwner&quot;</b></font><font style="font-family: monospaced;" color="#000000">.equals(evt.getPropertyName())){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(evt.getNewValue() </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JComponent){ 
+                    JComponent comp = (JComponent)evt.getNewValue(); 
+                    Action action = comp.getActionMap().get(actionName); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(action!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                        changeDelegate(comp, action); 
+                } 
+            } 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> GloballyContextSensitiveAction(String actionName, String shortDescription, String longDescription){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.actionName = actionName; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.shortDescription = shortDescription; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.longDescription = longDescription; 
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(focusOwnerListener); 
+    } 
+ 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Delegate Listener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    PropertyChangeSupport support = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeSupport(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener delegateListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+            support.firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addPropertyChangeListener(PropertyChangeListener listener){ 
+        support.addPropertyChangeListener(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removePropertyChangeListener(PropertyChangeListener listener){ 
+        support.removePropertyChangeListener(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changeDelegate(JComponent comp, Action action){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            delegate.removePropertyChangeListener(delegateListener); 
+        source = comp; 
+        delegate = action; 
+        delegate.addPropertyChangeListener(delegateListener); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> enabled = delegate.isEnabled(); 
+        support.firePropertyChange(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;enabled&quot;</b></font><font style="font-family: monospaced;" color="#000000">, !enabled, enabled); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; delegate.isEnabled(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> enabled){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            delegate.setEnabled(enabled); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getValue(String key){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.NAME)) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> actionName; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.SHORT_DESCRIPTION)) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> shortDescription; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.LONG_DESCRIPTION)) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> longDescription; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> delegate.getValue(key); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> putValue(String key, Object value){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.NAME)) 
+            actionName = (String)value; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.SHORT_DESCRIPTION)) 
+            shortDescription = (String)value; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(key.equals(Action.LONG_DESCRIPTION)) 
+            longDescription = (String)value; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            delegate.putValue(key, value); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(delegate!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            delegate.actionPerformed(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(source, ae.getID(), ae.getActionCommand(), ae.getWhen(), ae.getModifiers())); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">&nbsp;The above class takes the actionName in 
+the constructor. This actionName is used to find the action from the focused 
+component. It registeres a property change listener to KeyboardFocusManager to 
+listen for changes in focusOwner. When it is notified about the change in 
+focusOwner, it changes its delegate action and fires appropriate property 
+changes to its listeners. I doesn't do anything if the current focused component 
+doesn't have any action with actionName as key.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/GloballyContextSensitiveActions.gif" width="293" height="251"></font></p>
+<p><font size="2" face="Verdana">This is the screenshot of the webstart demo. 
+Just make any of the components (JList or JTree or JTable) take focus and invoke 
+selectAll action either from menu or toolbar.</font></p>
+<p>
+<a href="http://www.jroller.com/resources/s/santhosh/GloballyContextSensitiveActions.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

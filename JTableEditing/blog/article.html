@@ -1,0 +1,135 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">There are two client properties supported by JTable which are related to 
+editing.</font></p>
+<p><font face="Verdana"><b><font size="2">JTable.autoStartsEdit: </font> </b>
+<font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The value is of type 
+Java.lang.Boolean. This property tells whether JTable should start edit when a 
+key is types. If the value of this property is null, it defaults to Boolean.TRUE. 
+So this feature is enabled by default in JTable.</font></font></p>
+<p><font face="Verdana"><b><font size="2">terminateEditOnFocusLost:</font></b><font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The value is of type 
+Java.lang.Boolean. This property tells whether what to do when focus goes 
+outside of JTable. It first tries to commit the changes in editor, if can't be 
+committed then the changes are cancelled. If the value of this property is null, 
+it default to Boolean.FALSE. So this feature is disabled by default in JTable. 
+You can enable this feature as follows:</font></font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">table.putClientProperty(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;terminateEditOnFocusLost&quot;</b></font><font style="font-family: monospaced;" color="#000000">, Boolean.TRUE);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">I suggest to make this feature to be enabled for JTable.</font></p>
+<p><b><font size="2" face="Verdana">Remove Borders of TableCellEditors:</font></b></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing1.gif" width="114" height="46">&nbsp;&nbsp; 
+---&gt;&nbsp;&nbsp;
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing2.gif" width="104" height="42"></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JTextField tf = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(); 
+tf.setBorder(BorderFactory.createEmptyBorder()); 
+table.setDefaultEditor(Object.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultCellEditor(tf));</font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing3.gif" width="108" height="36">&nbsp;&nbsp; 
+----&gt;&nbsp;
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing4.gif" width="112" height="35"></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JComboBox combo = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JComboBox(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> String[]{</font><font style="font-family: monospaced;" color="#008000"><b>&quot;item1&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;item2&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;item3&quot;</b></font><font style="font-family: monospaced;" color="#000000">}); 
+combo.setBorder(BorderFactory.createEmptyBorder()); 
+table.getColumn(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;B&quot;</b></font><font style="font-family: monospaced;" color="#000000">).setCellEditor(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultCellEditor(combo));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">Make JComboBox popup open when user invokes 
+editing with F2 key:</font></b></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JComboBox combo = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JComboBox(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> String[]{</font><font style="font-family: monospaced;" color="#008000"><b>&quot;item1&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;item2&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;item3&quot;</b></font><font style="font-family: monospaced;" color="#000000">}){ 
+     </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> processFocusEvent(FocusEvent fe) { 
+           </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.processFocusEvent(fe); 
+           Component focusOwner = KeyboardFocusManager. 
+               getCurrentKeyboardFocusManager().getFocusOwner(); 
+ 
+          </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (isDisplayable() &amp;&amp; fe.getID()==FocusEvent.FOCUS_GAINED 
+                   &amp;&amp; focusOwner==</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; !isPopupVisible()) { 
+                       showPopup(); 
+           } 
+     } 
+}; 
+combo.setBorder(BorderFactory.createEmptyBorder()); 
+table.getColumn(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;B&quot;</b></font><font style="font-family: monospaced;" color="#000000">).setCellEditor(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultCellEditor(combo));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">Add rows on tabbing to a cell beyond the 
+last cell:</font></b></p>
+
+<p><font size="2" face="Verdana">JTable by defaults selects the next cell when 
+TAB is pressed. When the current selection is last cell, pressing tab selects 
+the first cell. But here we want a new row to be inserted and selected the next 
+newly created cell.</font></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">JTable table = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTable(</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">){ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> KeyStroke tabKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_TAB, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changeSelection(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rowIndex, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> columnIndex, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> toggle, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> extend) { 
+        AWTEvent currentEvent = EventQueue.getCurrentEvent(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(currentEvent </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent){ 
+            KeyEvent ke = (KeyEvent)currentEvent; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(ke.getSource()!=</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// focus change with keyboard</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(rowIndex==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; columnIndex==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> 
+                    &amp;&amp; KeyStroke.getKeyStrokeForEvent(ke).equals(tabKeyStroke)){ 
+                ((DefaultTableModel)getModel()).addRow(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Object[getColumnCount()]); 
+                rowIndex = getRowCount()-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.changeSelection(rowIndex, columnIndex, toggle, extend); 
+    } 
+};</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">See how do we find out whether the selection 
+change is because of tab key press or not.</font></p>
+
+<p><font size="2" face="Verdana">This trick may be useful in only occasional 
+scenarios. I found such feature during HTML table editing of Microsoft Frontpage.</font></p>
+
+<p><font size="2" face="Verdana">I created a webstart demo to show this tricks 
+live:</font></p>
+
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTableEditing.gif" width="286" height="199"></font></p>
+
+<p><font size="2" face="Verdana">The first tab contains JTable without any of 
+these tricks, and the second tab contains JTable with all these tricks 
+implemented.</font></p>
+
+<p><a href="http://www.jroller.com/resources/s/santhosh/JTableEditing.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+
+<p><font size="2" face="Verdana">Your comments are appreciated.<br> 
+&nbsp;</font></p>
+
+</body>
+
+</html>

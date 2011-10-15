@@ -1,0 +1,340 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Let me explain what is &quot;JTree with CheckBoxes&quot;.</font></p>
+<ul>
+  <li><font size="2" face="Verdana">Each node of the JTree contains a CheckBox.
+  </font></li>
+  <li><font size="2" face="Verdana">When a node's checkbox is selected, all its 
+  descendants should also get checked and vice versa. </font></li>
+  <li><font size="2" face="Verdana">When all descendants of a node are not 
+  checked but some of them are checked (i.e, partial selection) then the node 
+  should be checked with a gray tick.</font></li>
+  <li><font size="2" face="Verdana">&nbsp;When all children of a node are 
+  unselected, the node should unselected.</font></li>
+</ul>
+<p><font face="Verdana"><font size="2">If you google for &quot;JTree CheckBox&quot; you 
+will get :<br>
+&nbsp;&nbsp; </font>
+<a href="http://www.java2s.com/ExampleCode/Swing-Components/CheckboxNodeTreeExample.htm">
+<font size="2">
+http://www.java2s.com/ExampleCode/Swing-Components/CheckboxNodeTreeExample.htm</font></a></font></p>
+<p><font size="2" face="Verdana">There are <b>many drawbacks</b> in the above 
+implementation. The major drawback is, It restricts to use DefaultTreeModel 
+whose nodes are CheckNode.<br>
+<br>
+JTree should have two selections: one is normal selection and another is <b>
+checkSelection</b> (checkbox selected)</font></p>
+<p><font size="2" face="Verdana">Why don't we use TreeSelectionModel to maintain 
+checkSelection. But we can't use DefaultTreeSelection as-it-is without any 
+changes. because we have to restrict the selection as explained in the above 
+points:<br>
+<br>
+In our check selection model, it contains only the selected node but not all its 
+descendants. i.e. let us say Node A has children B, C, D;<br>
+When user checks Node A, the tree shows B, C and D also checked. But the 
+selectionModel actually contains only A,</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> DefaultTreeSelectionModel{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TreeModel model; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel(TreeModel model){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.model = model; 
+        setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// tests whether there is any unselected node in the subtree of given path</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isPartiallySelected(TreePath path){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isPathSelected(path, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">)) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        TreePath[] selectionPaths = getSelectionPaths(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectionPaths==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> j = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; j&lt;selectionPaths.length; j++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isDescendant(selectionPaths[j], path)) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// tells whether given path is selected.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// if dig is true, then a path is assumed to be selected, if</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// one of its ancestor is selected.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isPathSelected(TreePath path, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> dig){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!dig) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.isPathSelected(path); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(path!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; !</font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.isPathSelected(path)) 
+            path = path.getParentPath(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> path!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// is path1 descendant of path2</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isDescendant(TreePath path1, TreePath path2){ 
+        Object obj1[] = path1.getPath(); 
+        Object obj2[] = path2.getPath(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;obj2.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(obj1[i]!=obj2[i]) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setSelectionPaths(TreePath[] pPaths){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> UnsupportedOperationException(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;not implemented yet!!!&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addSelectionPaths(TreePath[] paths){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// unselect all descendants of paths[]</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;paths.length; i++){ 
+            TreePath path = paths[i]; 
+            TreePath[] selectionPaths = getSelectionPaths(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectionPaths==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            ArrayList toBeRemoved = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ArrayList(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> j = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; j&lt;selectionPaths.length; j++){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isDescendant(selectionPaths[j], path)) 
+                    toBeRemoved.add(selectionPaths[j]); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeSelectionPaths((TreePath[])toBeRemoved.toArray(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">])); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// if all siblings are selected then unselect them and select parent recursively</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// otherwize just select that path.</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;paths.length; i++){ 
+            TreePath path = paths[i]; 
+            TreePath temp = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(areSiblingsSelected(path)){ 
+                temp = path; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(path.getParentPath()==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+                path = path.getParentPath(); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(temp!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(temp.getParentPath()!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    addSelectionPath(temp.getParentPath()); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!isSelectionEmpty()) 
+                        removeSelectionPaths(getSelectionPaths()); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{temp}); 
+                } 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{ path}); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// tells whether all siblings of given path are selected.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> areSiblingsSelected(TreePath path){ 
+        TreePath parent = path.getParentPath(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(parent==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        Object node = path.getLastPathComponent(); 
+        Object parentNode = parent.getLastPathComponent(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> childCount = model.getChildCount(parentNode); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;childCount; i++){ 
+            Object childNode = model.getChild(parentNode, i); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(childNode==node) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>continue</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!isPathSelected(parent.pathByAddingChild(childNode))) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeSelectionPaths(TreePath[] paths){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;paths.length; i++){ 
+            TreePath path = paths[i]; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(path.getPathCount()==</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{ path}); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                toggleRemoveSelection(path); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// if any ancestor node of given path is selected then unselect it</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>//  and selection all its descendants except given path and descendants.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// otherwise just unselect the given path</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> toggleRemoveSelection(TreePath path){ 
+        Stack stack = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Stack(); 
+        TreePath parent = path.getParentPath(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(parent!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; !isPathSelected(parent)){ 
+            stack.push(parent); 
+            parent = parent.getParentPath(); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(parent!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            stack.push(parent); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{path}); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(!stack.isEmpty()){ 
+            TreePath temp = (TreePath)stack.pop(); 
+            TreePath peekPath = stack.isEmpty() ? path : (TreePath)stack.peek(); 
+            Object node = temp.getLastPathComponent(); 
+            Object peekNode = peekPath.getLastPathComponent(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> childCount = model.getChildCount(node); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;childCount; i++){ 
+                Object childNode = model.getChild(node, i); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(childNode!=peekNode) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{temp.pathByAddingChild(childNode)}); 
+            } 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeSelectionPaths(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreePath[]{parent}); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">You can ask the the above selection model 
+whether B is selected as below:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; checkSelectionModel.isPathSelected(getPath(B), true); 
+// the second argument tells that selection is to be digged.</font></p>
+<p><font size="2" face="Verdana">Please take time to understand the above code 
+(It is little bit complex, I guess). </font></p>
+<p><font size="2" face="Verdana">As usual we attacked the model. next is 
+renderer,&nbsp; In the google link I specified in the beginning restricts you to 
+use its renderer. But in our implementation we <b>let user add checkbox to any TreeCellRenderer</b>:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeCellRenderer </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JPanel </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TreeCellRenderer{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel selectionModel; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TreeCellRenderer delegate; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TristateCheckBox checkBox = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TristateCheckBox(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeCellRenderer(TreeCellRenderer delegate, CheckTreeSelectionModel selectionModel){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.delegate = delegate; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.selectionModel = selectionModel; 
+        setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+        setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        checkBox.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Component getTreeCellRendererComponent(JTree tree, Object value, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> selected, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> expanded, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> leaf, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> hasFocus){ 
+        Component renderer = delegate.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus); 
+ 
+        TreePath path = tree.getPathForRow(row); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(path!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selectionModel.isPathSelected(path, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">)) 
+                checkBox.setState(Boolean.TRUE); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                checkBox.setState(selectionModel.isPartiallySelected(path) ? </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> : Boolean.FALSE); 
+        } 
+        removeAll(); 
+        add(checkBox, BorderLayout.WEST); 
+        add(renderer, BorderLayout.CENTER); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">The above renderer can wrap any of your 
+TreeCellRenderer implementation. <br>
+I used TristateCheckBox from
+<a href="http://www.javaspecialists.co.za/archive/Issue082.html">
+http://www.javaspecialists.co.za/archive/Issue082.html</a><br>
+<br>
+We can also implement editor in the same way such that it can wrap any 
+TreeCellEditor implementation. But I am leaving it as exercise for you :)<br>
+<br>
+The next question comes is:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; We have SelectionModel and renderer. But who will 
+listen of mouseclicks in checkbox and update the selectionmodel ???<br>
+<br>
+Here is that class, CheckTreeManager:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeManager </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TreeSelectionListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel selectionModel; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JTree tree = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTree(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hotspot = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox().getPreferredSize().width; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeManager(JTree tree){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.tree = tree; 
+        selectionModel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel(tree.getModel()); 
+        tree.setCellRenderer(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeCellRenderer(tree.getCellRenderer(), selectionModel)); 
+        tree.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        selectionModel.addTreeSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent me){ 
+        TreePath path = tree.getPathForLocation(me.getX(), me.getY()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(path==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(me.getX()&gt;tree.getPathBounds(path).x+hotspot) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> selected = selectionModel.isPathSelected(path, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        selectionModel.removeTreeSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selected) 
+                selectionModel.removeSelectionPath(path); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                selectionModel.addSelectionPath(path); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>finally</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            selectionModel.addTreeSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            tree.treeDidChange(); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeSelectionModel getSelectionModel(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> selectionModel; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> valueChanged(TreeSelectionEvent e){ 
+        tree.treeDidChange(); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<ul>
+  <li><font size="2" face="Verdana">It listens for mouse clicks in the hotspot 
+  (inside checkbox) and updates the selection</font></li>
+  <li><font size="2" face="Verdana">updates the tree (repaints) when 
+  checkselection is changed</font></li>
+  <li><font size="2" face="Verdana">listens for selectionmodel changes and 
+  updates the view. Because it allows you tocheck a node programmatically..
+  </font></li>
+</ul>
+<p><b><font size="2" face="Verdana">How to use this:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">// makes your tree as CheckTree
+CheckTreeManager checkTreeManager = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CheckTreeManager(yourTree); 
+
+// to get the paths that were checked
+TreePath checkedPaths[] = checkTreeManager.getSelectionModel().getSelectionPaths(); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2"><b>See how powerful our solution is:</b></font></p>
+<ul>
+  <li><font face="Verdana" size="2">You can convert any JTree (with any 
+  TreeModel and any TreeCellRenderer) just by one line.</font></li>
+  <li><font face="Verdana" size="2">normal selection doesn't interfere with 
+  checkselection. In the google link i specified, when you select a node, it 
+  gets checked.</font></li>
+  <li><font face="Verdana" size="2">you can reuse your renderers/editors</font></li>
+</ul>
+<p><font face="Verdana" size="2">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/CheckTree.gif" width="187" height="320"></font></p>
+<p><font face="Verdana" size="2">The webstart demo shows the selection at the 
+bottom of the window in a JLable. This lets you understand how our 
+CheckSelectionModel is updated with your changes to checkselection.<br>
+<br>
+</font><a href="http://www.jroller.com/resources/s/santhosh/CheckTree.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font face="Verdana" size="2">Your comments are welcome.</font></p>
+
+</body>
+
+</html>

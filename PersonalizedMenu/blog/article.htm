@@ -1,0 +1,182 @@
+<html>
+<body>
+<p><font face="Verdana" size="2">Personalized menus are so common in Microsoft applications. 
+</font> </p>
+<p><b><font face="Verdana" size="2">What is personalized menu ?</font></b></p>
+<p><font face="Verdana" size="2">Personalized menus keep the menus clean, by hiding items that are used 
+rarely. You can gain access to the hidden items by clicking down arrow at the 
+bottom of menu.</font></p>
+<p>
+<font face="Verdana" size="2">
+<img border="0" src="http://jroller.com/resources/s/santhosh/microsoft_personalized.png" width="320" height="250"></font></p>
+<p>
+<font face="Verdana" size="2">Let us see How to do the same with swing. </font> </p>
+<p>
+<font face="Verdana" size="2">The Bottom MenuItem which contain down arrow, which I call ExpandMenuItem is as 
+below:</font></p>
+<table border="1" width="100%" id="table1" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-style: normal;" color="#000000">1    </font><font style="font-family: monospaced;" color="#000080"><b>package</b></font><font style="font-family: monospaced;" color="#000000"> santhosh; 
+<font style="font-style: normal;" color="#000000">2    </font> 
+<font style="font-style: normal;" color="#000000">3    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+<font style="font-style: normal;" color="#000000">4    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.event.PopupMenuEvent; 
+<font style="font-style: normal;" color="#000000">5    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.event.PopupMenuListener; 
+<font style="font-style: normal;" color="#000000">6    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.*; 
+<font style="font-style: normal;" color="#000000">7    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ActionEvent; 
+<font style="font-style: normal;" color="#000000">8    </font></font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ActionListener; 
+<font style="font-style: normal;" color="#000000">9    </font> 
+<font style="font-style: normal;" color="#000000">10   </font></font><font style="font-family: monospaced;" color="#808080"><i>/** 
+<font style="font-style: normal;" color="#000000">11   </font> * MySwing: Advanced Swing Utilites 
+<font style="font-style: normal;" color="#000000">12   </font> * Copyright (C) 2005  Santhosh Kumar T 
+<font style="font-style: normal;" color="#000000">13   </font> * &lt;p/&gt; 
+<font style="font-style: normal;" color="#000000">14   </font> * This library is free software; you can redistribute it and/or 
+<font style="font-style: normal;" color="#000000">15   </font> * modify it under the terms of the GNU Lesser General Public 
+<font style="font-style: normal;" color="#000000">16   </font> * License as published by the Free Software Foundation; either 
+<font style="font-style: normal;" color="#000000">17   </font> * version 2.1 of the License, or (at your option) any later version. 
+<font style="font-style: normal;" color="#000000">18   </font> * &lt;p/&gt; 
+<font style="font-style: normal;" color="#000000">19   </font> * This library is distributed in the hope that it will be useful, 
+<font style="font-style: normal;" color="#000000">20   </font> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<font style="font-style: normal;" color="#000000">21   </font> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+<font style="font-style: normal;" color="#000000">22   </font> * Lesser General Public License for more details. 
+<font style="font-style: normal;" color="#000000">23   </font> */</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">24   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ExpandMenuItem </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JMenuItem </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener{ 
+<font style="font-style: normal;" color="#000000">25   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ExpandMenuItem(){ 
+<font style="font-style: normal;" color="#000000">26   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Expand&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">27   </font>        addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">28   </font>    } 
+<font style="font-style: normal;" color="#000000">29   </font> 
+<font style="font-style: normal;" color="#000000">30   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> showPersonalizedItems(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> show){ 
+<font style="font-style: normal;" color="#000000">31   </font>        JMenu menu = (JMenu)((JPopupMenu)getParent()).getInvoker(); 
+<font style="font-style: normal;" color="#000000">32   </font> 
+<font style="font-style: normal;" color="#000000">33   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// show/hide all personalized menu items</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">34   </font>        Component[] comp = menu.getMenuComponents(); 
+<font style="font-style: normal;" color="#000000">35   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;comp.length; i++){ 
+<font style="font-style: normal;" color="#000000">36   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(comp[i] </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JMenuItem){ 
+<font style="font-style: normal;" color="#000000">37   </font>                JComponent jc = (JComponent)comp[i]; 
+<font style="font-style: normal;" color="#000000">38   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(Boolean.TRUE.equals(jc.getClientProperty(PERSONALIZED))) 
+<font style="font-style: normal;" color="#000000">39   </font>                    jc.setVisible(show); 
+<font style="font-style: normal;" color="#000000">40   </font>            } 
+<font style="font-style: normal;" color="#000000">41   </font>        } 
+<font style="font-style: normal;" color="#000000">42   </font> 
+<font style="font-style: normal;" color="#000000">43   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// hide the separator before this menu item</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">44   </font>        comp[comp.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">].setVisible(!show); 
+<font style="font-style: normal;" color="#000000">45   </font> 
+<font style="font-style: normal;" color="#000000">46   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// hide this menu item</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">47   </font>        setVisible(!show); 
+<font style="font-style: normal;" color="#000000">48   </font>    } 
+<font style="font-style: normal;" color="#000000">49   </font> 
+<font style="font-style: normal;" color="#000000">50   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">51   </font>     
+<font style="font-style: normal;" color="#000000">52   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+<font style="font-style: normal;" color="#000000">53   </font>        showPersonalizedItems(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">54   </font> 
+<font style="font-style: normal;" color="#000000">55   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// reopen the menu</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">56   </font>        JMenu menu = (JMenu)((JPopupMenu)getParent()).getInvoker(); 
+<font style="font-style: normal;" color="#000000">57   </font>        MenuElement newPath[] = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MenuElement[</font><font style="font-family: monospaced;" color="#0000ff">4</font><font style="font-family: monospaced;" color="#000000">]; 
+<font style="font-style: normal;" color="#000000">58   </font>        newPath[</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">] = (MenuElement)menu.getParent(); 
+<font style="font-style: normal;" color="#000000">59   </font>        newPath[</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">] = menu; 
+<font style="font-style: normal;" color="#000000">60   </font>        newPath[</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">] = menu.getPopupMenu(); 
+<font style="font-style: normal;" color="#000000">61   </font>        newPath[</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">] = (MenuElement)menu.getMenuComponent(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>// any menu item</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">62   </font>        MenuSelectionManager.defaultManager().setSelectedPath(newPath); 
+<font style="font-style: normal;" color="#000000">63   </font>    } 
+<font style="font-style: normal;" color="#000000">64   </font> 
+<font style="font-style: normal;" color="#000000">65   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ PopupMenuListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">66   </font> 
+<font style="font-style: normal;" color="#000000">67   </font>    PopupMenuListener listener = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">68   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addNotify(){ 
+<font style="font-style: normal;" color="#000000">69   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addNotify(); 
+<font style="font-style: normal;" color="#000000">70   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(listener==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">71   </font>            JPopupMenu popup = (JPopupMenu)getParent(); 
+<font style="font-style: normal;" color="#000000">72   </font>            popup.addPopupMenuListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> PopupMenuListener(){ 
+<font style="font-style: normal;" color="#000000">73   </font>                </font><font style="font-family: monospaced;" color="#808080"><i>// when popup menu closed, again restore previous state</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">74   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuWillBecomeInvisible(PopupMenuEvent e){ 
+<font style="font-style: normal;" color="#000000">75   </font>                    showPersonalizedItems(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">76   </font>                } 
+<font style="font-style: normal;" color="#000000">77   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuCanceled(PopupMenuEvent e){} 
+<font style="font-style: normal;" color="#000000">78   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> popupMenuWillBecomeVisible(PopupMenuEvent e){} 
+<font style="font-style: normal;" color="#000000">79   </font>            }); 
+<font style="font-style: normal;" color="#000000">80   </font>        } 
+<font style="font-style: normal;" color="#000000">81   </font>    } 
+<font style="font-style: normal;" color="#000000">82   </font> 
+<font style="font-style: normal;" color="#000000">83   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Timer ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">84   </font> 
+<font style="font-style: normal;" color="#000000">85   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> menuSelectionChanged(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isIncluded){ 
+<font style="font-style: normal;" color="#000000">86   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.menuSelectionChanged(isIncluded); 
+<font style="font-style: normal;" color="#000000">87   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isIncluded){ 
+<font style="font-style: normal;" color="#000000">88   </font>            timer.setRepeats(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">89   </font>            timer.start(); 
+<font style="font-style: normal;" color="#000000">90   </font>        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">91   </font>            timer.stop(); 
+<font style="font-style: normal;" color="#000000">92   </font>    } 
+<font style="font-style: normal;" color="#000000">93   </font> 
+<font style="font-style: normal;" color="#000000">94   </font>    Timer timer = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Timer(</font><font style="font-family: monospaced;" color="#0000ff">1500</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener(){ 
+<font style="font-style: normal;" color="#000000">95   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+<font style="font-style: normal;" color="#000000">96   </font>            MenuSelectionManager.defaultManager().clearSelectedPath(); 
+<font style="font-style: normal;" color="#000000">97   </font>            doClick(); 
+<font style="font-style: normal;" color="#000000">98   </font>        } 
+<font style="font-style: normal;" color="#000000">99   </font>    }); 
+<font style="font-style: normal;" color="#000000">100  </font> 
+<font style="font-style: normal;" color="#000000">101  </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Make Personalized ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">102  </font> 
+<font style="font-style: normal;" color="#000000">103  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String PERSONALIZED = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Personalized&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">104  </font> 
+<font style="font-style: normal;" color="#000000">105  </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setPersonalized(JMenuItem menuItem){ 
+<font style="font-style: normal;" color="#000000">106  </font>        menuItem.putClientProperty(PERSONALIZED, Boolean.TRUE); 
+<font style="font-style: normal;" color="#000000">107  </font>        menuItem.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">108  </font>    } 
+<font style="font-style: normal;" color="#000000">109  </font>}</font></pre>
+		</td>
+	</tr>
+</table>
+
+<p><font size="2" face="Verdana">103-108:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; A menuItem is recognized as personalized item if it has 
+client property &quot;Personalized&quot; with value Boolean.TRUE. Personalized items are 
+hidden by default.</font></p>
+<p><font size="2" face="Verdana">30-48<br>
+&nbsp;&nbsp;&nbsp; this method is used to toggle the visibility of personalized 
+items, exandItem and the separator above it. In Menu, we separate the expandItem 
+by a separator.</font></p>
+<p><font size="2" face="Verdana">52-63<br>
+&nbsp;&nbsp; this is what executed when expandItem is clicked. It makes the 
+personalized items visible and reopen the menu popup.</font></p>
+<p><font size="2" face="Verdana">67-81<br>
+&nbsp;&nbsp; when the menu is closed, again the personalized items should be 
+hidden, so that they don't appear again when menu opened. this is done using 
+PopupMenuListener.</font></p>
+<p><font size="2" face="Verdana">85-99<br>
+&nbsp;&nbsp; when the mouse stays on expandItem for a while, it automatically 
+expands without any additional mouse click. this is handled using a timer.</font></p>
+<table border="1" width="100%" id="table2" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<font style="font-family: monospaced;" color="#000000" face="Courier New" size="2"> 
+		menu.add(menuItem1); <br>
+		menu.add(menuItem2);<br>
+		menu.add(menuItem3);<br>
+		...<br>
+		<br>
+		// make some items personalized<br>
+		ExpandMenuItem.setPersonalized(menuItem2);<br>
+		ExpandMenuItem.setPersonalized(menuItem5);<br>
+		<br>
+		// add separator and expandItem<br>
+		menu.addSeparator();<br>
+		menu.add(new ExpandMenuItem());</font></td>
+	</tr>
+</table>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/personalized_before.png" width="300" height="300"><br>
+<br>
+<font size="2" face="Verdana">Either let the mouse stay on [Expand] for a while 
+or click [Expand], then you will see personalzed menus as below:</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://jroller.com/resources/s/santhosh/personalized_after.png" width="313" height="477"></font></p>
+<p><a href="http://jroller.com/resources/s/santhosh/PersonalizedMenus.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your Comments are appreciated.</font></p>
+
+</body>
+</html>

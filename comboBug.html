@@ -1,0 +1,67 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Today I found a bug in JComboBox</title>
+</head>
+
+<body>
+
+<p><font size="2" face="Verdana">Today I <font color="#FF0000"><b>found a bug in 
+JComboBox</b></font>. This is even <b><font color="#FF0000">reproducable in 
+JDK1.5</font></b>;</font></p>
+<p><font size="2" face="Verdana">When model of JComboBox is changes any change 
+in its selection is not notified to the registered ItemListeners.</font></p>
+<p><font size="2" face="Verdana">Here is the code to reproduce the bug:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ItemListener; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ItemEvent; 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> JComboBoxBug{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JComboBox combo = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JComboBox(); 
+        combo.addItemListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ItemListener(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> itemStateChanged(ItemEvent e){ 
+                System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;item States changed:&quot;</b></font><font style="font-family: monospaced;" color="#000000">+e.getItem() +</font><font style="font-family: monospaced;" color="#008000"><b>&quot; &quot;</b></font><font style="font-family: monospaced;" color="#000000">+ (e.getStateChange()==ItemEvent.SELECTED ? </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Selected&quot;</b></font><font style="font-family: monospaced;" color="#000000">: </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Deselected&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+            } 
+        }); 
+        System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;currenlty selelected item: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+combo.getSelectedItem()); 
+        combo.setModel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultComboBoxModel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> String[]{</font><font style="font-family: monospaced;" color="#008000"><b>&quot;item1&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Item2&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Item3&quot;</b></font><font style="font-family: monospaced;" color="#000000">})); 
+        System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;model changed.&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;currenlty selelected item: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+combo.getSelectedItem()); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">When you run the above class, you get the 
+following output:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%"><font size="2" face="Courier New">currenlty selelected 
+    item: null<br>
+    model changed.<br>
+    currenlty selelected item: item1</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The expected output is as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%"><font size="2" face="Courier New">currenlty selelected 
+    item: null<br>
+    item States changed: Item1 Selected<br>
+    model changed.<br>
+    currenlty selelected item: item1</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">I am going to report this to Sun...</font></p>
+
+</body>
+
+</html>

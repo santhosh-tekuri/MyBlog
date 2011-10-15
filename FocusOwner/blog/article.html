@@ -1,0 +1,221 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Today we are going to create a simple custom component called <b>JTitledPanel</b>.</font></p>
+<p>
+<font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTitledPanel.gif" width="225" height="154"></font></p>
+<p><font size="2" face="Verdana">JTitledPanel contains a title-bar and content-pane. The title that appears in 
+the title-bar is passed in the constructor. User can add any component to the 
+content-pane.</font></p>
+<p><font face="Verdana"><b><font size="2">The feature that is provided by this component is:</font></b><font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When any component 
+inside JTitlePane gets focus, the title-bar gets highlighted (say in blue 
+color), as soon as the focus goes to any component outside the JTtitlePane, the 
+title-bar removes the highlighting (say in gray color).</font></font></p>
+<p><font face="Verdana"><b><font size="2">How does JTitledPanel knows when focus is from a component inside it to a 
+component outside it and vice-versa ?</font></b><font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; One naive answer 
+is, add focus listener to the content-pane, highlight the title-bar when 
+focusGained(...) is called and remove the highlight when focusLost(...) is 
+called.</font></font></p>
+
+<p><font size="2" face="Verdana">But that doesn't work. Because scope of the notification of FocusListener is 
+just the component to which it is registered, not to the descendants of that 
+component.</font></p>
+
+<p><font face="Verdana"><b><font size="2">Thinking one step further:</font></b><font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Add a focusListener to 
+all descendants of content-pane and track the focus. </font></font> </p>
+
+<p><font size="2" face="Verdana">This seems to work, But not perfect. Why? If some components are 
+added/removed to the content-pane's descendants depending on user's action, this 
+will no longer work.</font></p>
+
+<p><font face="Verdana"><b><font size="2">Thinking one more step further:<br>
+</font></b><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In addition to focusListener, 
+also add a containerListener to all descendant container's and when 
+componentRemoved(...) called unregister the focusListener recursively and when 
+componentAdded(...) is called add focusListener recursively.</font></font></p>
+
+<p><font size="2" face="Verdana">I think this approach is lot of mess. What do you say ?</font></p>
+
+<p><font face="Verdana"><font size="2">There is <b>clean &amp; simple solution</b> to handle this:
+</font><b><font size="2">KeyboardFocusManager</font></b></font></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerTracker </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String PERMANENT_FOCUS_OWNER = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;permanentFocusOwner&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Component comp; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> inside; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerTracker(Component comp){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isFocusInside(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> isFocusInside(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isFocusInside(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> find){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!find) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> inside; 
+ 
+        Component c = focusManager.getPermanentFocusOwner(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(c!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==comp){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((c </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> Window) || 
+                    (c </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> Applet &amp;&amp; c.getParent()==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">)){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==SwingUtilities.getRoot(comp)){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+            c = c.getParent(); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> start(){ 
+        focusManager.addPropertyChangeListener(PERMANENT_FOCUS_OWNER, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        inside = isFocusInside(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stop(){ 
+        focusManager.removePropertyChangeListener(PERMANENT_FOCUS_OWNER, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> inside = isFocusInside(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.inside!=inside){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(inside) 
+                focusGained(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                focusLost(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.inside = inside; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> focusLost(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> focusGained(); 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+
+<p><font size="2" face="Verdana">We listen for the change in the property &quot;permanentFocusOwner&quot; 
+from keyboardFocusManager and find whether the focus is still inside the 
+JTitledPanel. This is how JTable supports &quot;terminateEditOnFocusLost&quot; client 
+property. I separated this into a nice class so that this can be re-used at many 
+places.</font></p>
+
+<p><font size="2" face="Verdana">In the above class, we have start() &amp; stop() 
+which starts/stops listening to changes from keyboardFocusManager. Note that, 
+when you are adding a listener to a long lived object (keyboardFocusManager), 
+you should take special care to avoid memory leaks.</font></p>
+
+<p><font size="2" face="Verdana">Let us see how to use this in JTitledPanel 
+implementation:</font></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">6    </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> JTitledPanel </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JComponent{ 
+<font style="font-style: normal;" color="#000000">7    </font>    JLabel titleLabel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(); 
+<font style="font-style: normal;" color="#000000">8    </font> 
+<font style="font-style: normal;" color="#000000">9    </font>    FocusOwnerTracker tracker = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerTracker(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">10   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> focusGained(){ 
+<font style="font-style: normal;" color="#000000">11   </font>            titleLabel.setForeground(UIManager.getColor(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;textHighlightText&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">12   </font>            titleLabel.setBackground(UIManager.getColor(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;textHighlight&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">13   </font>        } 
+<font style="font-style: normal;" color="#000000">14   </font> 
+<font style="font-style: normal;" color="#000000">15   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> focusLost(){ 
+<font style="font-style: normal;" color="#000000">16   </font>            titleLabel.setForeground(UIManager.getColor(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;textText&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">17   </font>            titleLabel.setBackground(UIManager.getColor(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;control&quot;</b></font><font style="font-family: monospaced;" color="#000000">).darker()); 
+<font style="font-style: normal;" color="#000000">18   </font>        } 
+<font style="font-style: normal;" color="#000000">19   </font>    }; 
+<font style="font-style: normal;" color="#000000">20   </font> 
+<font style="font-style: normal;" color="#000000">21   </font>    JPanel contents = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+<font style="font-style: normal;" color="#000000">22   </font> 
+<font style="font-style: normal;" color="#000000">23   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> JTitledPanel(String title){ 
+<font style="font-style: normal;" color="#000000">24   </font>        setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+<font style="font-style: normal;" color="#000000">25   </font>        titleLabel.setText(title); 
+<font style="font-style: normal;" color="#000000">26   </font>        titleLabel.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">27   </font>        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD)); 
+<font style="font-style: normal;" color="#000000">28   </font>        titleLabel.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">29   </font>        tracker.focusLost(); 
+<font style="font-style: normal;" color="#000000">30   </font> 
+<font style="font-style: normal;" color="#000000">31   </font>        add(titleLabel, BorderLayout.NORTH); 
+<font style="font-style: normal;" color="#000000">32   </font>        add(contents, BorderLayout.CENTER); 
+<font style="font-style: normal;" color="#000000">33   </font> 
+<font style="font-style: normal;" color="#000000">34   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// Memory-Leak occurs here. Why ?</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">35   </font>        </font><font style="font-family: monospaced;" color="#808080"><i>// How to avoid this ?</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">36   </font>        tracker.start(); 
+<font style="font-style: normal;" color="#000000">37   </font>    } 
+<font style="font-style: normal;" color="#000000">38   </font> 
+<font style="font-style: normal;" color="#000000">39   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> JPanel getContents(){ 
+<font style="font-style: normal;" color="#000000">40   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> contents; 
+<font style="font-style: normal;" color="#000000">41   </font>    } 
+<font style="font-style: normal;" color="#000000">42   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Line 9-19: JTitledPanel uses FocusOwnerTracker 
+to track changes in focus and changes the title bar highlighting.</font></p>
+<p><b><font size="2" face="Verdana">Let us write a simple demo to see it in 
+action:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerDemo </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JFrame{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerDemo(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Focus Tracking - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        JTitledPanel tp1 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTitledPanel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;First FileChooser&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        tp1.getContents().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFileChooser()); 
+ 
+        JTitledPanel tp2 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTitledPanel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Second FileChooser&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        tp2.getContents().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFileChooser()); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> GridLayout(</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)); 
+        contents.add(tp1); 
+        contents.add(tp2); 
+        pack(); 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FocusOwnerDemo().setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/FocusTracking.gif" width="628" height="435"></p>
+<p><font size="2" face="Verdana">The demo contains two JFileChoosers each in a 
+JTitledPanel. When you switch focus from one filechooser to another, the 
+title-bars also changes highlighting.</font></p>
+<p><font face="Verdana"><b><font size="2">Note:</font></b><font size="2"> <br>
+&nbsp;&nbsp;&nbsp; This webstart demo requires access to local file system as it 
+contains file choosers. I was bit lazy in creating demo :)</font></font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/FocusOwner.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font face="Verdana"><b><font size="2">MySwing update:</font></b><font size="2">
+<br>
+&nbsp;&nbsp;&nbsp; </font>
+<a href="http://www.jroller.com/page/santhosh/20050523#fit_tablecolumns_on_demand">
+<font size="2">Fit Table Columns on Demand</font></a></font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+package skt.swing.border;
+
+import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
+import java.io.FileReader;
+import java.io.File;
+
+/**
+ * MySwing: Advanced Swing Utilites
+ * Copyright (C) 2005  Santhosh Kumar T
+ * <p/>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * <p/>
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ */
+public class ScrollPanes{
+    public static void main(String[] args) throws Exception{
+        if(args.length==0){
+            System.err.println("pass a file as arugment");
+            return;
+        }
+
+        File file = new File(args[0]);
+        if(!file.exists()){
+            System.err.println(file+" doesn't exist");
+            return;
+        }
+        JTextArea t1 = new JTextArea();
+        JTextArea t2 = new JTextArea();
+
+        new DefaultEditorKit().read(
+                new FileReader(file), t1.getDocument(), 0);
+        t2.setText(t1.getText());
+
+
+        JScrollPane s1 = new JScrollPane(t1);
+        JScrollPane s2 = new JScrollPane(t2);
+        s1.getVerticalScrollBar().setModel(s2.getVerticalScrollBar().getModel());
+
+        JFrame frame = new JFrame("Sync Vertical ScrollBars - santhosh@in.fiorano.com");
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, s1, s2);
+        split.setResizeWeight(0.5d);
+        frame.getContentPane().add(split);
+        frame.setSize(500, 300);
+        frame.setVisible(true);
+    }
+}

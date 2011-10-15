@@ -1,0 +1,106 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Have a look at the following screenshot, which 
+tells what I am going to do:</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/PartiallTableCells.gif" width="532" height="342"></font></p>
+<p><font face="Verdana"><font size="2">In one of my previous blog, I have shown 
+how to do this for JTree:<br>
+&nbsp;&nbsp;&nbsp; </font>
+<font size="2">
+<a href="http://www.jroller.com/page/santhosh/20050522#partially_visible_jtree_nodes">Partially Visible TreeNodes</a></font></font></p>
+<p><font size="2" face="Verdana">It uses GlassPane to do this. But here I am 
+using another approach which uses ToolTips.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyTable </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JTable{ 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// JTree has convertValueToText(), but why not JTable ???</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> String convertValueToText(Object value, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(value != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) { 
+            String sValue = value.toString(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (sValue != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> sValue; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> String getToolTipText(MouseEvent event) { 
+        String tip = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        Point p = event.getPoint(); 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Locate the renderer under the event location</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hitColumnIndex = columnAtPoint(p); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hitRowIndex = rowAtPoint(p); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> ((hitColumnIndex != -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; (hitRowIndex != -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">)) { 
+            TableCellRenderer renderer = getCellRenderer(hitRowIndex, hitColumnIndex); 
+            Component component = prepareRenderer(renderer, hitRowIndex, hitColumnIndex); 
+ 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// Now have to see if the component is a JComponent before</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#808080"><i>// getting the tip</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (component </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> JComponent) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Convert the event to the renderer's coordinate system</i></font><font style="font-family: monospaced;" color="#000000"> 
+                Rectangle cellRect = getCellRect(hitRowIndex, hitColumnIndex, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(cellRect.width&gt;=component.getPreferredSize().width) 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+                p.translate(-cellRect.x, -cellRect.y); 
+                MouseEvent newEvent = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent(component, event.getID(), 
+                                          event.getWhen(), event.getModifiers(), 
+                                          p.x, p.y, event.getClickCount(), 
+                                          event.isPopupTrigger()); 
+ 
+                tip = ((JComponent)component).getToolTipText(newEvent); 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// No tip from the renderer, see whether any tooltip is set on JTable</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (tip == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            tip = getToolTipText(); 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// calculate tooltip from cell value</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(tip==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            Object value = getValueAt(hitRowIndex, hitColumnIndex); 
+            tip = convertValueToText(value, hitRowIndex, hitColumnIndex); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(tip.length()==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+                tip = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>// don't show empty tooltips</i></font><font style="font-family: monospaced;" color="#000000"> 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> tip; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// makes the tooltip's location to match table cell location</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// also avoids showing empty tooltips</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Point getToolTipLocation(MouseEvent event){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row = rowAtPoint( event.getPoint() ); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(row==-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> col = columnAtPoint( event.getPoint() ); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(col==-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// to avoid empty tooltips - return null location</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> hasTooltip = getToolTipText()==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> 
+                ? getToolTipText(event)!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> 
+                : </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> hasTooltip 
+                ? getCellRect(row, col, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">).getLocation() 
+                : </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above code is self-explanatory with 
+comments. :)</font></p>
+<p><font size="2" face="Verdana"><b>How to use this: </b><br>
+&nbsp;&nbsp; Simple, instead of JTable, use MyTable.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/PartialTableCells.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

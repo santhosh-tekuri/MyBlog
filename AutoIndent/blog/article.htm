@@ -1,0 +1,105 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">In VI editor, there is an option &quot;set 
+autoindent&quot;. Let us try implementing the auto-indent feature for JTextArea. I am 
+creating an action which eats up &lt;enter&gt; stroke and performs the required 
+behavior.</font></p>
+<table border="1" width="100%" id="table1" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * MySwing: Advanced Swing Utilites 
+ * Copyright (C) 2005  Santhosh Kumar T 
+ * &lt;p/&gt; 
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public 
+ * License as published by the Free Software Foundation; either 
+ * version 2.1 of the License, or (at your option) any later version. 
+ * &lt;p/&gt; 
+ * This library is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+ * Lesser General Public License for more details. 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.text.Document; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.text.BadLocationException; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ActionEvent; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * </i><b><i>@author</i></b><i> Santhosh Kumar T 
+ * </i><b><i>@email</i></b><i> santhosh@fiorano.com 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> AutoIndentAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction { 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae) { 
+        JTextArea comp = (JTextArea)ae.getSource(); 
+        Document doc = comp.getDocument(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!comp.isEditable()) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000"> { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> line = comp.getLineOfOffset(comp.getCaretPosition()); 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> start = comp.getLineStartOffset(line); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> end = comp.getLineEndOffset(line); 
+            String str = doc.getText(start, end - start - </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">); 
+            String whiteSpace = getLeadingWhiteSpace(str); 
+            doc.insertString(comp.getCaretPosition(), </font><font style="font-family: monospaced;" color="#008000"><b>'</b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>'</b></font><font style="font-family: monospaced;" color="#000000"> + whiteSpace, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ex) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000"> { 
+                doc.insertString(comp.getCaretPosition(), </font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ignore) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// ignore</i></font><font style="font-family: monospaced;" color="#000000"> 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+     *  Returns leading white space characters in the specified string. 
+     */</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> String getLeadingWhiteSpace(String str) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> str.substring(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, getLeadingWhiteSpaceWidth(str)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+     *  Returns the number of leading white space characters in the specified string. 
+     */</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getLeadingWhiteSpaceWidth(String str) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> whitespace = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(whitespace&lt;str.length()) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>char</b></font><font style="font-family: monospaced;" color="#000000"> ch = str.charAt(whitespace); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(ch==</font><font style="font-family: monospaced;" color="#008000"><b>' '</b></font><font style="font-family: monospaced;" color="#000000"> || ch==</font><font style="font-family: monospaced;" color="#008000"><b>'</b></font><font style="font-family: monospaced;" color="#000080"><b>\t</b></font><font style="font-family: monospaced;" color="#008000"><b>'</b></font><font style="font-family: monospaced;" color="#000000">) 
+                whitespace++; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> whitespace; 
+    } 
+} </font></pre>
+		</td>
+	</tr>
+</table>
+<p><font face="Verdana" size="2">When &lt;enter&gt; is pressed, rather than adding 
+&quot;\n&quot; to textarea, this action's actionPerformed(...) will be called. Here we 
+find the leading whitespace of current line and append (&quot;\n&quot; + leading space 
+calculated) to the end of current line.</font></p>
+<p><b><font face="Verdana" size="2">How to use it:</font></b></p>
+<table border="1" width="100%" id="table2" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#000000">textArea.registerKeyboardAction(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AutoIndentAction(), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">), JComponent.WHEN_FOCUSED);</font></pre>
+		</td>
+	</tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/autoindent.png" width="401" height="149"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/AutoIndent.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="88" height="23"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated</font></p>
+
+</body>
+
+</html>

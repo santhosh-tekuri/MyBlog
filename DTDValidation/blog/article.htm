@@ -1,0 +1,87 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">I have the following xml file at D:/MyBlog/DTDValidation/note.xml</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>&lt;?xml version=</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;1.0&quot;</b></font><font style="font-family: monospaced;" color="#000080"><b>?&gt;</b></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>&lt;!DOCTYPE note SYSTEM &quot;note.dtd&quot;&gt;</b></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+&lt;</font><font style="font-family: monospaced;" color="#000080"><b>note</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+   &lt;</font><font style="font-family: monospaced;" color="#000080"><b>to</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>Tove</b>&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>to</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+   &lt;</font><font style="font-family: monospaced;" color="#000080"><b>from</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>Jani</b>&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>from</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+   &lt;</font><font style="font-family: monospaced;" color="#000080"><b>heading</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>Reminder</b>&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>heading</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+   &lt;</font><font style="font-family: monospaced;" color="#000080"><b>body</b></font><font style="font-family: monospaced;" color="#000000">&gt;<b>Don't</b> <b>forget</b> <b>me</b> <b>this</b> <b>weekend!</b>&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>body</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>note</b></font><font style="font-family: monospaced;" color="#000000">&gt; </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above xml has a doctype declaration which refers to note.dtd file. When I 
+try to parse the above xml using SAX, the xml parser tries to find note.dtd file 
+and parses that dtd file. I want to make the xml parser not to parse the dtd 
+file. Why do I need so ?</font></p>
+<ol>
+  <li><font size="2" face="Verdana">I don't have note.dtd in my filesystem</font></li>
+  <li><font size="2" face="Verdana">I want to save the time spent by parser in parsing dtd file. This will 
+  improve the performance of application. </font> </li>
+</ol>
+<p><font size="2" face="Verdana">Following is sample code that can be used to parse the above xml file using 
+SAX:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> DTDValidationTest{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Exception{ 
+        SAXParserFactory factory = SAXParserFactory.newInstance(); 
+        SAXParser parser = factory.newSAXParser(); 
+        parser.getXMLReader().parse(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;d:/MyBlog/DTDValidation/note.xml&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">When I run the above program, I got the following exception:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%"><pre>java.io.FileNotFoundException: d:\MyBlog\DTDValidation\note.dtd (The system cannot find the file specified)
+	at org.apache.crimson.parser.Parser2.fatal(Parser2.java:3339)
+	at org.apache.crimson.parser.Parser2.externalParameterEntity(Parser2.java:3027)
+	at org.apache.crimson.parser.Parser2.maybeDoctypeDecl(Parser2.java:1314)</pre></td>
+  </tr>
+</table>
+
+<p><font size="2" face="Verdana">Because I don't have the file note.dtd.</font></p>
+<p><font size="2" face="Verdana">How can I tell the parser not to find/parse the dtd file. I found a simple 
+trick to solve this. Here is modified code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> DTDValidationTest{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String[] args) </font><font style="font-family: monospaced" color="#000080"><b>throws</b></font><font style="font-family: monospaced" color="#000000"> Exception{ 
+        SAXParserFactory factory = SAXParserFactory.newInstance(); 
+        SAXParser parser = factory.newSAXParser(); 
+        parser.getXMLReader().setEntityResolver(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> EntityResolver(){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> InputSource resolveEntity(String publicId, String systemId){ 
+                </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> InputSource(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> ByteArrayInputStream(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>byte</b></font><font style="font-family: monospaced" color="#000000">[</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">])); 
+            } 
+        }); 
+        parser.getXMLReader().parse(</font><font style="font-family: monospaced" color="#008000"><b>&quot;d:/MyBlog/DTDValidation/note.xml&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">We set a EntityResolver which always returns a empty byte stream when parser 
+asks to resolve the dtd. When you run the above program it works fine. That is 
+we saved the time spent by parser in parsing dtd file.</font></p>
+<p><b><font size="2" face="Verdana">Assumptions:</font></b></p>
+<ol>
+  <li><font size="2" face="Verdana">the xml file doesn't refer any entities defined in the dtd</font></li>
+  <li><font size="2" face="Verdana">the dtd is not inlined in xml file.</font></li>
+</ol>
+<p><font size="2" face="Verdana">Your comments are appreciated</font></p>
+
+</body>
+
+</html>

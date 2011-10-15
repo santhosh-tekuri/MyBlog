@@ -1,0 +1,486 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">JScrollPane supports RowHeader, ColumnHeader 
+and also various corners. But still I feel there is something missing in 
+JScrollPane. Today I am going to fill the gap.</font></p>
+<p><font face="Verdana" size="2">what is that gap ?? try to guess...</font></p>
+<p><font face="Verdana" size="2">If you are unable to guess I can help you with 
+following screenshots:</font></p>
+<p><font face="Verdana" size="2"><b>Adobe Acrobat Reader:</b><br>
+<br>
+</font>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/adobeScroll.gif" width="464" height="120"></p>
+<p><b><font face="Verdana" size="2">Microsoft Word:<br>
+</font></b><br>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/mswordScroll.gif" width="339" height="246"></p>
+<p><b><font face="Verdana" size="2">Microsoft FrontPage:<br>
+<br>
+</font></b>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/fronpgScroll.gif" width="395" height="131"><br>
+&nbsp;</p>
+<p><font face="Verdana" size="2">If you are a good observer, you should have got 
+what I am talking about.</font></p>
+<p><font face="Verdana" size="2">1. Adobe Acrobat Reader has a pager to the left 
+of its horizontal scrollbar<br>
+2. Microsoft Word has PageLayoutBar on the left of its horizontal scrollbar and 
+a pager on bottom of its vertical scrollbar<br>
+3. Microsoft FrontPage has DocumentViewBar on the left of its horizontal 
+scrollbar.<br>
+<br>
+You can't create such thing using the JScrollPane with its default Layout.<br>
+So I tried to extend its layout to support more other than headers and corners:<br>
+<br>
+The following screenshot tells you, what your can do with my Enhanced 
+JScrollPane:<br>
+<br>
+</font>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/MyScrollPane.gif" width="473" height="298"><br>
+<br>
+<font face="Verdana" size="2">No you can any layout which was shown in above 
+applications using this enhanced JScrollPane.<br>
+<br>
+Here is the code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyScrollPaneLayout </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> ScrollPaneLayout{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String HORIZONTAL_LEFT = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;HorizontalLeft&quot;</b></font><font style="font-family: monospaced;" color="#000000">;      </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String HORIZONTAL_RIGHT = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;HorizontalRight&quot;</b></font><font style="font-family: monospaced;" color="#000000">;    </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String VERTICAL_TOP = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;VerticalTop&quot;</b></font><font style="font-family: monospaced;" color="#000000">;            </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String VERTICAL_BOTTOM = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;VerticalBottom&quot;</b></font><font style="font-family: monospaced;" color="#000000">;      </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Component hleft, hright, vtop, vbottom = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addLayoutComponent(String s, Component c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(s.equals(HORIZONTAL_LEFT)) 
+            hleft = c; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(s.equals(HORIZONTAL_RIGHT)) 
+            hright = c; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(s.equals(VERTICAL_TOP)) 
+            vtop = c; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(s.equals(VERTICAL_BOTTOM)) 
+            vbottom = c; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.addLayoutComponent(s, c); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeLayoutComponent(Component c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==hleft) 
+            hleft = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==hright) 
+            hright = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==vtop) 
+            vtop = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(c==vbottom) 
+            vbottom = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.removeLayoutComponent(c); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> layoutContainer(Container parent){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* Sync the (now obsolete) policy fields with the 
+         * JScrollPane. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+        JScrollPane scrollPane = (JScrollPane)parent; 
+        vsbPolicy = scrollPane.getVerticalScrollBarPolicy(); 
+        hsbPolicy = scrollPane.getHorizontalScrollBarPolicy(); 
+ 
+        Rectangle availR = scrollPane.getBounds(); 
+        availR.x = availR.y = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+ 
+        Insets insets = parent.getInsets(); 
+        availR.x = insets.left; 
+        availR.y = insets.top; 
+        availR.width -= insets.left + insets.right; 
+        availR.height -= insets.top + insets.bottom; 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* Get the scrollPane's orientation. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> leftToRight = isLeftToRight(scrollPane); 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* If there's a visible column header remove the space it 
+         * needs from the top of availR.  The column header is treated 
+         * as if it were fixed height, arbitrary width. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Rectangle colHeadR = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, availR.y, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((colHead != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; (colHead.isVisible())){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> colHeadHeight = Math.min(availR.height, 
+                                         colHead.getPreferredSize().height); 
+            colHeadR.height = colHeadHeight; 
+            availR.y += colHeadHeight; 
+            availR.height -= colHeadHeight; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* If there's a visible row header remove the space it needs 
+         * from the left or right of availR.  The row header is treated 
+         * as if it were fixed width, arbitrary height. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Rectangle rowHeadR = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((rowHead != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; (rowHead.isVisible())){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rowHeadWidth = Math.min(availR.width, 
+                                        rowHead.getPreferredSize().width); 
+            rowHeadR.width = rowHeadWidth; 
+            availR.width -= rowHeadWidth; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(leftToRight){ 
+                rowHeadR.x = availR.x; 
+                availR.x += rowHeadWidth; 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                rowHeadR.x = availR.x + availR.width; 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* If there's a JScrollPane.viewportBorder, remove the 
+         * space it occupies for availR. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Border viewportBorder = scrollPane.getViewportBorder(); 
+        Insets vpbInsets; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(viewportBorder != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            vpbInsets = viewportBorder.getBorderInsets(parent); 
+            availR.x += vpbInsets.left; 
+            availR.y += vpbInsets.top; 
+            availR.width -= vpbInsets.left + vpbInsets.right; 
+            availR.height -= vpbInsets.top + vpbInsets.bottom; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            vpbInsets = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Insets(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* At this point availR is the space available for the viewport 
+         * and scrollbars. rowHeadR is correct except for its height and y 
+         * and colHeadR is correct except for its width and x.  Once we're 
+         * through computing the dimensions  of these three parts we can 
+         * go back and set the dimensions of rowHeadR.height, rowHeadR.y, 
+         * colHeadR.width, colHeadR.x and the bounds for the corners. 
+         * 
+         * We'll decide about putting up scrollbars by comparing the 
+         * viewport views preferred size with the viewports extent 
+         * size (generally just its size).  Using the preferredSize is 
+         * reasonable because layout proceeds top down - so we expect 
+         * the viewport to be laid out next.  And we assume that the 
+         * viewports layout manager will give the view it's preferred 
+         * size.  One exception to this is when the view implements 
+         * Scrollable and Scrollable.getViewTracksViewport{Width,Height} 
+         * methods return true.  If the view is tracking the viewports 
+         * width we don't bother with a horizontal scrollbar, similarly 
+         * if view.getViewTracksViewport(Height) is true we don't bother 
+         * with a vertical scrollbar. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Component view = (viewport != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) ? viewport.getView() : </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        Dimension viewPrefSize = 
+                (view != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) ? view.getPreferredSize() 
+                : </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        Dimension extentSize = 
+                (viewport != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) ? viewport.toViewCoordinates(availR.getSize()) 
+                : </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> viewTracksViewportWidth = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> viewTracksViewportHeight = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEmpty = (availR.width &lt; </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> || availR.height &lt; </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        Scrollable sv; 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Don't bother checking the Scrollable methods if there is no room</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// for the viewport, we aren't going to show any scrollbars in this</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// case anyway.</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!isEmpty &amp;&amp; view </font><font style="font-family: monospaced;" color="#000080"><b>instanceof</b></font><font style="font-family: monospaced;" color="#000000"> Scrollable){ 
+            sv = (Scrollable)view; 
+            viewTracksViewportWidth = sv.getScrollableTracksViewportWidth(); 
+            viewTracksViewportHeight = sv.getScrollableTracksViewportHeight(); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            sv = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* If there's a vertical scrollbar and we need one, allocate 
+         * space for it (we'll make it visible later). A vertical 
+         * scrollbar is considered to be fixed width, arbitrary height. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Rectangle vsbR = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, availR.y - vpbInsets.top, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> vsbNeeded; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isEmpty){ 
+            vsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsbPolicy == VERTICAL_SCROLLBAR_ALWAYS){ 
+            vsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsbPolicy == VERTICAL_SCROLLBAR_NEVER){ 
+            vsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ </font><font style="font-family: monospaced;" color="#808080"><i>// vsbPolicy == VERTICAL_SCROLLBAR_AS_NEEDED</i></font><font style="font-family: monospaced;" color="#000000"> 
+            vsbNeeded = !viewTracksViewportHeight &amp;&amp; (viewPrefSize.height &gt; extentSize.height); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((vsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; vsbNeeded){ 
+            adjustForVSB(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">, availR, vsbR, vpbInsets, leftToRight); 
+            extentSize = viewport.toViewCoordinates(availR.getSize()); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* If there's a horizontal scrollbar and we need one, allocate 
+         * space for it (we'll make it visible later). A horizontal 
+         * scrollbar is considered to be fixed height, arbitrary width. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        Rectangle hsbR = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(availR.x - vpbInsets.left, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> hsbNeeded; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(isEmpty){ 
+            hsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hsbPolicy == HORIZONTAL_SCROLLBAR_ALWAYS){ 
+            hsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hsbPolicy == HORIZONTAL_SCROLLBAR_NEVER){ 
+            hsbNeeded = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ </font><font style="font-family: monospaced;" color="#808080"><i>// hsbPolicy == HORIZONTAL_SCROLLBAR_AS_NEEDED</i></font><font style="font-family: monospaced;" color="#000000"> 
+            hsbNeeded = !viewTracksViewportWidth &amp;&amp; (viewPrefSize.width &gt; extentSize.width); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((hsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; hsbNeeded){ 
+            adjustForHSB(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">, availR, hsbR, vpbInsets); 
+ 
+            </font><font style="font-family: monospaced;" color="#808080"><i>/* If we added the horizontal scrollbar then we've implicitly 
+             * reduced  the vertical space available to the viewport. 
+             * As a consequence we may have to add the vertical scrollbar, 
+             * if that hasn't been done so already.  Of course we 
+             * don't bother with any of this if the vsbPolicy is NEVER. 
+             */</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((vsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; !vsbNeeded &amp;&amp; 
+               (vsbPolicy != VERTICAL_SCROLLBAR_NEVER)){ 
+ 
+                extentSize = viewport.toViewCoordinates(availR.getSize()); 
+                vsbNeeded = viewPrefSize.height &gt; extentSize.height; 
+ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsbNeeded){ 
+                    adjustForVSB(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">, availR, vsbR, vpbInsets, leftToRight); 
+                } 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* Set the size of the viewport first, and then recheck the Scrollable 
+         * methods. Some components base their return values for the Scrollable 
+         * methods on the size of the Viewport, so that if we don't 
+         * ask after resetting the bounds we may have gotten the wrong 
+         * answer. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(viewport != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            viewport.setBounds(availR); 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(sv != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                extentSize = viewport.toViewCoordinates(availR.getSize()); 
+ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> oldHSBNeeded = hsbNeeded; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> oldVSBNeeded = vsbNeeded; 
+                viewTracksViewportWidth = sv. 
+                                          getScrollableTracksViewportWidth(); 
+                viewTracksViewportHeight = sv. 
+                                           getScrollableTracksViewportHeight(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; vsbPolicy == VERTICAL_SCROLLBAR_AS_NEEDED){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> newVSBNeeded = !viewTracksViewportHeight &amp;&amp; 
+                                           (viewPrefSize.height &gt; extentSize.height); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(newVSBNeeded != vsbNeeded){ 
+                        vsbNeeded = newVSBNeeded; 
+                        adjustForVSB(vsbNeeded, availR, vsbR, vpbInsets, 
+                                     leftToRight); 
+                        extentSize = viewport.toViewCoordinates 
+                                     (availR.getSize()); 
+                    } 
+                } 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; hsbPolicy == HORIZONTAL_SCROLLBAR_AS_NEEDED){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> newHSBbNeeded = !viewTracksViewportWidth &amp;&amp; 
+                                            (viewPrefSize.width &gt; extentSize.width); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(newHSBbNeeded != hsbNeeded){ 
+                        hsbNeeded = newHSBbNeeded; 
+                        adjustForHSB(hsbNeeded, availR, hsbR, vpbInsets); 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">((vsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) &amp;&amp; !vsbNeeded &amp;&amp; 
+                           (vsbPolicy != VERTICAL_SCROLLBAR_NEVER)){ 
+ 
+                            extentSize = viewport.toViewCoordinates 
+                                         (availR.getSize()); 
+                            vsbNeeded = viewPrefSize.height &gt; 
+                                        extentSize.height; 
+ 
+                            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsbNeeded){ 
+                                adjustForVSB(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">, availR, vsbR, vpbInsets, 
+                                             leftToRight); 
+                            } 
+                        } 
+                    } 
+                } 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(oldHSBNeeded != hsbNeeded || 
+                   oldVSBNeeded != vsbNeeded){ 
+                    viewport.setBounds(availR); 
+                    </font><font style="font-family: monospaced;" color="#808080"><i>// You could argue that we should recheck the</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    </font><font style="font-family: monospaced;" color="#808080"><i>// Scrollable methods again until they stop changing,</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    </font><font style="font-family: monospaced;" color="#808080"><i>// but they might never stop changing, so we stop here</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    </font><font style="font-family: monospaced;" color="#808080"><i>// and don't do any additional checks.</i></font><font style="font-family: monospaced;" color="#000000"> 
+                } 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* We now have the final size of the viewport: availR. 
+         * Now fixup the header and scrollbar widths/heights. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+        vsbR.height = availR.height + vpbInsets.top + vpbInsets.bottom; 
+        hsbR.width = availR.width + vpbInsets.left + vpbInsets.right; 
+        rowHeadR.height = availR.height + vpbInsets.top + vpbInsets.bottom; 
+        rowHeadR.y = availR.y - vpbInsets.top; 
+        colHeadR.width = availR.width + vpbInsets.left + vpbInsets.right; 
+        colHeadR.x = availR.x - vpbInsets.left; 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>/* Set the bounds of the remaining components.  The scrollbars 
+         * are made invisible if they're not needed. 
+         */</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(rowHead != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            rowHead.setBounds(rowHeadR); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(colHead != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            colHead.setBounds(colHeadR); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vsbNeeded){ 
+                vsb.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vtop==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; vbottom==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    vsb.setBounds(vsbR); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    Rectangle rect = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(vsbR); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vtop!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                        Dimension dim = vtop.getPreferredSize(); 
+                        rect.y += dim.height; 
+                        rect.height-=dim.height; 
+                        vtop.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                        vtop.setBounds(vsbR.x, vsbR.y, vsbR.width, dim.height); 
+                    } 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vbottom!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                        Dimension dim = vbottom.getPreferredSize(); 
+                        rect.height-=dim.height; 
+                        vbottom.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                        vbottom.setBounds(vsbR.x, vsbR.y+vsbR.height-dim.height, vsbR.width, dim.height); 
+                    } 
+                    vsb.setBounds(rect); 
+                } 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                vsb.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vtop!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    vtop.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(vbottom!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    vbottom.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hsb != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hsbNeeded){ 
+                hsb.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hleft==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; hright==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    hsb.setBounds(hsbR); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    Rectangle rect = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(hsbR); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hleft!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                        Dimension dim = hleft.getPreferredSize(); 
+                        rect.x += dim.width; 
+                        rect.width-=dim.width; 
+                        hleft.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                        hleft.setBounds(hsbR.x, hsbR.y, dim.width, hsbR.height); 
+                        hleft.doLayout(); 
+                    } 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hright!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                        Dimension dim = hright.getPreferredSize(); 
+                        rect.width-=dim.width; 
+                        hright.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                        hright.setBounds(hsbR.x+hsbR.width-dim.width, hsbR.y, dim.width, hsbR.height); 
+                    } 
+                    hsb.setBounds(rect); 
+                } 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                hsb.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hleft!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    hleft.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(hright!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    hright.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(lowerLeft != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            lowerLeft.setBounds(leftToRight ? rowHeadR.x : vsbR.x, 
+                                hsbR.y, 
+                                leftToRight ? rowHeadR.width : vsbR.width, 
+                                hsbR.height); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(lowerRight != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            lowerRight.setBounds(leftToRight ? vsbR.x : rowHeadR.x, 
+                                 hsbR.y, 
+                                 leftToRight ? vsbR.width : rowHeadR.width, 
+                                 hsbR.height); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(upperLeft != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            upperLeft.setBounds(leftToRight ? rowHeadR.x : vsbR.x, 
+                                colHeadR.y, 
+                                leftToRight ? rowHeadR.width : vsbR.width, 
+                                colHeadR.height); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(upperRight != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            upperRight.setBounds(leftToRight ? vsbR.x : rowHeadR.x, 
+                                 colHeadR.y, 
+                                 leftToRight ? vsbR.width : rowHeadR.width, 
+                                 colHeadR.height); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> adjustForHSB(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> wantsHSB, Rectangle available, 
+                              Rectangle hsbR, Insets vpbInsets){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> oldHeight = hsbR.height; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(wantsHSB){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> hsbHeight = Math.max(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, Math.min(available.height, 
+                                                 hsb.getPreferredSize().height)); 
+ 
+            available.height -= hsbHeight; 
+            hsbR.y = available.y + available.height + vpbInsets.bottom; 
+            hsbR.height = hsbHeight; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            available.height += oldHeight; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> adjustForVSB(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> wantsVSB, Rectangle available, 
+                              Rectangle vsbR, Insets vpbInsets, 
+                              </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> leftToRight){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> oldWidth = vsbR.width; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(wantsVSB){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> vsbWidth = Math.max(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, Math.min(vsb.getPreferredSize().width, 
+                                                available.width)); 
+ 
+            available.width -= vsbWidth; 
+            vsbR.width = vsbWidth; 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(leftToRight){ 
+                vsbR.x = available.x + available.width + vpbInsets.right; 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                vsbR.x = available.x - vpbInsets.left; 
+                available.x += vsbWidth; 
+            } 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            available.width += oldWidth; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isLeftToRight(Component c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> c.getComponentOrientation().isLeftToRight(); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p>&nbsp; <a href="http://www.jroller.com/resources/s/santhosh/ScrollPane.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+<html>
+<body>
+<p>
+<font face="Verdana">
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JEditorPane.html">
+<font size="2">JEditorPane</font></a><font size="2"> is the swing component which can display html pages. We can add 
+a
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/event/HyperlinkListener.html">
+HyperLinkListener</a> to JEditorPane to listen for any hyperlink events.</font></font></p>
+<p><font size="2" face="Verdana">It is very easy to build a WebBrowser in Swing by a simple HyperLinkListener 
+Implementation:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> HyperlinkActivator </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> HyperlinkListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> hyperlinkUpdate(HyperlinkEvent e){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e.getEventType()==HyperlinkEvent.EventType.ACTIVATED){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                ((JEditorPane)e.getSource()).setPage(e.getURL()); 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception ex){ 
+                ex.printStackTrace(); 
+            } 
+        } 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">There is nothing new in the above class. One such class is available directly 
+in JEditorPane's
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JEditorPane.html">
+JavaDoc</a>.</font></p>
+<p><font size="2" face="Verdana">Now we will see how these hyperlinks can be used to invoke
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Action.html">swing 
+actions</a>. Let us see the following screenshot from Microsoft Outlook's 
+Message Rule Dialog:</font></p>
+<p>
+<font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/hyperLinks0.gif" width="444" height="105"></font></p>
+<p><font size="2" face="Verdana">Swing Components manage their list of action using
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/ActionMap.html">
+ActionMap</a> Let us see the class which binds hyperlinks with swing actions.:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ActionBasedHyperlinkListener </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> HyperlinkListener{ 
+    ActionMap actionMap; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ActionBasedHyperlinkListener(ActionMap actionMap){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.actionMap = actionMap; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> hyperlinkUpdate(HyperlinkEvent e){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e.getEventType()!=HyperlinkEvent.EventType.ACTIVATED) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        String href = e.getDescription(); 
+        Action action = actionMap.get(href); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(action!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+            action.actionPerformed(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(e, ActionEvent.ACTION_PERFORMED, href)); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">When a hyperlinks gets activated, we get its href value from
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/event/HyperlinkEvent.html">
+HyperLinkEvent</a> and find the action with that key from actionMap. If any 
+action is found, we perform that action.</font></p>
+<p><font size="2" face="Verdana">Let us create a simple action which simulates the above screenshot:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> SelectPeopleAction </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> String people[] = {</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Santhosh&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Rick&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Matt&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Lorimer&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;Scott&quot;</b></font><font style="font-family: monospaced;" color="#000000">}; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> SelectPeopleAction(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;selectPeople&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        HyperlinkEvent hle = (HyperlinkEvent)e.getSource(); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Element elem = hle.getSourceElement(); 
+            Document doc = elem.getDocument(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> start = elem.getStartOffset(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> end = elem.getEndOffset(); 
+            String link = doc.getText(start, end-start); 
+            link = link.equals(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;contains people&quot;</b></font><font style="font-family: monospaced;" color="#000000">) ? </font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000"> : link.substring(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;contains &quot;</b></font><font style="font-family: monospaced;" color="#000000">.length()); 
+ 
+            JList list = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JList(people); 
+            StringTokenizer stok = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringTokenizer(link, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;, &quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(stok.hasMoreTokens()){ 
+                String token = stok.nextToken(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;list.getModel().getSize(); i++){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(list.getModel().getElementAt(i).equals(token)) 
+                        list.getSelectionModel().addSelectionInterval(i, i); 
+                } 
+            } 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> response = JOptionPane.showOptionDialog((Component)hle.getSource(), </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(list), </font><font style="font-family: monospaced;" color="#008000"><b>&quot;People&quot;</b></font><font style="font-family: monospaced;" color="#000000">, 
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(response==JOptionPane.OK_OPTION){ 
+                String newLink = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+                Object selected[] = list.getSelectedValues(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;selected.length; i++){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(i!=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+                        newLink += </font><font style="font-family: monospaced;" color="#008000"><b>&quot;, &quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+                    newLink += selected[i]; 
+                } 
+                newLink = newLink.length()==</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000"> ? </font><font style="font-family: monospaced;" color="#008000"><b>&quot;contains people&quot;</b></font><font style="font-family: monospaced;" color="#000000"> : </font><font style="font-family: monospaced;" color="#008000"><b>&quot;contains &quot;</b></font><font style="font-family: monospaced;" color="#000000">+newLink; 
+                elem.getDocument().remove(start, end-start); 
+                elem.getDocument().insertString(start, newLink, elem.getAttributes()); 
+            } 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ex){ 
+            ex.printStackTrace(); 
+        } 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above action will be activated when the hyperlink &quot;contains people&quot; is 
+activated. It finds the text of hyperlink from the offsets got from hyperlink 
+event. It then creates a JList with available people and selects the current 
+people from the hyperlink text by tokenizing it. It pops up a dialog from which 
+user can change the selected people. On this dialog's confirm, it computes the 
+new text for hyperlink and updates the html accordingly.</font></p>
+<p><font size="2" face="Verdana">From the above class, you learn:</font></p>
+<ol>
+  <li><font size="2" face="Verdana">How to fetch href attribute value from hyperlink</font></li>
+  <li><font size="2" face="Verdana">How to fetch hyperlink text.</font></li>
+  <li><font size="2" face="Verdana">How to modify html partially</font></li>
+</ol>
+<p><font size="2" face="Verdana">Let us write the demo application:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> HyperLinksDemo </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JFrame{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> HyperLinksDemo() </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Exception{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Hyperlinks Demo - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        JEditorPane editor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JEditorPane(); 
+        editor.setPage(getClass().getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;rule.html&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        editor.setEditable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        ActionMap actionMap = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionMap(); 
+        actionMap.put(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;selectPeople&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> SelectPeopleAction()); 
+        editor.addHyperlinkListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionBasedHyperlinkListener(actionMap)); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">)); 
+        contents.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(editor)); 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setSize(</font><font style="font-family: monospaced;" color="#0000ff">400</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Exception{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> HyperLinksDemo().setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">This is the file rule.html used:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">&lt;</font><font style="font-family: monospaced;" color="#000080"><b>html</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+&lt;</font><font style="font-family: monospaced;" color="#000080"><b>body</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+ 
+&lt;</font><font style="font-family: monospaced;" color="#000080"><b>p</b></font><font style="font-family: monospaced;" color="#000000">&gt;When the newly arrived message arrives&lt;</font><font style="font-family: monospaced;" color="#000080"><b>br</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; where the From &lt;</font><font style="font-family: monospaced;" color="#000080"><b>a</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#0000ff"><b>href=</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;selectPeople&quot;</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+contains people&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>a</b></font><font style="font-family: monospaced;" color="#000000">&gt;&lt;</font><font style="font-family: monospaced;" color="#000080"><b>br</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; delete it.&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>p</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+ 
+&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>body</b></font><font style="font-family: monospaced;" color="#000000">&gt; 
+ 
+&lt;/</font><font style="font-family: monospaced;" color="#000080"><b>html</b></font><font style="font-family: monospaced;" color="#000000">&gt;</font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks1.gif" width="338" height="146"></p>
+<p><font size="2" face="Verdana">When hyperlink is clicked it displays:</font></p>
+<p>
+<font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks2.gif" width="268" height="221"></font></p>
+<p><font size="2" face="Verdana">On confirming the above dialog:</font></p>
+<p>
+<font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/HyperLinks3.gif" width="338" height="146"></font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/HyperLinks.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

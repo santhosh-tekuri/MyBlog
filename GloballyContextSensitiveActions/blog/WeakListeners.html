@@ -1,0 +1,102 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">In the previous post:
+<a href="http://www.jroller.com/page/santhosh/20050709#globally_context_sensitive_actions">
+Globally Context Sensitive Actions</a>, we learned how to wrap an action in 
+GloballyContextSensitiveAction to make it globally context aware.</font></p>
+<p><font size="2" face="Verdana">If you have read the source of 
+GloballyContextSensitiveAction carefully, you will notice that it introduces 
+memory leak into swing applications. Don't worry, If you are not able to find 
+where the memory leak is. I will explain:</font></p>
+<p><font size="2" face="Verdana">GloballyContextSensitiveAction adds a 
+propertyChangeListener to keyboardFocusManager in its constructor to listen for 
+focus changes. But this listener is never unregistered. When all the components 
+(such as JButton, JMenuItem) using this action are garbage collected, we want 
+this action also to be garbage collected. But this won't happen. Because it is 
+always reachable from keyboardFocusManager using its listener list.</font></p>
+<p><font size="2" face="Verdana">In order to avoid this memory leak, we should 
+unregister the propertyChangeListener when this action is no longer reachable by 
+any component. But how do you determine when this action is no longer used by 
+any component. The action is unaware of the components which are using it. It 
+seems to be difficult to avoid this memory leak.</font></p>
+<p><font size="2" face="Verdana">In such cases, weak listeners can be used to 
+solve this memory leak. Here is the source code of a weak property change 
+listener:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> WeakPropertyChangeListener </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> PropertyChangeListener{ 
+    WeakReference listenerRef; 
+    Object src; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> WeakPropertyChangeListener(PropertyChangeListener listener, Object src){ 
+        listenerRef = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> WeakReference(listener); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font color="#000080"><b>.</b></font><font style="font-family: monospaced;" color="#000000">src = src; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+        PropertyChangeListener listener = (PropertyChangeListener)listenerRef.get(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(listener==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            removeListener(); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            listener.propertyChange(evt); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeListener(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Method method = src.getClass().getMethod(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;removePropertyChangeListener&quot;</b></font><font style="font-family: monospaced;" color="#000000"> 
+                    , </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Class[] {PropertyChangeListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">}); 
+            method.invoke(src, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Object[]{ </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000"> }); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How to use this:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000"> 
+  KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager(); 
+ 
+  </font><font style="font-family: monospaced;" color="#808080"><i>// instead of registering direclty use weak listener</i></font><font style="font-family: monospaced;" color="#000000"> 
+  </font><font style="font-family: monospaced;" color="#808080"><i>// focusManager.addPropertyChangeListener(focusOwnerListener);</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+  focusManager.addPropertyChangeListener( 
+           </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> WeakPropertyChangeListener(focusOwnerListener, </font><font style="font-family: monospaced;" color="#000000">focusManager</font><font style="font-family: monospaced;" color="#000000">));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How does this work:</font></b></p>
+<p><font size="2" face="Verdana">Instead of registering propertyChangeListener 
+directly to keyboardFocusManager, we wrap it inside WeakPropertyChangeListener 
+and register this weak listener to keyboardFocusManager. This weak listener acts 
+a delegate. It receives the propertyChangeEvents from keyboardFocusManager and 
+delegates it the wrapped listener.</font></p>
+<p><font size="2" face="Verdana">The interesting part of this weak listener, it 
+hold a weakReference to the original propertyChangeListener. so this delegate is 
+eligible for garbage collection which it is no longer reachable via references. 
+When it gets garbage collection, the weakReference will be pointing to null. On 
+next propertyChangeEvent notification from keyboardFocusManager, it find that 
+the weakReference is pointing to null, and unregisters itself from 
+keyboardFocusManager. Thus the weak listener will also become eligible for 
+garbage collection in next gc cycle.</font></p>
+<p><font size="2" face="Verdana">This concept is not something new. If you have 
+a habit of looking into swing sources, you will find that AbstractButton 
+actually adds a weak listener to its action. The weak listener class used for 
+this is : javax.swing.AbstractActionPropertyChangeListener; This class is 
+package-private, so you don't find it in javadoc.</font></p>
+<p><font size="2" face="Verdana">The full-fledged, generic implementation of 
+weak listeners is available in Netbeans OpenAPI:
+<a href="http://www.netbeans.org/unbranded-source/browse/*checkout*/openide/util/src/org/openide/util/WeakListeners.java?rev=HEAD&content-type=text/plain">
+WeakListeners.java</a>. It is worth to have a look at it.</font></p>
+
+</body>
+
+</html>

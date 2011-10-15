@@ -1,0 +1,111 @@
+<html>
+
+<body>
+<p><a href="mailto:peterdb@goowy.com" title="194.78.25.195">Peter De Bruycker</a> <font size="2" face="Verdana">
+has completed the left out todos in CurrentLineHighLighter. Now it rocks !!</font></p>
+<p><font face="Verdana" size="2">Here is the updated code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * This class can be used to highlight the current line for any JTextComponent. 
+ * 
+ * </i><b>@author</b><i> Santhosh Kumar T 
+ * </i><b>@author</b><i> Peter De Bruycker 
+ * </i><b>@version</b><i> 1.0 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CurrentLineHighlighter{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String LINE_HIGHLIGHT = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;linehilight&quot;</b></font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N - used as clientproperty</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String PREVIOUS_CARET = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;previousCaret&quot;</b></font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>//NOI18N - used as clientproperty</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Color col = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Color(</font><font style="font-family: monospaced;" color="#0000ff">255</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">255</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">204</font><font style="font-family: monospaced;" color="#000000">); </font><font style="font-family: monospaced;" color="#808080"><i>//Color used for highlighting the line</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// to be used as static utility</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> CurrentLineHighlighter(){} 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// Installs CurrentLineHilighter for the given JTextComponent</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> install(JTextComponent c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Object obj = c.getHighlighter().addHighlight(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, painter); 
+            c.putClientProperty(LINE_HIGHLIGHT, obj); 
+            c.putClientProperty(PREVIOUS_CARET, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Integer(c.getCaretPosition())); 
+            c.addCaretListener(caretListener); 
+            c.addMouseListener(mouseListener); 
+            c.addMouseMotionListener(mouseListener); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ignore){} 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// Uninstalls CurrentLineHighligher for the given JTextComponent</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> uninstall(JTextComponent c){ 
+        c.putClientProperty(LINE_HIGHLIGHT, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        c.putClientProperty(PREVIOUS_CARET, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        c.removeCaretListener(caretListener); 
+        c.removeMouseListener(mouseListener); 
+        c.removeMouseMotionListener(mouseListener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> CaretListener caretListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> CaretListener(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> caretUpdate(CaretEvent e){ 
+            JTextComponent c = (JTextComponent)e.getSource(); 
+            currentLineChanged(c); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> MouseInputAdapter mouseListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseInputAdapter(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mousePressed(MouseEvent e){ 
+            JTextComponent c = (JTextComponent)e.getSource(); 
+            currentLineChanged(c); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseDragged(MouseEvent e){ 
+            JTextComponent c = (JTextComponent)e.getSource(); 
+            currentLineChanged(c); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+     * Fetches the previous caret location, stores the current caret location, 
+     * If the caret is on another line, repaint the previous line and the current line 
+     * 
+     * </i><b>@param</b><i> c the text component 
+     */</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> currentLineChanged(JTextComponent c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> previousCaret = ((Integer)c.getClientProperty(PREVIOUS_CARET)).intValue(); 
+            Rectangle prev = c.modelToView(previousCaret); 
+            Rectangle r = c.modelToView(c.getCaretPosition()); 
+            c.putClientProperty(PREVIOUS_CARET, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Integer(c.getCaretPosition())); 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(prev.y!=r.y){ 
+                c.repaint(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, prev.y, c.getWidth(), r.height); 
+                c.repaint(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, r.y, c.getWidth(), r.height); 
+            } 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ignore){} 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Highlighter.HighlightPainter painter = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Highlighter.HighlightPainter(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paint(Graphics g, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> p0, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> p1, Shape bounds, JTextComponent c){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                Rectangle r = c.modelToView(c.getCaretPosition()); 
+                g.setColor(col); 
+                g.fillRect(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, r.y, c.getWidth(), r.height); 
+            } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(BadLocationException ignore){} 
+        } 
+    }; 
+ }</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">how to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">CurrentLineHighlighter.install(textArea);</font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<a href="http://www.jroller.com/resources/s/santhosh/CurrentLineHighlighter1.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

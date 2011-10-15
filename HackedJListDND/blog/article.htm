@@ -1,0 +1,46 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">the hack in the previous blog entry works for 
+JList also.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> applyDNDHack(JComponent comp){ 
+    MouseListener dragListener = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// the default dnd implemntation requires to first select node and then drag</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+        Class clazz = Class.forName(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;javax.swing.plaf.basic.BasicDragGestureRecognizer&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        MouseListener[] mouseListeners = comp.getMouseListeners(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;mouseListeners.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(clazz.isAssignableFrom(mouseListeners[i].getClass())){ 
+                dragListener = mouseListeners[i]; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(dragListener!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            comp.removeMouseListener(dragListener); 
+            comp.removeMouseMotionListener((MouseMotionListener)dragListener); 
+            comp.addMouseListener(dragListener); 
+            comp.addMouseMotionListener((MouseMotionListener)dragListener); 
+        } 
+    } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(ClassNotFoundException e){ 
+        e.printStackTrace();
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/hackedJListDND.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+</p>
+<p><font face="Verdana" size="2">
+<a href="http://www.jroller.com/resources/s/santhosh/JListDNDHack.java">Source 
+Code</a></font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">We create a subclass to JComboBox here.</font></p>
+<table border="1" width="100%" id="table1" style="border-collapse: collapse" bordercolor="#000000">
+	<tr>
+		<td>
+		<pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.util.Vector; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// got this workaround from the following bug:</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#808080"><i>//      http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4618607</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> WideComboBox </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JComboBox{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> WideComboBox() { 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> WideComboBox(</font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Object items[]){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(items); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> WideComboBox(Vector items) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(items); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> WideComboBox(ComboBoxModel aModel) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(aModel); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> layingOut = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> doLayout(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            layingOut = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.doLayout(); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>finally</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            layingOut = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Dimension getSize(){ 
+        Dimension dim = </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.getSize(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!layingOut) 
+            dim.width = Math.max(dim.width, getPreferredSize().width); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> dim; 
+    } 
+}</font></pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">Here is a webstart demo to show it working.
+</font></p>
+<table border="0" width="100%" id="table2">
+	<tr>
+		<td width="356" valign="top"><b></b><font size="2" face="Verdana"><b>
+		JComboBox:</b><br>
+		<br>
+		<img border="0" src="http://www.jroller.com/resources/s/santhosh/narrowcombo.png" width="116" height="162"></font></td>
+		<td valign="top"><font size="2" face="Verdana"><b>WideComboBox:</b><br>
+		<br>
+		<img border="0" src="http://www.jroller.com/resources/s/santhosh/widecombo.png" width="162" height="184"></font></td>
+	</tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/WideComboBox.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="88" height="23"></a></p>
+
+</body>
+
+</html>

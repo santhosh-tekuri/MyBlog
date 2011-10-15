@@ -1,0 +1,110 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/IncrementalSearchList.gif" width="346" height="210"></font></p>
+<p><font size="2" face="Verdana">Both JComboBox and JList actually use ListModel. 
+So why don't we separate the search algorithm into separate class so that it can 
+used in implementing Incremental Search for JComboBox.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>abstract</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ListModelFindAction </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> FindAction{ 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> getNextMatch(ListModel model, String prefix, </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> startIndex, Position.Bias bias){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> max = model.getSize(); 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(prefix==</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>throw</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> IllegalArgumentException(); 
+        } 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(startIndex&lt;</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000"> || startIndex&gt;= max){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>throw</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> IllegalArgumentException(); 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(ignoreCase) 
+            prefix = prefix.toUpperCase(); 
+ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// start search from the next element after the selected element</i></font><font style="font-family: monospaced" color="#000000"> 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> increment = (bias==</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000"> || bias == Position.Bias.Forward) ? </font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000"> : -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> index = startIndex; 
+        </font><font style="font-family: monospaced" color="#000080"><b>do</b></font><font style="font-family: monospaced" color="#000000">{ 
+            Object item = model.getElementAt(index); 
+ 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(item!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">){ 
+                String text = item.toString(); 
+                </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(ignoreCase) 
+                    text = text.toUpperCase(); 
+ 
+                </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(text!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000"> &amp;&amp; text.startsWith(prefix)){ 
+                    </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> index; 
+                } 
+            } 
+            index = (index+increment+max)%max; 
+        } </font><font style="font-family: monospaced" color="#000080"><b>while</b></font><font style="font-family: monospaced" color="#000000">(index!=startIndex); 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Then next is the class that implements the Incremental Search for JList:</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ListFindAction </font><font style="font-family: monospaced" color="#000080"><b>extends</b></font><font style="font-family: monospaced" color="#000000"> ListModelFindAction{ 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> changed(JComponent comp, String searchString, Position.Bias bias){ 
+        JList list = (JList)comp; 
+        </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> startingFromSelection = </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> max = list.getModel().getSize(); 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> increment = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(bias!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+            increment = (bias==Position.Bias.Forward) ? </font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000"> : -</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">; 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> startingRow = (list.getLeadSelectionIndex()+increment+max)%max; 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(startingRow&lt;</font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000"> || startingRow&gt;= list.getModel().getSize()){ 
+            startingFromSelection = </font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">; 
+            startingRow = </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">; 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> index = getNextMatch(list.getModel(), searchString, startingRow, bias); 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(index!=-</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">){ 
+            changeSelection(list, index); 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+        } </font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(startingFromSelection){ 
+            index = getNextMatch(list.getModel(), searchString, </font><font style="font-family: monospaced" color="#0000ff">0</font><font style="font-family: monospaced" color="#000000">, bias); 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(index!=-</font><font style="font-family: monospaced" color="#0000ff">1</font><font style="font-family: monospaced" color="#000000">){ 
+                changeSelection(list, index); 
+                </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>true</b></font><font style="font-family: monospaced" color="#000000">; 
+            } 
+        } 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>false</b></font><font style="font-family: monospaced" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> changeSelection(JList list, </font><font style="font-family: monospaced" color="#000080"><b>int</b></font><font style="font-family: monospaced" color="#000000"> index){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(controlDown) 
+            list.addSelectionInterval(index, index); 
+        </font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000"> 
+            list.setSelectedIndex(index); 
+        list.ensureIndexIsVisible(index); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">changeSelection(...) takes care of modifiers.</font></p>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> ListFindAction().install(list);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/IncrementalSearch.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

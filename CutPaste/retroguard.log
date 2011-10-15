@@ -1,0 +1,103 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Tue Aug 02 03:58:42 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           CutPaste.jar
+# Target Jar file for obfuscated code: CutPaste_obfsucated.jar
+# RetroGuard Script file used:         retroguard.txt
+#
+#
+# WARNING - Methods are called which may unavoidably break in obfuscated
+# version at runtime. Please review your source code to ensure that these
+# methods are not intended to act on classes within the obfuscated Jar file.
+#      Your class santhosh/TextPaneTest uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#      Your class santhosh/TransferNotifier$1 uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#
+# Memory in use after class data structure built: 511240 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 13 times	(40%)
+#  'if'   	used 6 times	(18%)
+#  'do'   	used 3 times	(9%)
+#  'b'   	used 1 times	(3%)
+#  'c'   	used 1 times	(3%)
+#  'd'   	used 1 times	(3%)
+#  'e'   	used 1 times	(3%)
+#  'for'   	used 1 times	(3%)
+#  'f'   	used 1 times	(3%)
+#  'g'   	used 1 times	(3%)
+#  'h'   	used 1 times	(3%)
+#  'i'   	used 1 times	(3%)
+#  'j'   	used 1 times	(3%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (3%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/CutPasteDemo
+.method santhosh/CutPasteDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/ListItemSelection a
+.field_map santhosh/ListItemSelection/index do
+.field_map santhosh/ListItemSelection/list for
+.method_map santhosh/ListItemSelection/transferAccepted ()V a
+.class_map santhosh/ImageUtil b
+.field_map santhosh/ImageUtil/imgObserver a
+.method_map santhosh/ImageUtil/createGhostImage (Ljava/awt/Image;)Ljava/awt/Image; a
+.class_map santhosh/TransferNotifierProxy c
+.field_map santhosh/TransferNotifierProxy/delegate if
+.method_map santhosh/TransferNotifierProxy/getTransferDataFlavors ()[Ljava/awt/datatransfer/DataFlavor; getTransferDataFlavors
+.method_map santhosh/TransferNotifierProxy/isDataFlavorSupported (Ljava/awt/datatransfer/DataFlavor;)Z isDataFlavorSupported
+.method_map santhosh/TransferNotifierProxy/transferAccepted ()V a
+.method_map santhosh/TransferNotifierProxy/clearClipBoard ()V do
+.method_map santhosh/TransferNotifierProxy/getTransferData (Ljava/awt/datatransfer/DataFlavor;)Ljava/lang/Object; getTransferData
+.method_map santhosh/TransferNotifierProxy/transferRejected ()V if
+.method_map santhosh/CutPasteDemo/createList (II)Ljavax/swing/JScrollPane; a
+.class_map santhosh/MyListCellRenderer d
+.field_map santhosh/MyListCellRenderer/icon a
+.field_map santhosh/MyListCellRenderer/ghostIcon if
+.method_map santhosh/MyListCellRenderer/getListCellRendererComponent (Ljavax/swing/JList;Ljava/lang/Object;IZZ)Ljava/awt/Component; getListCellRendererComponent
+.class_map santhosh/GhostIcon e
+.field_map santhosh/GhostIcon/delegate a
+.field_map santhosh/GhostIcon/composite if
+.method_map santhosh/GhostIcon/paintIcon (Ljava/awt/Component;Ljava/awt/Graphics;II)V paintIcon
+.method_map santhosh/GhostIcon/getIconWidth ()I getIconWidth
+.method_map santhosh/GhostIcon/getIconHeight ()I getIconHeight
+.class_map santhosh/TextPaneTest f
+.field_map santhosh/TextPaneTest/class$santhosh$TextPaneTest class$santhosh$TextPaneTest
+.method_map santhosh/TextPaneTest/main ([Ljava/lang/String;)V a
+.method_map santhosh/TextPaneTest/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.class_map santhosh/ListTransferHandler g
+.method_map santhosh/ListTransferHandler/canImport (Ljavax/swing/JComponent;[Ljava/awt/datatransfer/DataFlavor;)Z canImport
+.method_map santhosh/ListTransferHandler/createTransferable (Ljavax/swing/JComponent;)Ljava/awt/datatransfer/Transferable; createTransferable
+.method_map santhosh/ListTransferHandler/acceptOrReject (Ljava/awt/datatransfer/Transferable;Z)V a
+.method_map santhosh/ListTransferHandler/getSourceActions (Ljavax/swing/JComponent;)I getSourceActions
+.method_map santhosh/ListTransferHandler/importData (Ljavax/swing/JComponent;Ljava/awt/datatransfer/Transferable;)Z importData
+.method_map santhosh/ListTransferHandler/exportToClipboard (Ljavax/swing/JComponent;Ljava/awt/datatransfer/Clipboard;I)V exportToClipboard
+.class_map santhosh/XTransferable h
+.method_map santhosh/XTransferable/transferAccepted ()V a
+.method_map santhosh/XTransferable/transferRejected ()V if
+.class_map santhosh/ListClipboardOwner i
+.field_map santhosh/ListClipboardOwner/index a
+.field_map santhosh/ListClipboardOwner/CLIP_BOARD_OWNER if
+.field_map santhosh/ListClipboardOwner/list do
+.method_map santhosh/ListClipboardOwner/lostOwnership (Ljava/awt/datatransfer/Clipboard;Ljava/awt/datatransfer/Transferable;)V lostOwnership
+.method_map santhosh/ListClipboardOwner/getIndex ()I a
+.class_map santhosh/TransferNotifier$1 1
+.field_map santhosh/TransferNotifier$1/class$santhosh$TransferNotifier class$santhosh$TransferNotifier
+.method_map santhosh/TransferNotifier$1/class$ (Ljava/lang/String;)Ljava/lang/Class; class$
+.class_map santhosh/TransferNotifier j
+.field_map santhosh/TransferNotifier/NOTIFICATION_FLAVOR a
+.method_map santhosh/TransferNotifier/transferAccepted ()V a
+.method_map santhosh/TransferNotifier/transferRejected ()V if

@@ -1,0 +1,120 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Every Swing programmer knows that all swing 
+components support tool tips.</font></p>
+<p><font size="2" face="Verdana">&nbsp;&nbsp;&nbsp; 
+JComponent.setToolTipText(String tooltip);</font></p>
+<p><font size="2" face="Verdana">Suppose I have a JSlider component, I can set a 
+tool tip text, and the tool tip is shown when mouse stays for a while on that 
+component.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/SliderToolTip1.gif" width="273" height="115"></font></p>
+<p><font size="2" face="Verdana">Today I will show how tool tips can be used in 
+a different way.</font></p>
+<p><font size="2" face="Verdana">First of all, How many programmers know how 
+tool tips work. Let us say Swing doesn't has in-built support for tooltips. How 
+do you approach for tool tips??</font></p>
+<ul>
+  <li><font size="2" face="Verdana">add a mouse listener for the component.</font></li>
+  <li><font size="2" face="Verdana">when mouse enters start a timer say with 750 
+  msec.</font></li>
+  <li><font size="2" face="Verdana">when the timer hits, show a window which 
+  contains jlabel with tooltip background.</font></li>
+  <li><font size="2" face="Verdana">when the timer hits the second time or mouse 
+  exits the component, dispose the tooltip window.</font></li>
+</ul>
+<p><font size="2" face="Verdana">All this stuff in Swing is done by 
+ToolTipManager class.</font></p>
+<p><font size="2" face="Verdana">In the above screenshot, JSlider has been set 
+the tooltip text &quot;drag the thumb to see tooltips!!&quot;. Now what I am going to do 
+is, while user is dragging the thumb, I will show the current value of thumb as 
+tooltip. After user releases the thumb, it should get the original tooltip text.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>
+public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> SliderToolTips{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> enableSliderToolTips(</font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JSlider slider){ 
+        slider.addChangeListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ChangeListener(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> adjusting = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> String oldTooltip; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stateChanged(ChangeEvent e){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(slider.getModel().getValueIsAdjusting()){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!adjusting){ 
+                        oldTooltip = slider.getToolTipText(); 
+                        adjusting = </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+                    } 
+                    slider.setToolTipText(String.valueOf(slider.getValue())); 
+                    hideToolTip(slider); </font><font style="font-family: monospaced;" color="#808080"><i>// to avoid flickering :)</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    postToolTip(slider); 
+                }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    hideToolTip(slider); 
+                    slider.setToolTipText(oldTooltip); 
+                    adjusting = </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+                    oldTooltip = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+            } 
+        }); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Manual ToolTips ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> postToolTip(JComponent comp){ 
+        Action action = comp.getActionMap().get(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;postTip&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(action==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) </font><font style="font-family: monospaced;" color="#808080"><i>// no tooltip</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        ActionEvent ae = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(comp, ActionEvent.ACTION_PERFORMED, 
+                                </font><font style="font-family: monospaced;" color="#008000"><b>&quot;postTip&quot;</b></font><font style="font-family: monospaced;" color="#000000">, EventQueue.getMostRecentEventTime(), </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        action.actionPerformed(ae); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> hideToolTip(JComponent comp){ 
+        Action action = comp.getActionMap().get(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;hideTip&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(action==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) </font><font style="font-family: monospaced;" color="#808080"><i>// no tooltip</i></font><font style="font-family: monospaced;" color="#000000"> 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        ActionEvent ae = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(comp, ActionEvent.ACTION_PERFORMED, 
+                                </font><font style="font-family: monospaced;" color="#008000"><b>&quot;hideTip&quot;</b></font><font style="font-family: monospaced;" color="#000000">, EventQueue.getMostRecentEventTime(), </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+        action.actionPerformed(ae); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">If you look at the source code of 
+ToolTipManager class, you will find that, the way tooltips are shown is actually 
+through actions. We have two methods in the above class postToolTip(...) and 
+hideToolTip(...) which manually perform those actions which eventually executed 
+by ToolTipManager. i.e, these two methods allow to show/hide manually without 
+any mouse movements.</font></p>
+<p><font size="2" face="Verdana">we add a ChangeListener to the slider and 
+change the tooltip to current slider value and post the tooltip manually. I have 
+taken care so that, </font></p>
+<ul>
+  <li><font size="2" face="Verdana">any tooltips that were set on slider should 
+  not be lost after mouse is released</font></li>
+  <li><font size="2" face="Verdana">avoid flickering: tooltip needs to be 
+  updated while user is dragging the thumb. Thus the tooltip text is changed 
+  very frequently which will result in some flickering in tooltip.</font></li>
+</ul>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/SliderToolTip.gif" width="273" height="115"></p>
+<p>
+<b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">   SliderToolTips.enableSliderToolTips(slider); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Same trick can be used for JScrollBar also. If 
+you ever noticed, Microsoft Word shows the page number while dragging the 
+vertical scrollbar of document :)</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/SliderToolTip.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Yours comments are appreciated.</font></p>
+
+</body>
+
+</html>

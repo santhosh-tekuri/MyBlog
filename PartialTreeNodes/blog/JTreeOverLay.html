@@ -1,0 +1,117 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Folders Tree in Windows Explorer has a very nice feature</title>
+</head>
+
+<body>
+
+<p><font size="2" face="Verdana">Folders Tree in Windows Explorer has a very 
+nice feature: &quot;when mouse moves over a partially visible tree node, it paints 
+the tree node over all components so that it is completely visible&quot;. See the 
+following screenshot to get an idea:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/WindowsExplorer.gif" width="180" height="72"></p>
+<p><font size="2" face="Verdana">Today I tried to achieve the same with JTree.
+<br>
+1. we need to show complete tree node on mouse over. so we need a Mouse Listener<br>
+2. we need to paint the partial tree node over all components. so glasspane 
+comes into handy.</font></p>
+<p><font size="2" face="Verdana">here is the code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> OverlayListener </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseInputAdapter{ 
+    JTree tree; 
+    Component oldGlassPane; 
+    TreePath path; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row; 
+    Rectangle bounds; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> OverlayListener(JTree tree){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.tree = tree; 
+        tree.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        tree.addMouseMotionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    JComponent c = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JComponent(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paint(Graphics g){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> selected = tree.isRowSelected(row); 
+            Component renderer = tree.getCellRenderer().getTreeCellRendererComponent(tree, path.getLastPathComponent(), 
+                    tree.isRowSelected(row), tree.isExpanded(row), tree.getModel().isLeaf(path.getLastPathComponent()), row, 
+                    selected); 
+            c.setFont(tree.getFont()); 
+            Rectangle paintBounds = SwingUtilities.convertRectangle(tree, bounds, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            SwingUtilities.paintComponent(g, renderer, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, paintBounds); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(selected) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+            g.setColor(Color.blue); 
+            ((Graphics2D)g).draw(paintBounds); 
+         } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseExited(MouseEvent e){ 
+        resetGlassPane(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> resetGlassPane(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(oldGlassPane!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            c.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            tree.getRootPane().setGlassPane(oldGlassPane); 
+            oldGlassPane = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseMoved(MouseEvent me){ 
+        path = tree.getPathForLocation(me.getX(), me.getY()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(path==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            resetGlassPane(); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        row = tree.getRowForPath(path); 
+        bounds = tree.getPathBounds(path); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!tree.getVisibleRect().contains(bounds)){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(oldGlassPane==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                oldGlassPane = tree.getRootPane().getGlassPane(); 
+                c.setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+                tree.getRootPane().setGlassPane(c); 
+                c.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                tree.getRootPane().repaint(); 
+        }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            resetGlassPane(); 
+        } 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">how to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        JTree tree = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTree(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> OverlayListener(tree); // use overlay
+        JSplitPane split = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitPane(); 
+        split.setLeftComponent(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(tree)); 
+        JFrame challenge = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;TreeOverlay Test&quot;</b></font><font style="font-family: monospaced;" color="#000000">);
+        challenge.getContentPane().add(split);
+        challenge.setSize(</font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">);
+        challenge.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">);
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">here is our effort:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/JTreeOverlay.gif" width="206" height="182"></p>
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">There was one painting issue in the previous 
+implementation. Move mouse to a partially visible tree node. it is painted on 
+glasspane. Now if you click with mouse the nodes gets selected but the portion 
+of the tree node lying outside still in white background. you might understand 
+what I am trying to explain with the following figure:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/continuation.gif" width="73" height="71"></p>
+<p><font size="2" face="Verdana">to solve this we use TreeSelectionListener. The 
+OverlayListener in the previous blog is modified to implement 
+TreeSelectionListener.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> OverlayListener </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseInputAdapter </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TreeSelectionListener{ 
+    .......
+</font>    <font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> valueChanged(TreeSelectionEvent e){ 
+        tree.getRootPane().repaint(); //repaints our glass-pane
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">we shouldn't add this TreeSelectionListener in 
+Constructor . If we do so, it will unnecessarily repaint for each selection 
+change even this there is no overlay painted currently. The solution is add the 
+TreeSelectionListener when we change the glasspane and remove it when we reset 
+the glasspane.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> resetGlassPane(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(oldGlassPane!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            ......
+            tree.removeTreeSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseMoved(MouseEvent me){ 
+        .....
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(oldGlassPane==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                ......
+                tree.addTreeSelectionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+       ..........
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p>&nbsp;<a href="http://www.jroller.com/resources/s/santhosh/PartialTreeNodes.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

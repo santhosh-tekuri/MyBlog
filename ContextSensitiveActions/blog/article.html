@@ -1,0 +1,125 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Swing Components manage the list of actions and 
+their key bindings using
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/ActionMap.html">
+ActionMap</a> and
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/InputMap.html">
+InputMap</a>.</font></p>
+<p><font size="2" face="Verdana">In simple terms,<br>
+ActionMap can be thought of Map between actionName and action.<br>
+InputMap can be thought of Map between KeyStroke and actionName.</font></p>
+<p><font size="2" face="Verdana">The ActionMap and InputMap of a component is 
+actually created by its LookAndFeel class and UI Delegate. Most of the actions 
+of swing components are singleton instances. I mean, a single instance of action 
+is enough to handle actions from multiple instances of swing components.Such 
+action can't be reused in creating Action based components such as JButton.
+</font></p>
+<p><font size="2" face="Verdana">For example let us see the following snippet:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">  JList list = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JList(listData); 
+  JPanel listPanel = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JPanel(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> BorderLayout()); 
+  listPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JScrollPane(list), BorderLayout.CENTER); 
+  Action action = list.getActionMap().get(</font><font style="font-family: monospaced" color="#008000"><b>&quot;selectAll&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+  listPanel.add(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JButton(action), BorderLayout.SOUTH); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">In the above snippet, we fetched the &quot;selectAll&quot; 
+action from a JList's actionMap and created a JButton with that action. But when 
+you click that button, it won't work as expected. It throws ClassCastException.</font></p>
+<p><font size="2" face="Verdana">java.lang.ClassCastException<br>
+&nbsp;&nbsp;&nbsp; at 
+javax.swing.plaf.basic.BasicListUI$SelectAllAction.actionPerformed(BasicListUI.java:2125)<br>
+&nbsp;&nbsp;&nbsp; at 
+javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1786)<br>
+&nbsp;&nbsp; at 
+javax.swing.AbstractButton$ForwardActionEvents.actionPerformed(AbstractButton.java:1839)</font></p>
+<p><font size="2" face="Verdana">The reason is, such actions assume that 
+ActionEvent.getSource() is the JList on which the action to be performed. But 
+here the ActionEvent.getSource() returns the JButton that we created. That is 
+why ClassCastException is thrown.</font></p>
+<p><font size="2" face="Verdana"><b>Then question arises:</b> does it mean, there is no 
+way to reuse the action without writing your own SelectAllAction implementation 
+?</font></p>
+<p><font size="2" face="Verdana">There is a solution. We should somehow make the 
+selectAll action context sensitive to this particular JList. We create a wrapper 
+to the original action and add the context sensitive information via this.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ContextSensitiveAction </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Action{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Action delegate; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Object source; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ContextSensitiveAction(Action delegate, Object source){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.delegate = delegate; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.source = source; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isEnabled(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> delegate.isEnabled(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> enabled){ 
+        delegate.setEnabled(enabled); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addPropertyChangeListener(PropertyChangeListener listener){ 
+        delegate.addPropertyChangeListener(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removePropertyChangeListener(PropertyChangeListener listener){ 
+        delegate.removePropertyChangeListener(listener); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getValue(String key){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> delegate.getValue(key); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> putValue(String key, Object value){ 
+        delegate.putValue(key, value); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent ae){ 
+        delegate.actionPerformed(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionEvent(source, ae.getID(), ae.getActionCommand(), ae.getWhen(), ae.getModifiers())); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p>Now we modify the original snippet to use this wrapper action:</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">  JList list = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JList(listData); 
+  JPanel listPanel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BorderLayout()); 
+  listPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(list), BorderLayout.CENTER); 
+  Action action = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ContextSensitiveAction(list.getActionMap().get(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;selectAll&quot;</b></font><font style="font-family: monospaced;" color="#000000">), list); 
+  listPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(action), BorderLayout.SOUTH); </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/ContextSensitiveActions.gif" width="400" height="203"></p>
+<p><font size="2" face="Verdana">This is the screenshot of the webstart demo. 
+Here the first [SelectAll] button uses action from ActionMap. and the second [SelectAll] 
+button uses the action wrapped with ContextSensitiveAction.</font></p>
+<p>
+<a href="http://www.jroller.com/resources/s/santhosh/ContextSensitiveActions.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p>
+<font face="Verdana" size="2"><b>FYI:</b> I joined as a contributing editor to 
+JavaLobby's <a href="http://www.javalobby.org/java/forums/f18032.html">Java Tips 
+&amp; Tricks Section</a>.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; So you can read my posting from JavaLobby 
+also.</font></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

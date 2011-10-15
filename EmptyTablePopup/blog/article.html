@@ -1,0 +1,43 @@
+<html>
+<body>
+<p><font face="Verdana" size="2">It looks like as simple as writing a MouseListener implementation and 
+register with JTable where the MouseListener implementation shows JPopupMenu.</font></p>
+<p><font face="Verdana" size="2">But this doesn't works if there are no rows in JTable. Why so? The height of&nbsp; 
+the JTable is zero when there are no rows, Thus the area where user clicks is 
+not JTable, it is JViewPort.</font></p>
+<p><font face="Verdana" size="2">This can be solved by overriding the method
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html#getScrollableTracksViewportHeight()">
+getScrollableTracksViewportHeight</a>() of
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html">
+Scrollable</a> interface. JTable already implements Scrollable interface. So we 
+just override that method and make the table height same as that of view-port if 
+its preferred size is smaller than view-port size</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000"> JTable table = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTable(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">){ 
+     </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> getScrollableTracksViewportHeight() { 
+         </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> getPreferredSize().height &lt; getParent().getHeight(); 
+     } 
+ };</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">This is how JTextComponent handles this. You can checkout JTextComponent.java 
+and see getScrollableTracksViewportHeight() implementation.</font></p>
+<p><font face="Verdana" size="2">Any JComponent can be scrollable by adding to JScrollable. Then what is 
+Scrollable interface is for ? <br>
+Scrollable interface which gives some hints to perform better scrolling, such as 
+how many pixels to move per mouse-click or page up/down.</font></p>
+<p>
+<img border="0" src="http://jroller.com/resources/s/santhosh/EmptyTablePopup.gif" width="310" height="250"></p>
+<p><font size="2" face="Verdana">The demo contains two tables. and both tables have the same MouseListener 
+registered. But only the bottom table shows JPopupMenu on right mouse click. The 
+bottom table overrides getScrollableTracksViewportHeight() as explained above.</font></p>
+<p><a href="http://jroller.com/resources/s/santhosh/EmptyTablePopup.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

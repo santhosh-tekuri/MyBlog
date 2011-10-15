@@ -1,0 +1,79 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">There are many use-cases in which retaining the 
+expansion state of JTree improves the usability. I will introduce you to one 
+such use case. </font></p>
+<p><font size="2" face="Verdana">We have a JTree in which user can move the tree 
+nodes from one place to another using drag-n-drop. When a non-leaf node is moved 
+from one place to another, it looses its expansion state. It is very irritating 
+from user point of view and becomes a usability issue. Today I will introduce a 
+trick that can be used to store the expansion state and retain it later when 
+required.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author santhosh kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> TreeUtil{ 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// is path1 descendant of path2</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isDescendant(TreePath path1, TreePath path2){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> count1 = path1.getPathCount(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> count2 = path2.getPathCount(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(count1&lt;=count2) 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(count1!=count2){ 
+            path1 = path1.getParentPath(); 
+            count1--; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> path1.equals(path2); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> String getExpansionState(JTree tree, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row){ 
+        TreePath rowPath = tree.getPathForRow(row); 
+        StringBuffer buf = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringBuffer(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rowCount = tree.getRowCount(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i=row; i&lt;rowCount; i++){ 
+            TreePath path = tree.getPathForRow(i); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(i==row || isDescendant(path, rowPath)){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(tree.isExpanded(path)) 
+                    buf.append(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;,&quot;</b></font><font style="font-family: monospaced;" color="#000000">+String.valueOf(i-row)); 
+            }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> buf.toString(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> restoreExpanstionState(JTree tree, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row, String expansionState){ 
+        StringTokenizer stok = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringTokenizer(expansionState, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;,&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>while</b></font><font style="font-family: monospaced;" color="#000000">(stok.hasMoreTokens()){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> token = row + Integer.parseInt(stok.nextToken()); 
+            tree.expandRow(token); 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">getExpanstionState(...) returns the current 
+expansion state of the given row, and restoreExpansionState(....) restores the 
+expansion state of a row from specified status.</font></p>
+<p><font size="2" face="Verdana">ExpansionState of a row is the list of 
+descendant rows that are expanded. Note that here is row is counted from the row 
+for which expansion state is calculated.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/expansionState.gif" width="212" height="276"></font></p>
+<p><font size="2" face="Verdana">For example in the above screen shot the 
+expansion state of the selected node is 0, 2</font></p>
+<p><font size="2" face="Verdana">during drag-n-drop, get the expansion state of 
+the dragged node before moving and restore the expansion state after drop.</font></p>
+<p><font size="2" face="Verdana">In the webstart demo, you can unselect the 
+checkbox, to see how loosing expansion state irritates user.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/ExpansionState.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">Each of the complex model in swing has one 
+abstract implementation and one default implementation.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="33%"><b><font size="2" face="Verdana">&nbsp;Model</font></b></td>
+    <td width="33%"><b><font size="2" face="Verdana">&nbsp;Abstract 
+    Implementation</font></b></td>
+    <td width="34%"><b><font size="2" face="Verdana">&nbsp;Default 
+    Implementation</font></b></td>
+  </tr>
+  <tr>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;TableModel</font></td>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;AbstractTableModel</font></td>
+    <td width="34%"><font size="2" face="Verdana">&nbsp;DefaultTableModel</font></td>
+  </tr>
+  <tr>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;ListModel</font></td>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;AbstractListModel</font></td>
+    <td width="34%"><font size="2" face="Verdana">&nbsp;DefaultListModel</font></td>
+  </tr>
+  <tr>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;TreeModel</font></td>
+    <td width="33%"><font size="2" face="Verdana">&nbsp;&nbsp; ???</font></td>
+    <td width="34%"><font size="2" face="Verdana">&nbsp;DefaultTreeModel</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana"><b>Why AbstractTreeModel is missing in Swing??</b> 
+I don't find any reasons. Every time I have to implement Custom TreeModel, I end 
+up copying most of the code(listener registration, event firing) from 
+DefaultTreeModel. So why not implement one to make it easier in future:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.event.EventListenerList; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.event.TreeModelEvent; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.event.TreeModelListener; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.tree.TreeModel; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.tree.TreePath; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>/** 
+ *  This abstract class provides default implementations for some of 
+ *  the methods in the &lt;code&gt;TreeModel&lt;/code&gt; interface. It takes care of 
+ *  the management of listeners and provides some conveniences for generating 
+ *  &lt;code&gt;TreeModelEvents&lt;/code&gt; and dispatching them to the listeners. 
+ * 
+ * </i><b>@author</b><i> Santhosh Kumar T 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> AbstractTreeModel </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> TreeModel{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> valueForPathChanged(TreePath path, Object newValue){ 
+        fireTreeNodesChanged(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, path.getPath(), </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Listener Registration ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> EventListenerList listenerList = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> EventListenerList(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> addTreeModelListener(TreeModelListener l) { 
+        listenerList.add(TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, l); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeTreeModelListener(TreeModelListener l) { 
+        listenerList.remove(TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, l); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> TreeModelListener[] getTreeModelListeners() { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> (TreeModelListener[])listenerList.getListeners(TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ Event Firing ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireTreeNodesChanged(Object source, Object[] path, 
+                                        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">[] childIndices, 
+                                        Object[] children) { 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Guaranteed to return a non-null array</i></font><font style="font-family: monospaced;" color="#000000"> 
+        Object[] listeners = listenerList.getListenerList(); 
+        TreeModelEvent e = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Process the listeners last to first, notifying</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// those that are interested in this event</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000"> (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = listeners.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; i&gt;=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i-=</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (listeners[i]==TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Lazily create the event:</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (e == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    e = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreeModelEvent(source, path, 
+                                           childIndices, children); 
+                ((TreeModelListener)listeners[i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]).treeNodesChanged(e); 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireTreeNodesInserted(Object source, Object[] path, 
+                                        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">[] childIndices, 
+                                        Object[] children) { 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Guaranteed to return a non-null array</i></font><font style="font-family: monospaced;" color="#000000"> 
+        Object[] listeners = listenerList.getListenerList(); 
+        TreeModelEvent e = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Process the listeners last to first, notifying</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// those that are interested in this event</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000"> (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = listeners.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; i&gt;=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i-=</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (listeners[i]==TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Lazily create the event:</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (e == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    e = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreeModelEvent(source, path, 
+                                           childIndices, children); 
+                ((TreeModelListener)listeners[i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]).treeNodesInserted(e); 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireTreeNodesRemoved(Object source, Object[] path, 
+                                        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">[] childIndices, 
+                                        Object[] children) { 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Guaranteed to return a non-null array</i></font><font style="font-family: monospaced;" color="#000000"> 
+        Object[] listeners = listenerList.getListenerList(); 
+        TreeModelEvent e = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Process the listeners last to first, notifying</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// those that are interested in this event</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000"> (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = listeners.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; i&gt;=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i-=</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (listeners[i]==TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Lazily create the event:</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (e == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    e = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreeModelEvent(source, path, 
+                                           childIndices, children); 
+                ((TreeModelListener)listeners[i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]).treeNodesRemoved(e); 
+            } 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fireTreeStructureChanged(Object source, Object[] path, 
+                                        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">[] childIndices, 
+                                        Object[] children) { 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Guaranteed to return a non-null array</i></font><font style="font-family: monospaced;" color="#000000"> 
+        Object[] listeners = listenerList.getListenerList(); 
+        TreeModelEvent e = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// Process the listeners last to first, notifying</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// those that are interested in this event</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000"> (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = listeners.length-</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; i&gt;=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i-=</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">) { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (listeners[i]==TreeModelListener.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">) { 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// Lazily create the event:</i></font><font style="font-family: monospaced;" color="#000000"> 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (e == </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    e = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> TreeModelEvent(source, path, 
+                                           childIndices, children); 
+                ((TreeModelListener)listeners[i+</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]).treeStructureChanged(e); 
+            } 
+        } 
+    }  
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">I hope, It is at least added in Mustang 
+release.</font></p>
+<p><font size="2" face="Verdana">Your comments are most welcome.</font></p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

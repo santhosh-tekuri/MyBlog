@@ -1,0 +1,55 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Tue Aug 09 02:26:26 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           ComponentTitledBorder.jar
+# Target Jar file for obfuscated code: ComponentTitledBorder_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# Memory in use after class data structure built: 288976 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 3 times	(42%)
+#  'if'   	used 1 times	(14%)
+#  'for'   	used 1 times	(14%)
+#  'int'   	used 1 times	(14%)
+#  'do'   	used 1 times	(14%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (2%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/ComponentTitledBorderDemo
+.method santhosh/ComponentTitledBorderDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/ComponentTitledBorderDemo$1 1
+.field_map santhosh/ComponentTitledBorderDemo$1/val$checkBox val$checkBox
+.field_map santhosh/ComponentTitledBorderDemo$1/val$proxyPanel val$proxyPanel
+.method_map santhosh/ComponentTitledBorderDemo$1/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/ComponentTitledBorder a
+.field_map santhosh/ComponentTitledBorder/container a
+.field_map santhosh/ComponentTitledBorder/comp if
+.field_map santhosh/ComponentTitledBorder/border do
+.field_map santhosh/ComponentTitledBorder/rect for
+.field_map santhosh/ComponentTitledBorder/offset int
+.method_map santhosh/ComponentTitledBorder/paintBorder (Ljava/awt/Component;Ljava/awt/Graphics;IIII)V paintBorder
+.method_map santhosh/ComponentTitledBorder/getBorderInsets (Ljava/awt/Component;)Ljava/awt/Insets; getBorderInsets
+.method_map santhosh/ComponentTitledBorder/mouseEntered (Ljava/awt/event/MouseEvent;)V mouseEntered
+.method_map santhosh/ComponentTitledBorder/dispatchEvent (Ljava/awt/event/MouseEvent;)V a
+.method_map santhosh/ComponentTitledBorder/mousePressed (Ljava/awt/event/MouseEvent;)V mousePressed
+.method_map santhosh/ComponentTitledBorder/mouseClicked (Ljava/awt/event/MouseEvent;)V mouseClicked
+.method_map santhosh/ComponentTitledBorder/mouseExited (Ljava/awt/event/MouseEvent;)V mouseExited
+.method_map santhosh/ComponentTitledBorder/mouseReleased (Ljava/awt/event/MouseEvent;)V mouseReleased
+.method_map santhosh/ComponentTitledBorder/isBorderOpaque ()Z isBorderOpaque

@@ -1,0 +1,135 @@
+<html>
+<body>
+<p><font face="Verdana" size="2">Here is the screenshot of JTable with 
+AUTO_RESIZE_OFF</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/normalTableOff.gif" width="297" height="277"></p>
+<p><font face="Verdana" size="2">now we start the make-up.<br>
+<br>
+There is lot of gray background (it is JViewPort) which screws up the JTable 
+look. Another interesting thing is when you right click on this gray area popup 
+won't appear, because we attached mouse listener to JTable not to JViewPort.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/autoresizeOffRegions.gif" width="299" height="277"></p>
+<p><font size="2" face="Verdana">I divided the gray background into 3 regions. 
+We will attack each region one by one.</font></p>
+<p><b><font size="2" face="Verdana">Region1:</font></b></p>
+<p><font size="2" face="Verdana">we will make JTable occupy this region by 
+overriding following method:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>boolean</b></font><font style="font-family: monospaced" color="#000000"> getScrollableTracksViewportHeight() { 
+    </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> getPreferredSize().height &lt; getParent().getHeight(); 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">now you will get popup when you right click in 
+region1.</font></p>
+<p><b><font size="2" face="Verdana">Region2:</font></b></p>
+<p><font size="2" face="Verdana">we can't override </font>
+<font size="2" face="Courier New">getScrollableTracksViewPortWidth()</font><font size="2" face="Verdana"> 
+same as above. If you by mistake do so, JTable behaves like 
+AUTO_RESIZE_ALL_COLUMNS.<br>
+<br>
+we just make the viewport background same as table background by overriding
+</font>
+<font style="font-family: monospaced" color="#000000" face="Courier New" size="2">
+configureEnclosingScrollPane()</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>protected</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> configureEnclosingScrollPane() {
+   .....
+   viewport.setBackground(getBackground());
+   .....
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">But there is still one problem. we don't get 
+popup menu on right click in this region. To attack this we use a mouse 
+listener.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">MouseListener viewPortMouseListener = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> MouseAdapter(){ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> mouseClicked(MouseEvent e){ 
+        repostEvent(e); 
+    } 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> mousePressed(MouseEvent e){ 
+        repostEvent(e); 
+    } 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> mouseReleased(MouseEvent e){ 
+        repostEvent(e); 
+    } 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> mouseEntered(MouseEvent e){ 
+        repostEvent(e); 
+    } 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> mouseExited(MouseEvent e){ 
+        repostEvent(e); 
+    } 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> repostEvent(MouseEvent e) { 
+        MouseEvent e2 = SwingUtilities.convertMouseEvent(e.getComponent(), e, MyTable.</font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">); 
+        dispatchEvent(e2); 
+    } 
+};</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">this mouse listener listens for mouse events 
+from JViewPort and reposts those events to JTable.</font></p>
+<p><font face="Verdana" size="2">When should we add this mouse listener?? <br>
+Answer is override </font>
+<font style="font-family: monospaced" color="#000000" face="Courier New" size="2">
+configureEnclosingScrollPane()</font><font face="Verdana" size="2"> add this 
+listener to viewport.<br>
+Don't forget to remove this listener in </font>
+<font style="font-family: monospaced" color="#000000" face="Courier New" size="2">
+unconfigureEnclosingScrollPane()</font><font face="Verdana" size="2"> </font>
+</p>
+<p><b><font face="Verdana" size="2">Region3:<br>
+<br>
+</font></b><font face="Verdana" size="2">We replace JScrollPane's column view 
+with a panel containing TableHeader + a dummy label which looks like TableColumn</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> JPanel headerPanel = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JPanel(</font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> BorderLayout()); 
+</font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> JLabel dummyColumn = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JLabel(){ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> Border getBorder(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> UIManager.getBorder(</font><font style="font-family: monospaced" color="#008000"><b>&quot;TableHeader.cellBorder&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+    } 
+}; </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">override </font>
+<font style="font-family: monospaced" color="#000000" face="Courier New" size="2">
+unconfigureEnclosingScrollPane()</font><font face="Verdana" size="2"> and do the 
+following:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000000">headerPanel.removeAll(); 
+headerPanel.add(getTableHeader(), BorderLayout.WEST); 
+headerPanel.add(dummyColumn, BorderLayout.CENTER); 
+scrollPane.setColumnHeaderView(headerPanel); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">now our JTable is ready for demo.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/tableaftermytouch.gif" width="303" height="280"></p>
+<p><font face="Verdana" size="2">it looks now same as the file table in windows 
+explorer :)</font></p>
+<p><font face="Verdana" size="2">
+<a href="http://www.jroller.com/resources/s/santhosh/autoResizeOff.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></font></p>
+<p><font face="Verdana" size="2"><a href="mailto:santhosh@in.fiorano.com">Want 
+the Source Code</a></font></p>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Wed Nov 09 06:34:59 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           ModalProgress.jar
+# Target Jar file for obfuscated code: ModalProgress_obfsucated.jar
+# RetroGuard Script file used:         retroguard.txt
+#
+#
+# Memory in use after class data structure built: 474736 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 13 times	(39%)
+#  'if'   	used 6 times	(18%)
+#  'do'   	used 5 times	(15%)
+#  'new'   	used 2 times	(6%)
+#  'for'   	used 2 times	(6%)
+#  'int'   	used 2 times	(6%)
+#  'b'   	used 1 times	(3%)
+#  'c'   	used 1 times	(3%)
+#  'try'   	used 1 times	(3%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (1%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/ModalProgressDemo
+.method santhosh/ModalProgressDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/ProgressDialog$1 1
+.field_map santhosh/ProgressDialog$1/this$0 this$0
+.field_map santhosh/ProgressDialog$1/val$ce val$ce
+.method_map santhosh/ProgressDialog$1/run ()V run
+.class_map santhosh/ProgressDialog a
+.field_map santhosh/ProgressDialog/monitor a
+.field_map santhosh/ProgressDialog/statusLabel if
+.field_map santhosh/ProgressDialog/progressBar do
+.method_map santhosh/ProgressDialog/stateChanged (Ljavax/swing/event/ChangeEvent;)V stateChanged
+.method_map santhosh/ProgressDialog/init (Lsanthosh/ProgressMonitor;)V a
+.class_map santhosh/ProgressMonitor b
+.field_map santhosh/ProgressMonitor/status a
+.field_map santhosh/ProgressMonitor/milliSecondsToWait if
+.field_map santhosh/ProgressMonitor/listeners do
+.field_map santhosh/ProgressMonitor/total for
+.field_map santhosh/ProgressMonitor/ce int
+.field_map santhosh/ProgressMonitor/current new
+.field_map santhosh/ProgressMonitor/indeterminate try
+.method_map santhosh/ProgressMonitor/getTotal ()I a
+.method_map santhosh/ProgressMonitor/getMilliSecondsToWait ()I if
+.method_map santhosh/ProgressMonitor/setCurrent (Ljava/lang/String;I)V a
+.method_map santhosh/ProgressMonitor/isIndeterminate ()Z do
+.method_map santhosh/ProgressMonitor/getCurrent ()I for
+.method_map santhosh/ProgressMonitor/start (Ljava/lang/String;)V a
+.method_map santhosh/ProgressMonitor/getStatus ()Ljava/lang/String; int
+.method_map santhosh/ProgressMonitor/removeChangeListener (Ljavax/swing/event/ChangeListener;)V a
+.method_map santhosh/ProgressMonitor/fireChangeEvent ()V new
+.method_map santhosh/ProgressMonitor/addChangeListener (Ljavax/swing/event/ChangeListener;)V if
+.class_map santhosh/ModalProgressDemo$2 2
+.method_map santhosh/ModalProgressDemo$2/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/ModalProgressDemo$1 1
+.method_map santhosh/ModalProgressDemo$1/fetchRecord (I)V a
+.method_map santhosh/ModalProgressDemo$1/run ()V run
+.field_map santhosh/ModalProgressDemo/heavyAction a
+.field_map santhosh/ModalProgressDemo/heavyRunnable if
+.field_map santhosh/ModalProgressDemo/frame do
+.class_map santhosh/ProgressUtil$MonitorListener a
+.field_map santhosh/ProgressUtil$MonitorListener/owner a
+.field_map santhosh/ProgressUtil$MonitorListener/monitor if
+.field_map santhosh/ProgressUtil$MonitorListener/timer do
+.method_map santhosh/ProgressUtil$MonitorListener/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.method_map santhosh/ProgressUtil$MonitorListener/stateChanged (Ljavax/swing/event/ChangeEvent;)V stateChanged
+.class_map santhosh/ProgressUtil c
+.method_map santhosh/ProgressUtil/createModalProgressMonitor (Ljava/awt/Component;IZI)Lsanthosh/ProgressMonitor; a

@@ -1,0 +1,34 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Sun Feb 19 01:06:12 GMT+05:30 2006
+#
+# Jar file to be obfuscated:           FitTableColumns1.jar
+# Target Jar file for obfuscated code: FitTableColumns1_obfsucated.jar
+# RetroGuard Script file used:         retroguard.txt
+#
+#
+# Memory in use after class data structure built: 282976 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 1 times	(100%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (0%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/FitTableColumns1Demo
+.method santhosh/FitTableColumns1Demo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/FitTableColumnsAction a
+.method_map santhosh/FitTableColumnsAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed

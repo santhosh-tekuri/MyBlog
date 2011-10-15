@@ -1,0 +1,205 @@
+The Swing Components that support renderers are: 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JTable, JList and JTree
+
+<b>How do CellRenderers work ?</b>
+All of know, that component we see in JTable is not the actual renderer component but is just it's rubber stamp. Let us see how JTable creates these rubber stamps.
+[code]
+System.out.println(new JTable().getComponent(0));
+[/code]
+When the above snippet is executed, you will see the following output:
+[code]
+javax.swing.CellRendererPane[,0,0,0x0,invalid,hidden]
+[/code]
+CellRendererPane is a class which is used by JTable to create rubber stamps. A CellRendererPane is added to JTable in BasicTableUI.installUI(). When renderer has to be rubber-stamped, it is added to CellRendererPane and its paint(...) method is called with JTable's Graphics Object.
+
+<b>Why do we need CellRendererPane? Can't we say cellRenderer.getTableCellRendererComponent(...).paint(tableGraphics) ?</b>
+In Swing, A Component is painted if and only if it is added to a showing component. So cellRenderer must be added to some currently visible component in order to paint its rubber-stamp. CellRendererPane fills this need. CellRenderer doesn't do any thing in its paint(...) and update(..) methods.
+
+SwingUtilities class has two utility methods to create rubber stamps of component:
+[code]
+public static void paintComponent(Graphics g, Component c, Container p, Rectangle r)
+public static void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h)
+[/code]
+The above two methods internally use CellRendererPane;
+
+Let us create some small application using rubber stamps:
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/ComponentTitledBorderSelected.gif" width="260" height="91">&nbsp;&nbsp;&nbsp;<img border="0" src="http://www.jroller.com/resources/s/santhosh/componentTitledBorderUnSelected.gif" width="260" height="91">
+
+<b>We are going to create a ComponentTitledBorder: </b>
+&nbsp;&nbsp;&nbsp; a border which can allow to place any component in it. (NOTE: border is not a visual component so we can't add a component)
+[code]
+1    /** 
+2     * MySwing: Advanced Swing Utilites 
+3     * Copyright (C) 2005  Santhosh Kumar T 
+4     * <p/> 
+5     * This library is free software; you can redistribute it and/or 
+6     * modify it under the terms of the GNU Lesser General Public 
+7     * License as published by the Free Software Foundation; either 
+8     * version 2.1 of the License, or (at your option) any later version. 
+9     * <p/> 
+10    * This library is distributed in the hope that it will be useful, 
+11    * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+12    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+13    * Lesser General Public License for more details. 
+14    */ 
+15    
+24   public class ComponentTitledBorder implements Border, MouseListener, SwingConstants{ 
+25       int offset = 5; 
+26    
+27       Component comp; 
+28       JComponent container; 
+29       Rectangle rect; 
+30       Border border; 
+31    
+32       public ComponentTitledBorder(Component comp, JComponent container, Border border){ 
+33           this.comp = comp; 
+34           this.container = container; 
+35           this.border = border; 
+36           container.addMouseListener(this); 
+37       } 
+38    
+39       public boolean isBorderOpaque(){ 
+40           return true; 
+41       } 
+42    
+43       public void paintBorder(Component c, Graphics g, int x, int y, int width, int height){ 
+44           Insets borderInsets = border.getBorderInsets(c); 
+45           Insets insets = getBorderInsets(c); 
+46           int temp = (insets.top-borderInsets.top)/2; 
+47           border.paintBorder(c, g, x, y+temp, width, height-temp); 
+48           Dimension size = comp.getPreferredSize(); 
+49           rect = new Rectangle(offset, 0, size.width, size.height); 
+50           SwingUtilities.paintComponent(g, comp, (Container)c, rect); 
+51       } 
+52    
+53       public Insets getBorderInsets(Component c){ 
+54           Dimension size = comp.getPreferredSize(); 
+55           Insets insets = border.getBorderInsets(c); 
+56           insets.top = Math.max(insets.top, size.height); 
+57           return insets; 
+58       } 
+59    
+60       private void dispatchEvent(MouseEvent me){ 
+61           if(rect!=null && rect.contains(me.getX(), me.getY())){ 
+62               Point pt = me.getPoint(); 
+63               pt.translate(-offset, 0); 
+64               comp.setBounds(rect); 
+65               comp.dispatchEvent(new MouseEvent(comp, me.getID() 
+66                       , me.getWhen(), me.getModifiers() 
+67                       , pt.x, pt.y, me.getClickCount() 
+68                       , me.isPopupTrigger(), me.getButton())); 
+69               if(!comp.isValid()) 
+70                   container.repaint(); 
+71           } 
+72       } 
+73    
+74       public void mouseClicked(MouseEvent me){ 
+75           dispatchEvent(me); 
+76       } 
+77    
+78       public void mouseEntered(MouseEvent me){ 
+79           dispatchEvent(me); 
+80       } 
+81    
+82       public void mouseExited(MouseEvent me){ 
+83           dispatchEvent(me); 
+84       } 
+85    
+86       public void mousePressed(MouseEvent me){ 
+87           dispatchEvent(me); 
+88       } 
+89    
+90       public void mouseReleased(MouseEvent me){ 
+91           dispatchEvent(me); 
+92       } 
+93   }
+[/code]
+
+32-35
+&nbsp;&nbsp;&nbsp;&nbsp; First argument is the component to be displayed in the border. Second argument is the container for which this border is set and the third argument is the border which has to be titled with component. If you see javax.swing.border.TitledBorder, it allows to place title on any given border. Similarly we make the component to be placed on any given border.
+
+36-37
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; we add a mouse listener to the component (I will refer to this as checkbox to make explanation more understandable). We want the checkbox selectable/unselectable by user. That is checkbox should respond to mouse events. But remember that Border is not a component, so we can't add the checkbox to border.
+
+44-47
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; we paint the specified border with proper insets.
+
+48-50
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the rubber stamp of the checkbox is painted at some offset say 5 pixels. We have used SwingUtilities.paintComponent(...) here which in turn used CellRendererPane.
+
+53-58
+&nbsp;&nbsp;&nbsp;&nbsp; we compute the union of the specified border insets and the checkbox height and return as insets of this border
+
+74-92
+&nbsp;&nbsp;&nbsp;&nbsp; in the constructor we added this border as mouselistener to checkbox. now we re-dispatch any mouse events in the checkbox's rubberstamp to the actual checkbox so that, user feels that checkbox actually 
+responds to the mouse clicks.
+
+61
+&nbsp;&nbsp;&nbsp; we dispatch only mouse events within the rubber stamp.
+
+62-63
+&nbsp;&nbsp;&nbsp; the mouse coordinates must be translated to the actual checkbox which is painted at some offset (5 pixels here).
+
+64
+&nbsp;&nbsp;&nbsp; we must set the size of checkbox to the size of current rubberstamp, because after the rubberstamp has been painted, CellRendererPane sets the size of checkbox to [0,0]
+
+65-68
+&nbsp;&nbsp;&nbsp; we create the new mouse event with translated coordinates and dispatch it to checkbox.
+
+69-70
+&nbsp;&nbsp;&nbsp; we must repaint the border, if there is any change in checkbox status such as selected/unselected.
+
+The ComponentTitledBorder is not just for JCheckBox. You can use any component. For example we might want to show a title with icon which is not possible with Swing's TitleBorder.
+
+<b>NOTE:</b>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The checkbox doesn't respond to keyboard. 
+So you can't bring focus to checkbox by TAB or select/unselect using SPACE. 
+After all, it is a rubber stamp :)
+
+Here is the source of demo application:
+[code]
+    public static void main(String[] args){ 
+        try{ 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } catch(Exception e){ 
+            e.printStackTrace(); 
+        } 
+        final JPanel proxyPanel = new JPanel(); 
+        proxyPanel.add(new JLabel("Proxy Host: ")); 
+        proxyPanel.add(new JTextField("proxy.xyz.com")); 
+        proxyPanel.add(new JLabel("  Proxy Port")); 
+        proxyPanel.add(new JTextField("8080")); 
+        final JCheckBox checkBox = new JCheckBox("Use Proxy", true); 
+        checkBox.setFocusPainted(false); 
+        ComponentTitledBorder componentBorder = 
+                new ComponentTitledBorder(checkBox, proxyPanel 
+                , BorderFactory.createEtchedBorder()); 
+        checkBox.addActionListener(new ActionListener(){ 
+            public void actionPerformed(ActionEvent e){ 
+                boolean enable = checkBox.isSelected(); 
+                Component comp[] = proxyPanel.getComponents(); 
+                for(int i = 0; i<comp.length; i++){ 
+                    comp[i].setEnabled(enable); 
+                } 
+            } 
+        }); 
+        proxyPanel.setBorder(componentBorder); 
+        JFrame frame = new JFrame("ComponentTitledBorder - santhosh@in.fiorano.com"); 
+        Container contents = frame.getContentPane(); 
+        contents.setLayout(new FlowLayout()); 
+        contents.add(proxyPanel); 
+        frame.pack(); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setVisible(true); 
+    } 
+[/code]
+
+<a href="http://www.jroller.com/resources/s/santhosh/ComponentTitledBorder.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a>
+
+Your comments are appreciated.
+
+Santhosh Kumar T    - santhosh@in.fiorano.com
+Contributing Editor - santhosh@javalobby.org
+MySwing Project     - https://myswing.dev.java.net/
+Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+Sr. Software Eng    - http://www.fiorano.com

@@ -1,0 +1,80 @@
+<html>
+<body>
+
+<p><font face="Verdana" size="2">Suppose in your application, If you want to 
+give freedom to user to customize shortcuts to various actions, then you might be 
+interested in this.</font></p>
+<p><font face="Verdana" size="2">it even traps focus traversal keys : TAB, 
+SHIFT+TAB</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** </i><b>@author</b><i> Santhosh Kumar - santhosh@in.fiorano.com **/</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ShortCutTest{ 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        JTextField tf = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(); 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// trap focus traversal keys also</i></font><font style="font-family: monospaced;" color="#000000"> 
+        tf.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET); 
+        tf.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET); 
+ 
+        tf.addKeyListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> KeyListener(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> currentKeyCode = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyPressed(KeyEvent ke){ 
+                ke.consume(); 
+                JTextField tf = (JTextField)ke.getSource(); 
+                tf.setText(toString(ke)); 
+            } 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyReleased(KeyEvent ke){ 
+                ke.consume(); 
+                JTextField tf = (JTextField)ke.getSource(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(currentKeyCode){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_ALT: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_ALT_GRAPH: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_CONTROL: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_SHIFT: 
+                        tf.setText(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } 
+            } 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> keyTyped(KeyEvent ke){ 
+                ke.consume(); 
+            } 
+            </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> String toString(KeyEvent ke){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> keyCode = currentKeyCode = ke.getKeyCode(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> modifiers = ke.getModifiers(); 
+                String modifText = KeyEvent.getKeyModifiersText(modifiers); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">.equals(modifText))  </font><font style="font-family: monospaced;" color="#808080"><i>// no modifiers</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.getKeyText(keyCode); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>switch</b></font><font style="font-family: monospaced;" color="#000000">(keyCode){ 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_ALT: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_ALT_GRAPH: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_CONTROL: 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>case</b></font><font style="font-family: monospaced;" color="#000000"> KeyEvent.VK_SHIFT: 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> modifText+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;+&quot;</b></font><font style="font-family: monospaced;" color="#000000">; </font><font style="font-family: monospaced;" color="#808080"><i>// middle of shortcut</i></font><font style="font-family: monospaced;" color="#000000"> 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>default</b></font><font style="font-family: monospaced;" color="#000000">: 
+                        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> modifText+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;+&quot;</b></font><font style="font-family: monospaced;" color="#000000">+KeyEvent.getKeyText(keyCode); 
+                } 
+            } 
+        }); 
+        JOptionPane.showMessageDialog(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, tf, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;ShortCut - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">, JOptionPane.INFORMATION_MESSAGE); 
+        System.exit(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/ShortCut.gif" width="268" height="115"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/ShortCut.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+<p><font face="Verdana" size="2">Don't forget to set focus to TextField after 
+application lauch.</font></p>
+
+</body>
+
+</html>

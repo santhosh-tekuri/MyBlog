@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="http://www.javalobby.org/resources/santhosh/postings">
+  <information>
+    <title>${title}</title>
+    <vendor>Santhosh Kumar T - santhosh@in.fiorano.com</vendor>
+    <offline-allowed/>
+  </information>  
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.4+" />
+    <jar href="${ant.project.name}/${ant.project.name}.jar"/>
+  </resources>
+  <application-desc main-class="santhosh.${ant.project.name}Demo"/>
+</jnlp>

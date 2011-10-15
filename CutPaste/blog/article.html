@@ -1,0 +1,427 @@
+<html>
+
+<body>
+
+<p><b><font size="2" face="Verdana">How cut/copy/paste works?</font></b></p>
+<p><font size="2" face="Verdana">When you copy something from a component, it 
+creates a
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html">
+transferable</a> object and places it in
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Clipboard.html">
+clipboard</a>. When user tries to paste on another component, the target 
+component fetches the transferable object from clipboard and
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html#getTransferData(java.awt.datatransfer.DataFlavor)">
+gets the actual data from transferable</a> and does its job. Thus there is a 
+data transfer between the source and target component via clipboard.</font></p>
+<p><b><font size="2" face="Verdana">Why not place the actual data in clipboard 
+rather than transferable ?</font></b></p>
+<p><font face="Verdana">
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html">
+<font size="2">Transferable</font></a><font size="2"> is an interface which lets 
+you define the data being transferred. The advantage of transferable is it 
+supports
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/DataFlavor.html">
+dataflavors</a>. Depending on the target component, the data getting transferred 
+might be different. For example, let us say you copied some text from a 
+web-browser, now if you try to paste in a notepad, it inserts only text, but if 
+you try to paste in a html aware editor such as DreamWeaver or FrontPage, it 
+inserts html snippet. i.e. the transferable created by the web-browser supports 
+two dataflavors: simple text flavor and html flavor. Another advantage of 
+dataflavors is delayed construction of data.</font></font></p>
+<p><font size="2" face="Verdana">In this article, I am concentrating on 
+cut/paste operation. There are two ways to implement cut/paste:</font></p>
+<p><font face="Verdana"><b><font size="2">Immediate cut/paste: </font></b>
+<font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When you issue a cut command, the data 
+immediately gets removed from the source component. For example text editor use 
+this approach. When you cut some text from an editor, it immediately gets 
+removed.</font></font></p>
+<p><font face="Verdana"><b><font size="2">Deferred cut/paste:</font></b><font size="2"><br>
+&nbsp;&nbsp;&nbsp;&nbsp; The actual data that is being cut won't be removed from 
+source component, until you paste it somewhere. For example windows explorer use 
+this approach. When you cut a file from windows explorer, the file won't be 
+removed immediately, rather its icon is shown in dim color. When you paste it in 
+some other folder, it is removed from original folder and added to the target 
+folder, and the icon changes from normal to dim. One interesting thing to note 
+here is highlighting the object being cut in dim color. When you cut two files 
+one after another, only the recently cut file will be highlighted in dim color. 
+Because only one transferable can be placed in clipboard.</font></font></p>
+<p><font size="2" face="Verdana">In this article, I will be concentrating on how 
+to implement Deferred cut/paste. because you can find implementation of 
+Immediate cut/paste in swing text components.</font></p>
+<p><font face="Verdana" size="2">First we will see how to create a dim image 
+using Java2D:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000080"><b>
+public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ImageUtil{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JLabel imgObserver = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(); 
+
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Image createGhostImage(Image img){ 
+        BufferedImage ghost = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> BufferedImage(img.getWidth(imgObserver) 
+                , img.getHeight(imgObserver), BufferedImage.TYPE_INT_ARGB_PRE); 
+        Graphics2D g2 = ghost.createGraphics(); 
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, </font><font style="font-family: monospaced;" color="#0000ff">0.5f</font><font style="font-family: monospaced;" color="#000000">)); 
+        g2.drawImage(img, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, ghost.getWidth(), ghost.getHeight(), imgObserver); 
+        g2.dispose(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> ghost; 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">In my example, I am using JList to make 
+explanation more clear. Now let us jump into highlighting. When user cuts an 
+item in JList, it places a transferable in clipboard and displays that item's 
+icon in dim color (we need a special ListCellRender for this). This item has to 
+be displayed in dim color as long as the transferable created by this JList is 
+in clipboard. If user copies something let us say some text from notepad, JList 
+should immediately display the item with normal icon. That is we need some sort 
+of Listener to clipboard so that we know when our transferable object is removed 
+from clipboard. We have such listener called
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/ClipboardOwner.html">
+ClipboardOwner</a>.<br>
+<br>
+A transferable object is placed in clipboard as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%"><code><b>Cliboard.<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Clipboard.html#setContents%28java.awt.datatransfer.Transferable,%20java.awt.datatransfer.ClipboardOwner%29">setContents</a></b>(<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/Transferable.html" title="interface in java.awt.datatransfer">Transferable</a>&nbsp;contents,
+    <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/datatransfer/ClipboardOwner.html" title="interface in java.awt.datatransfer">
+    ClipboardOwner</a>&nbsp;owner)</code></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The second argument is the clipboard owner. 
+when the transferable is removed from the clipboard, it calls lostOwnership(...) 
+method in clipboard owner.</font></p>
+<p><font face="Verdana" size="2">Thus the above interface is enough to handle 
+the highlighting of the item being cut. Now let us see how to implement Deferred 
+cut/paste.</font></p>
+<p><font face="Verdana" size="2">When user cuts an item in JList, it just places 
+a transferable in the clipboard but doesn't remove it from list. When user 
+pastes it somewhere then the item has to be removed from JList. Now the problem, 
+How does JList know when user tried to paste it somewhere. Let us see whether 
+ClipboardOwner can help us to track this. Using ClipboardOwner, we can just know 
+that. our transferable object is removed from the clipboard. But it doesn't tell 
+whether the transferable is removed because of whether clipboard content is 
+replaced by some other transferable, or because of some paste operation. Truly 
+saying, Java lack an API for this.</font></p>
+<p><font face="Verdana" size="2">At first I tried I could create a special 
+transferable subclass:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font>
+<font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>interface</b></font><font style="font-family: monospaced;" color="#000000"> XTransferable </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> Transferable{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferAccepted(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferRejected(); 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Now, JList can place a transferable object 
+implementing XTransferable in clipboard, which removes the item from list in 
+transferAccepted() method. When user pastes in some other component, the target 
+component can check if the transferable is an instanceof XTransferable, if so, 
+call transferAccepted() method after the data is pasted. </font></p>
+<p><font size="2" face="Verdana">The above solution seems to be excellent for me 
+and tried to implement this. But it didn't work. On debugging, I found that, the 
+transferable fetched at target component is not the same transferable placed by 
+the source component. You can confirm this, by executing the following snippet:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); 
+StringSelection transferable = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringSelection(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;data&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;transferable placed: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+transferable); 
+clipboard.setContents(transferable, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+System.out.println(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;transferable fetched: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+clipboard.getContents(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The output of the above snippet is as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%"><font size="2" face="Courier New">transferable placed: 
+    java.awt.datatransfer.StringSelection@87a5cc<br>
+    transferable fetched: sun.awt.datatransfer.TransferableProxy@18fb1f7</font></td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">The acutal transferable object is wrapped in 
+sun.awt.datatransfer.TransferableProxy object, which is a proprietary class of 
+Sun JVM.</font></p>
+<p><font face="Verdana" size="2">So I started trying to find is there any way to 
+implement this ? and finally I found one approach: using dataflavors</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber6">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font>
+<font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>interface</b></font><font style="font-family: monospaced;" color="#000000"> TransferNotifier{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> DataFlavor NOTIFICATION_FLAVOR = 
+            </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DataFlavor(TransferNotifier.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, TransferNotifier.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">.getName()); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferAccepted(); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferRejected(); 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">JList creates a transferable object which 
+supports two flavors: the original dataflavor and notification flavor. In 
+TransferNotifier implementation, we can take care of removing item from JList.</font></p>
+<p><font face="Verdana" size="2">To make usage of TransferNotifier usage easier, 
+a created a special delegating Transferable in which user can wrap his/her 
+original transferable object very easily.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber7">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font>
+<font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>abstract</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> TransferNotifierProxy </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Transferable, TransferNotifier{ 
+    Transferable delegate; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> TransferNotifierProxy(Transferable delegate){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.delegate = delegate; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> DataFlavor[] getTransferDataFlavors(){ 
+        DataFlavor delegateFlavors[] = delegate.getTransferDataFlavors(); 
+        DataFlavor flavors[] = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DataFlavor[delegateFlavors.length + </font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">]; 
+        System.arraycopy(delegateFlavors, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, flavors, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, delegateFlavors.length); 
+        flavors[flavors.length-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">] = NOTIFICATION_FLAVOR; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> flavors; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isDataFlavorSupported(DataFlavor flavor){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> flavor.equals(NOTIFICATION_FLAVOR) 
+                || delegate.isDataFlavorSupported(flavor); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object getTransferData(DataFlavor flavor) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> UnsupportedFlavorException, IOException{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> flavor.equals(NOTIFICATION_FLAVOR) 
+                ? </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000"> 
+                : delegate.getTransferData(flavor); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> clearClipBoard(){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// how to clear the clipboard contents ?</i></font><font style="font-family: monospaced;" color="#000000"> 
+        Toolkit.getDefaultToolkit().getSystemClipboard() 
+                .setContents(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringSelection(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">), </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferAccepted(){ 
+        clearClipBoard(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferRejected(){ 
+        clearClipBoard(); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Now let us create a sample application using 
+the above technique:</font></p>
+<p><font size="2" face="Verdana">Follwing is the transferable placed in 
+clipboard when an item is cut from JList:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber8">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a>
+</i></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ListItemSelection </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> TransferNotifierProxy{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JList list; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ListItemSelection(JList list){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringSelection((String)list.getSelectedValue())); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.list = list; 
+        index = list.getSelectedIndex(); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> transferAccepted(){ 
+        DefaultListModel model = (DefaultListModel)list.getModel(); 
+        model.removeElementAt(index); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.transferAccepted(); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Following is the ClipboardOwner implementation, 
+which updates the JList item's display:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber9">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font>
+<font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ListClipboardOwner </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ClipboardOwner{ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// used as JList's client property</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> String CLIP_BOARD_OWNER = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;ClipBoardOwner&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JList list; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ListClipboardOwner(JList list){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.list = list; 
+        index = list.getSelectedIndex(); 
+        list.putClientProperty(CLIP_BOARD_OWNER, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+        list.paintImmediately(list.getCellBounds(index, index)); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getIndex(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> index; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> lostOwnership(Clipboard clipboard, Transferable contents){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(list.getClientProperty(CLIP_BOARD_OWNER)==</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">) 
+            list.putClientProperty(CLIP_BOARD_OWNER, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        list.paintImmediately(list.getCellBounds(index, index)); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Here is the ListCellRenderer implementation 
+which takes care of dim highlighting:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber10">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a>
+</i></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> MyListCellRenderer </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> DefaultListCellRenderer{ 
+    ImageIcon icon = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ImageIcon(getClass().getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;user.gif&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+    Icon ghostIcon = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ImageIcon(ImageUtil.createGhostImage(icon.getImage())); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Component getListCellRendererComponent(JList list, Object value 
+                                                  , </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> index, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isSelected 
+                                                  , </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> cellHasFocus){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); 
+        ListClipboardOwner owner = (ListClipboardOwner)list.getClientProperty(ListClipboardOwner.CLIP_BOARD_OWNER); 
+        setIcon(owner!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; owner.getIndex()==index ? ghostIcon : icon); 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Here is the Swing's TransferHandler, which 
+tells you to copy data to and from JList:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber11">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a></i></font><font style="font-family: monospaced;" color="#000080"><b>
+public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ListTransferHandler </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> TransferHandler{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> Transferable createTransferable(JComponent c){ 
+        JList list = (JList)c; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ListItemSelection(list); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> exportToClipboard(JComponent comp, Clipboard clip, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> action) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> IllegalStateException{ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> clipboardAction = getSourceActions(comp) &amp; action; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(clipboardAction!=NONE){ 
+            Transferable t = createTransferable(comp); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(t!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+                    clip.setContents(t, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ListClipboardOwner((JList)comp)); 
+                    exportDone(comp, t, clipboardAction); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+                } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(IllegalStateException ise){ 
+                    exportDone(comp, t, NONE); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> ise; 
+                } 
+            } 
+        } 
+        exportDone(comp, </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">, NONE); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> getSourceActions(JComponent c){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> MOVE; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> canImport(JComponent comp, DataFlavor[] transferFlavors){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;transferFlavors.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(transferFlavors[i].equals(DataFlavor.stringFlavor)) 
+                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> importData(JComponent comp, Transferable t){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            String data = String.valueOf(t.getTransferData(DataFlavor.stringFlavor)); 
+            JList list = (JList)comp; 
+            ((DefaultListModel)list.getModel()).addElement(data); 
+            acceptOrReject(t, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            acceptOrReject(t, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">; 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> acceptOrReject(Transferable t, </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> accept){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(t.isDataFlavorSupported(TransferNotifier.NOTIFICATION_FLAVOR)){ 
+                TransferNotifier notifier = (TransferNotifier)t.getTransferData(TransferNotifier.NOTIFICATION_FLAVOR); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(accept) 
+                    notifier.transferAccepted(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                    notifier.transferRejected(); 
+            } 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(UnsupportedFlavorException e){ 
+            e.printStackTrace(); </font><font style="font-family: monospaced;" color="#808080"><i>// impossible</i></font><font style="font-family: monospaced;" color="#000000"> 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(IOException e){ 
+            e.printStackTrace(); 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Finally here is the main application's class:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber12">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - <a href="mailto:santhosh@in.fiorano.com">santhosh@in.fiorano.com</a>
+</i></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> CutPasteTest{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane createList(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> from, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> to){ 
+        DefaultListModel model1 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultListModel(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = from; i&lt;=to; i++) 
+            model1.addElement(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;User &quot;</b></font><font style="font-family: monospaced;" color="#000000">+i); 
+ 
+        JList list = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JList(model1); 
+        list.setTransferHandler(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ListTransferHandler()); 
+        list.setCellRenderer(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MyListCellRenderer()); 
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); 
+ 
+        JScrollPane scroll = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(list); 
+        scroll.setBorder(BorderFactory.createEmptyBorder()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> scroll; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        JFrame frame = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Deferred Cut/Paste - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        JSplitPane split = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitPane(JSplitPane.HORIZONTAL_SPLIT 
+                , createList(</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">) 
+                , createList(</font><font style="font-family: monospaced;" color="#0000ff">6</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">)); 
+        split.setResizeWeight(</font><font style="font-family: monospaced;" color="#0000ff">0.5d</font><font style="font-family: monospaced;" color="#000000">); 
+        frame.getContentPane().add(split); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setSize(</font><font style="font-family: monospaced;" color="#0000ff">200</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">200</font><font style="font-family: monospaced;" color="#000000">); 
+        frame.setLocationRelativeTo(</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">); 
+        frame.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/CutPaste.gif" width="200" height="200"></p>
+<p><font size="2" face="Verdana">Try to cut/paste items from one list to another 
+in demo.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/CutPaste.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your Comments are appreciated.</font></p>
+
+</body>
+
+</html>

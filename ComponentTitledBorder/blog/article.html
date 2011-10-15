@@ -1,0 +1,245 @@
+<html>
+<body>
+
+<p><font size="2" face="Verdana">The Swing Components that support renderers 
+are: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JTable, JList and JTree</font></p>
+<p><b><font size="2" face="Verdana">How do CellRenderers work ?</font></b></p>
+<p><font size="2" face="Verdana">All of know, that component we see in JTable is 
+not the actual renderer component but is just it's rubber stamp. Let us see how 
+JTable creates these rubber stamps.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000"> System.out.println(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTable().getComponent(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">When the above snippet is executed, you will 
+see the following output:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">&nbsp;<font size="2" face="Courier New">javax.swing.CellRendererPane[,0,0,0x0,invalid,hidden]</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">CellRendererPane is a class which is used by 
+JTable to create rubber stamps. A CellRendererPane is added to JTable in 
+BasicTableUI.installUI(). When renderer has to be rubber-stamped, it is added to 
+CellRendererPane and its paint(...) method is called with JTable's Graphics 
+Object.</font></p>
+<p><b><font size="2" face="Verdana">Why do we need CellRendererPane? Can't we 
+say cellRenderer.getTableCellRendererComponent(...).paint(tableGraphics) ?</font></b></p>
+<p><font size="2" face="Verdana">In Swing, A Component is painted if and only if 
+it is added to a showing component. So cellRenderer must be added to some 
+currently visible component in order to paint its rubber-stamp. CellRendererPane 
+fills this need. CellRenderer doesn't do any thing in its paint(...) and 
+update(..) methods.</font></p>
+<p><font size="2" face="Verdana">SwingUtilities class has two utility methods to 
+create rubber stamps of component:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paintComponent(Graphics g, Component c, Container p, Rectangle r)
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paintComponent(Graphics g, Component c, Container p, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> x, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> y, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> w, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> h)</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">The above two methods internally use 
+CellRendererPane;</font></p>
+<p><font size="2" face="Verdana">Let us create some small application using 
+rubber stamps:</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/ComponentTitledBorderSelected.gif" width="260" height="91">&nbsp;&nbsp;&nbsp;
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/componentTitledBorderUnSelected.gif" width="260" height="91"></p>
+<p><font size="2" face="Verdana"><b>We are going to create a 
+ComponentTitledBorder: </b><br>
+&nbsp;&nbsp;&nbsp; a border which can allow to place any component in it. (NOTE: 
+border is not a visual component so we can't add a component)</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-style: normal;" color="#000000">1    </font><font style="font-family: monospaced;" color="#808080"><i>/** 
+<font style="font-style: normal;" color="#000000">2    </font> * MySwing: Advanced Swing Utilites 
+<font style="font-style: normal;" color="#000000">3    </font> * Copyright (C) 2005  Santhosh Kumar T 
+<font style="font-style: normal;" color="#000000">4    </font> * &lt;p/&gt; 
+<font style="font-style: normal;" color="#000000">5    </font> * This library is free software; you can redistribute it and/or 
+<font style="font-style: normal;" color="#000000">6    </font> * modify it under the terms of the GNU Lesser General Public 
+<font style="font-style: normal;" color="#000000">7    </font> * License as published by the Free Software Foundation; either 
+<font style="font-style: normal;" color="#000000">8    </font> * version 2.1 of the License, or (at your option) any later version. 
+<font style="font-style: normal;" color="#000000">9    </font> * &lt;p/&gt; 
+<font style="font-style: normal;" color="#000000">10   </font> * This library is distributed in the hope that it will be useful, 
+<font style="font-style: normal;" color="#000000">11   </font> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<font style="font-style: normal;" color="#000000">12   </font> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+<font style="font-style: normal;" color="#000000">13   </font> * Lesser General Public License for more details. 
+<font style="font-style: normal;" color="#000000">14   </font> */</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">15   </font> 
+<font style="font-style: normal;" color="#000000">24   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ComponentTitledBorder </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> Border, MouseListener, SwingConstants{ 
+<font style="font-style: normal;" color="#000000">25   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> offset = </font><font style="font-family: monospaced;" color="#0000ff">5</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">26   </font> 
+<font style="font-style: normal;" color="#000000">27   </font>    Component comp; 
+<font style="font-style: normal;" color="#000000">28   </font>    JComponent container; 
+<font style="font-style: normal;" color="#000000">29   </font>    Rectangle rect; 
+<font style="font-style: normal;" color="#000000">30   </font>    Border border; 
+<font style="font-style: normal;" color="#000000">31   </font> 
+<font style="font-style: normal;" color="#000000">32   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ComponentTitledBorder(Component comp, JComponent container, Border border){ 
+<font style="font-style: normal;" color="#000000">33   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.comp = comp; 
+<font style="font-style: normal;" color="#000000">34   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.container = container; 
+<font style="font-style: normal;" color="#000000">35   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.border = border; 
+<font style="font-style: normal;" color="#000000">36   </font>        container.addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">37   </font>    } 
+<font style="font-style: normal;" color="#000000">38   </font> 
+<font style="font-style: normal;" color="#000000">39   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isBorderOpaque(){ 
+<font style="font-style: normal;" color="#000000">40   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">41   </font>    } 
+<font style="font-style: normal;" color="#000000">42   </font> 
+<font style="font-style: normal;" color="#000000">43   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paintBorder(Component c, Graphics g, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> x, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> y, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> width, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> height){ 
+<font style="font-style: normal;" color="#000000">44   </font>        Insets borderInsets = border.getBorderInsets(c); 
+<font style="font-style: normal;" color="#000000">45   </font>        Insets insets = getBorderInsets(c); 
+<font style="font-style: normal;" color="#000000">46   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> temp = (insets.top-borderInsets.top)/</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">47   </font>        border.paintBorder(c, g, x, y+temp, width, height-temp); 
+<font style="font-style: normal;" color="#000000">48   </font>        Dimension size = comp.getPreferredSize(); 
+<font style="font-style: normal;" color="#000000">49   </font>        rect = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Rectangle(offset, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, size.width, size.height); 
+<font style="font-style: normal;" color="#000000">50   </font>        SwingUtilities.paintComponent(g, comp, (Container)c, rect); 
+<font style="font-style: normal;" color="#000000">51   </font>    } 
+<font style="font-style: normal;" color="#000000">52   </font> 
+<font style="font-style: normal;" color="#000000">53   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Insets getBorderInsets(Component c){ 
+<font style="font-style: normal;" color="#000000">54   </font>        Dimension size = comp.getPreferredSize(); 
+<font style="font-style: normal;" color="#000000">55   </font>        Insets insets = border.getBorderInsets(c); 
+<font style="font-style: normal;" color="#000000">56   </font>        insets.top = Math.max(insets.top, size.height); 
+<font style="font-style: normal;" color="#000000">57   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> insets; 
+<font style="font-style: normal;" color="#000000">58   </font>    } 
+<font style="font-style: normal;" color="#000000">59   </font> 
+<font style="font-style: normal;" color="#000000">60   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> dispatchEvent(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">61   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(rect!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000"> &amp;&amp; rect.contains(me.getX(), me.getY())){ 
+<font style="font-style: normal;" color="#000000">62   </font>            Point pt = me.getPoint(); 
+<font style="font-style: normal;" color="#000000">63   </font>            pt.translate(-offset, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">64   </font>            comp.setBounds(rect); 
+<font style="font-style: normal;" color="#000000">65   </font>            comp.dispatchEvent(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> MouseEvent(comp, me.getID() 
+<font style="font-style: normal;" color="#000000">66   </font>                    , me.getWhen(), me.getModifiers() 
+<font style="font-style: normal;" color="#000000">67   </font>                    , pt.x, pt.y, me.getClickCount() 
+<font style="font-style: normal;" color="#000000">68   </font>                    , me.isPopupTrigger(), me.getButton())); 
+<font style="font-style: normal;" color="#000000">69   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!comp.isValid()) 
+<font style="font-style: normal;" color="#000000">70   </font>                container.repaint(); 
+<font style="font-style: normal;" color="#000000">71   </font>        } 
+<font style="font-style: normal;" color="#000000">72   </font>    } 
+<font style="font-style: normal;" color="#000000">73   </font> 
+<font style="font-style: normal;" color="#000000">74   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">75   </font>        dispatchEvent(me); 
+<font style="font-style: normal;" color="#000000">76   </font>    } 
+<font style="font-style: normal;" color="#000000">77   </font> 
+<font style="font-style: normal;" color="#000000">78   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseEntered(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">79   </font>        dispatchEvent(me); 
+<font style="font-style: normal;" color="#000000">80   </font>    } 
+<font style="font-style: normal;" color="#000000">81   </font> 
+<font style="font-style: normal;" color="#000000">82   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseExited(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">83   </font>        dispatchEvent(me); 
+<font style="font-style: normal;" color="#000000">84   </font>    } 
+<font style="font-style: normal;" color="#000000">85   </font> 
+<font style="font-style: normal;" color="#000000">86   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mousePressed(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">87   </font>        dispatchEvent(me); 
+<font style="font-style: normal;" color="#000000">88   </font>    } 
+<font style="font-style: normal;" color="#000000">89   </font> 
+<font style="font-style: normal;" color="#000000">90   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseReleased(MouseEvent me){ 
+<font style="font-style: normal;" color="#000000">91   </font>        dispatchEvent(me); 
+<font style="font-style: normal;" color="#000000">92   </font>    } 
+<font style="font-style: normal;" color="#000000">93   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">32-35<br>
+&nbsp;&nbsp;&nbsp;&nbsp; First argument is the component to be displayed in the 
+border. Second argument is the container for which this border is set and the 
+third argument is the border which has to be titled with component. If you see 
+javax.swing.border.TitledBorder, it allows to place title on any given border. 
+Similarly we make the component to be placed on any given border.</font></p>
+<p><font size="2" face="Verdana">36-37<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; we add a mouse listener to the component (I will 
+refer to this as checkbox to make explanation more understandable). We want the 
+checkbox selectable/unselectable by user. That is checkbox should respond to 
+mouse events. But remember that Border is not a component, so we can't add the 
+checkbox to border.</font></p>
+<p><font size="2" face="Verdana">44-47<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; we paint the specified border with proper insets.</font></p>
+<p><font size="2" face="Verdana">48-50<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the rubber stamp of the checkbox is painted at 
+some offset say 5 pixels. We have used SwingUtilities.paintComponent(...) here 
+which in turn used CellRendererPane.</font></p>
+<p><font size="2" face="Verdana">53-58<br>
+&nbsp;&nbsp;&nbsp;&nbsp; we compute the union of the specified border insets and 
+the checkbox height and return as insets of this border</font></p>
+<p><font size="2" face="Verdana">74-92<br>
+&nbsp;&nbsp;&nbsp;&nbsp; in the constructor we added this border as 
+mouselistener to checkbox. now we re-dispatch any mouse events in the checkbox's 
+rubberstamp to the actual checkbox so that, user feels that checkbox actually 
+responds to the mouse clicks.</font></p>
+<p><font size="2" face="Verdana">61<br>
+&nbsp;&nbsp;&nbsp; we dispatch only mouse events within the rubber stamp.</font></p>
+<p><font size="2" face="Verdana">62-63<br>
+&nbsp;&nbsp;&nbsp; the mouse coordinates must be translated to the actual 
+checkbox which is painted at some offset (5 pixels here).</font></p>
+<p><font size="2" face="Verdana">64<br>
+&nbsp;&nbsp;&nbsp; we must set the size of checkbox to the size of current 
+rubberstamp, because after the rubberstamp has been painted, CellRendererPane 
+sets the size of checkbox to [0,0]</font></p>
+<p><font size="2" face="Verdana">65-68<br>
+&nbsp;&nbsp;&nbsp; we create the new mouse event with translated coordinates and 
+dispatch it to checkbox.</font></p>
+<p><font size="2" face="Verdana">69-70<br>
+&nbsp;&nbsp;&nbsp; we must repaint the border, if there is any change in 
+checkbox status such as selected/unselected.</font></p>
+<p><font size="2" face="Verdana">The ComponentTitledBorder is not just for 
+JCheckBox. You can use any component. For example we might want to show a title 
+with icon which is not possible with Swing's TitleBorder.</font></p>
+<p><font size="2" face="Verdana"><b>NOTE:</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The checkbox doesn't respond to keyboard. 
+So you can't bring focus to checkbox by TAB or select/unselect using SPACE. 
+After all, it is a rubber stamp :)</font></p>
+<p><font size="2" face="Verdana">Here is the source of demo application:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber5">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+        </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JPanel proxyPanel = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JPanel(); 
+        proxyPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Proxy Host: &quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        proxyPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;proxy.xyz.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        proxyPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JLabel(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;  Proxy Port&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        proxyPanel.add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextField(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;8080&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox checkBox = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JCheckBox(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Use Proxy&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        checkBox.setFocusPainted(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        ComponentTitledBorder componentBorder = 
+                </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ComponentTitledBorder(checkBox, proxyPanel 
+                , BorderFactory.createEtchedBorder()); 
+        checkBox.addActionListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> enable = checkBox.isSelected(); 
+                Component comp[] = proxyPanel.getComponents(); 
+                </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;comp.length; i++){ 
+                    comp[i].setEnabled(enable); 
+                } 
+            } 
+        }); 
+        proxyPanel.setBorder(componentBorder); 
+        JFrame frame = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;ComponentTitledBorder - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        Container contents = frame.getContentPane(); 
+        contents.setLayout(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> FlowLayout()); 
+        contents.add(proxyPanel); 
+        frame.pack(); 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p>
+<a href="http://www.jroller.com/resources/s/santhosh/ComponentTitledBorder.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

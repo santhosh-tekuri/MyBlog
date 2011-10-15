@@ -1,0 +1,53 @@
+<html>
+
+<body>
+
+<font face="Verdana" size="2">If a JTree is used as a source for a drag operation, to drag a node from the tree, the user needs to click once on the unselected node, release the mouse button and click a second time, keep the button down to start dragging the node.
+</font>
+<p><font face="Verdana" size="2">i.e, 2 successive clicks are required to 
+initiate drag on JTree.</font></p>
+<p><font face="Verdana" size="2">after spending some time on JTree DND code, I 
+came up with a hack. </font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> applyDNDHack(JTree tree){ 
+    MouseListener dragListener = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// the default dnd implemntation requires to first select node and then drag</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+        Class clazz = Class.forName(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;javax.swing.plaf.basic.BasicDragGestureRecognizer&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        MouseListener[] mouseListeners = tree.getMouseListeners(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> i = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; i&lt;mouseListeners.length; i++){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(clazz.isAssignableFrom(mouseListeners[i].getClass())){ 
+                dragListener = mouseListeners[i]; 
+                </font><font style="font-family: monospaced;" color="#000080"><b>break</b></font><font style="font-family: monospaced;" color="#000000">; 
+            } 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(dragListener!=</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            tree.removeMouseListener(dragListener); 
+            tree.removeMouseMotionListener((MouseMotionListener)dragListener); 
+            tree.addMouseListener(dragListener); 
+            tree.addMouseMotionListener((MouseMotionListener)dragListener); 
+        } 
+    } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(ClassNotFoundException e){ 
+        e.printStackTrace();    
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">Using this hack you can initiate drag with 
+single click. This hack can be used if only one node is to be dragged. 
+(multi-selection drag doesn't work with this hack. <br>
+<br>
+see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4468566">
+http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4468566</a> (I added the 
+above hack long back to this issue)</font></p>
+<p><font face="Verdana" size="2">I created sample application (<a href="http://www.jroller.com/resources/s/santhosh/hackedJTreeDND.jnlp">webstart</a>) 
+using which you can see how this hack works.</font></p>
+
+</body>
+
+</html>

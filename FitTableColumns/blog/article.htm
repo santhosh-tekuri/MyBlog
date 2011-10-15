@@ -1,0 +1,90 @@
+<html>
+
+<body>
+
+<p><font face="Verdana" size="2">in windows, you can double click at column 
+split, to make the table column resize automatically to fit its contents.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/fitColumns.gif" width="302" height="201"></p>
+<p><font face="Verdana" size="2">Today I tried to implement the same for JTable.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-style: normal; font-family: monospaced" color="#000000">11   </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ColumnFitAdapter </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> MouseAdapter{ 
+<font style="font-style: normal;" color="#000000">12   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent e){ 
+<font style="font-style: normal;" color="#000000">13   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(e.getClickCount()==</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">14   </font>            JTableHeader header = (JTableHeader)e.getSource(); 
+<font style="font-style: normal;" color="#000000">15   </font>            TableColumn tableColumn = getResizingColumn(header, e.getPoint()); 
+<font style="font-style: normal;" color="#000000">16   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(tableColumn==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">17   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">18   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> col = header.getColumnModel().getColumnIndex(tableColumn.getIdentifier()); 
+<font style="font-style: normal;" color="#000000">19   </font>            JTable table = header.getTable(); 
+<font style="font-style: normal;" color="#000000">20   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rowCount = table.getRowCount(); 
+<font style="font-style: normal;" color="#000000">21   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> width = (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">)header.getDefaultRenderer() 
+<font style="font-style: normal;" color="#000000">22   </font>                    .getTableCellRendererComponent(table, tableColumn.getIdentifier() 
+<font style="font-style: normal;" color="#000000">23   </font>                            , </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">, -</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">, col).getPreferredSize().getWidth(); 
+<font style="font-style: normal;" color="#000000">24   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; row&lt;rowCount; row++){ 
+<font style="font-style: normal;" color="#000000">25   </font>                </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> preferedWidth = (</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000">)table.getCellRenderer(row, col).getTableCellRendererComponent(table, 
+<font style="font-style: normal;" color="#000000">26   </font>                        table.getValueAt(row, col), </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">, row, col).getPreferredSize().getWidth(); 
+<font style="font-style: normal;" color="#000000">27   </font>                width = Math.max(width, preferedWidth); 
+<font style="font-style: normal;" color="#000000">28   </font>            } 
+<font style="font-style: normal;" color="#000000">29   </font>            header.setResizingColumn(tableColumn); </font><font style="font-family: monospaced;" color="#808080"><i>// this line is very important</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">30   </font>            tableColumn.setWidth(width+table.getIntercellSpacing().width); 
+<font style="font-style: normal;" color="#000000">31   </font>        } 
+<font style="font-style: normal;" color="#000000">32   </font>    } 
+<font style="font-style: normal;" color="#000000">33   </font> 
+<font style="font-style: normal;" color="#000000">34   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// copied of BasicTableHeader.MouseInputHandler.getResizingColumn</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">35   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TableColumn getResizingColumn(JTableHeader header, Point p){ 
+<font style="font-style: normal;" color="#000000">36   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> getResizingColumn(header, p, header.columnAtPoint(p)); 
+<font style="font-style: normal;" color="#000000">37   </font>    } 
+<font style="font-style: normal;" color="#000000">38   </font> 
+<font style="font-style: normal;" color="#000000">39   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>// copied of BasicTableHeader.MouseInputHandler.getResizingColumn</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">40   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> TableColumn getResizingColumn(JTableHeader header, Point p, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> column){ 
+<font style="font-style: normal;" color="#000000">41   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(column==-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">){ 
+<font style="font-style: normal;" color="#000000">42   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">43   </font>        } 
+<font style="font-style: normal;" color="#000000">44   </font>        Rectangle r = header.getHeaderRect(column); 
+<font style="font-style: normal;" color="#000000">45   </font>        r.grow(-</font><font style="font-family: monospaced;" color="#0000ff">3</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">46   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(r.contains(p)) 
+<font style="font-style: normal;" color="#000000">47   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">48   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> midPoint = r.x+r.width/</font><font style="font-family: monospaced;" color="#0000ff">2</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">49   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> columnIndex; 
+<font style="font-style: normal;" color="#000000">50   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(header.getComponentOrientation().isLeftToRight()) 
+<font style="font-style: normal;" color="#000000">51   </font>            columnIndex = (p.x&lt;midPoint) ? column-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000"> : column; 
+<font style="font-style: normal;" color="#000000">52   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">53   </font>            columnIndex = (p.x&lt;midPoint) ? column : column-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">54   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(columnIndex==-</font><font style="font-family: monospaced;" color="#0000ff">1</font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">55   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">56   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> header.getColumnModel().getColumn(columnIndex); 
+<font style="font-style: normal;" color="#000000">57   </font>    } 
+<font style="font-style: normal;" color="#000000">58   </font>} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">this mouse listener,</font></p>
+<p><font face="Verdana" size="2">1. traps the double click<br>
+2, finds the column at mouse (reused code from JDK)<br>
+3. computes the maximumPreferedwidth(header, all rows of the column)<br>
+4, updates column width<br>
+</font><br>
+<font face="Verdana" size="2">the line 24 is very important. without that the 
+size we set will be overwritten by JTable.<br>
+<br>
+if the number of rows of your table is very large. you can compute preferred 
+sizes of only visible rows to make it fast.</font><br>
+<br>
+<font face="Verdana" size="2">how to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">table.getTableHeader().addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ColumnFitAdapter()); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">you can launch the above application using
+<a href="http://www.jroller.com/resources/s/santhosh/fitTableColumns.jnlp">
+WebStart</a></font></p>
+
+</body>
+
+</html>

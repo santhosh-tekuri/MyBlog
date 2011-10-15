@@ -1,0 +1,88 @@
+<html>
+<body>
+
+<p><font face="Verdana">
+<a href="http://java.sun.com/j2se/1.3/docs/api/java/awt/Robot.html">
+<font size="2">Robot</font></a><font size="2"> provides a way to generate system 
+events and some additional methods to capture screen etc. The primary purpose of 
+Robot is to facilitate automated testing of java applications.</font></font></p>
+<p><font size="2" face="Verdana">I have seen many examples which used Robot in 
+the following scenarios:</font></p>
+<ol>
+  <li><font size="2" face="Verdana">capture screen to create 
+  non-rectangular/transparent splash screens</font></li>
+  <li><font size="2" face="Verdana">implementing a color picker to pick the 
+  color of any pixel in the screen</font></li>
+</ol>
+<p><font size="2" face="Verdana">The above two examples use the screen-capturing 
+facility. </font></p>
+<p><font size="2" face="Verdana">I didn't find any nice example using the system 
+events generation feature. Today for the first time, I used Robot class to solve 
+a problem.</font></p>
+<p><font size="2" face="Verdana">In the previous post:
+<a href="http://www.jroller.com/page/santhosh?entry=enhanced_scrolling_in_swing">
+Enhanced Scrolling for Swing</a>, I have shown how to use middle mouse button to 
+scroll a component.</font></p>
+<p><font size="2" face="Verdana">In that example, we first press the component 
+to be scrolled with middle mouse button and then release it. Now the component 
+starts moving in the direction you move the mouse. If you observe the scrolling 
+behavior in web-browsers, they can also scroll the document simply by dragging 
+with middle mouse button. Today I was trying to implement this. First I changed 
+the mouseDragged(...) method of ScrollGlassPane as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseDragged(MouseEvent e) { 
+    mouseLocation = e.getPoint(); 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">I though this small change is enough to make 
+this work. But on running the application, I found that it was not working. 
+Surprisingly, I noticed that mouseDragged(...) method is never getting called. 
+So my question was where was these mouseDragged events are getting delivered. 
+Then I added a mouseMotionListener to JTextArea and found that, there 
+mouseDragged events are actually delivered to the JTextArea.</font></p>
+<p><font size="2" face="Verdana"><b>So the conclusion is:</b> <br>
+&nbsp;&nbsp;&nbsp; mouseDragged events will be delivered to the component in 
+which last mouseClicked happened. This happens even if we cover the JTextArea 
+with our ScrollGlassPane.<br>
+<br>
+Then how this could be solved. one solution is add mouseMotionListener to that 
+component and do the scrolling. But this might not work always. Why? suppose if 
+Drag is enabled on JTextArea, it initiates the dragging of text along with 
+scrolling.</font></p>
+<p><font size="2" face="Verdana">I solved this problem very easily using Robot 
+class. In ScrollGestureRecognizer, when middle mouse is clicked, before 
+replacing with ScrollGlasspane, generate a mouseReleased event using Robot:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> eventDispatched(AWTEvent event){ 
+        ..... 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            Robot robot = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Robot(); 
+            robot.mouseRelease(InputEvent.BUTTON2_MASK); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(AWTException ignore){ 
+            ignore.printStackTrace(); 
+        } 
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana"><b><font size="2">Note:</font></b><font size="2"> we 
+don't need to modify the mouseDragged(...) method in ScrollGlassPane. Because as 
+we have generated mouseReleased event using Robot, all mouseDragged events 
+actually become mouseMoved events. Thus even though user is actually dragging 
+the mouse, mouseDragged(...) never gets called, rather mouseMoved(...) will be 
+called.</font></font></p>
+<p><a href="https://myswing.dev.java.net/webstart/EnhancedScrolling.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font face="Verdana"><b><font size="2">MySwing Update: </font></b>
+<font size="2">Enhanced Scrolling is added along with a bug fix;</font></font></p>
+
+</body>
+
+</html>

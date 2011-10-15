@@ -1,0 +1,251 @@
+<html>
+<body>
+
+<p><font face="Verdana"><font size="2">Today, I read an interesting entry from Patrick's weblog: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font>
+<font size="2">
+<a href="http://jroller.com/page/pago?entry=improving_jscrollpane_with_mouse_based">Improving JScrollPane with mouse based scrolling</a></font></font></p>
+<p><font size="2" face="Verdana">This is very common technique used in web browsers.</font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/FireFoxScrolling.gif" width="338" height="245"></p>
+<p><b><font size="2" face="Verdana">Let us define the problem:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">When user clicks on any component inside scrollpane with middle button, a 
+  scroll icon appears at that location</font></li>
+  <li><font size="2" face="Verdana">When the user moves the mouse to any side of the scroll icon, the 
+  scrolling starting in that direction.</font></li>
+  <li><font size="2" face="Verdana">The speed of scrolling depends on how much distance the mouse is from the 
+  scroll icon.</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">Let us see Patrick's approach:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">The mouse scrolling is enabled for a given JScrollPane as follows:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </font> <code>
+  <font size="2"><font face="Verdana">MouseScrollHandler.enableMouseScrolling(scrollPane)</font></font></code></li>
+  <li><font size="2" face="Verdana">The above methods replace the current viewport of scrollpane with 
+  MouseScrollViewport and the view is removed from original viewport and added 
+  to this new viewport.</font></li>
+  <li><font size="2" face="Verdana">This viewport listens for mouse events.</font></li>
+  <li><font size="2" face="Verdana">MouseScrollViewport paints scroll icon when scrolling initialized.</font></li>
+  <li><font size="2" face="Verdana">When mouse pressed, it starts a timer and it scrolls the view when timer 
+  hits.</font></li>
+  <li><font size="2" face="Verdana">mouseMoved(...) &amp; mouseDragged(...) will keep collecting the current mouse 
+  location.</font></li>
+</ul>
+<p><b><font size="2" face="Verdana">Problems in Pattrick's approach:</font></b></p>
+<ul>
+  <li><font size="2" face="Verdana">Replaces the original viewport with MouseScrollViewport</font></li>
+  <li><font size="2" face="Verdana">Fails to work, if the component in scrollpane is a container. let us say 
+  the html page displayed contains buttons, tables.</font></li>
+  <li><font size="2" face="Verdana">Scroll Icon doesn't update its position as fast as the scrolling. So it 
+  looks flickering &amp; some times moves in the scrolling direction.</font></li>
+  <li><font size="2" face="Verdana">Requires some effort to use. as enableMouseScrolling(...) must be called 
+  on each scrollpane of your application.</font></li>
+</ul>
+<p><font size="2" face="Verdana">We had enough discussion. Let us get into work.</font></p>
+
+<p><font face="Verdana"><font size="2">AWT provides a way to listen to all mouse events that are dispatched to a 
+java application by a class : </font>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/awt/event/AWTEventListener.html">
+<font size="2">AWTEventListener</font></a></font></p>
+
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">10   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGestureRecognizer </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> AWTEventListener{ 
+<font style="font-style: normal;" color="#000000">11   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGestureRecognizer instance = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGestureRecognizer(); 
+<font style="font-style: normal;" color="#000000">12   </font> 
+<font style="font-style: normal;" color="#000000">13   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGestureRecognizer(){ 
+<font style="font-style: normal;" color="#000000">14   </font>        start(); 
+<font style="font-style: normal;" color="#000000">15   </font>    } 
+<font style="font-style: normal;" color="#000000">16   </font> 
+<font style="font-style: normal;" color="#000000">17   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGestureRecognizer getInstance(){ 
+<font style="font-style: normal;" color="#000000">18   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> instance; 
+<font style="font-style: normal;" color="#000000">19   </font>    } 
+<font style="font-style: normal;" color="#000000">20   </font> 
+<font style="font-style: normal;" color="#000000">21   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> start(){ 
+<font style="font-style: normal;" color="#000000">22   </font>        Toolkit.getDefaultToolkit().addAWTEventListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">, AWTEvent.MOUSE_EVENT_MASK); 
+<font style="font-style: normal;" color="#000000">23   </font>    } 
+<font style="font-style: normal;" color="#000000">24   </font> 
+<font style="font-style: normal;" color="#000000">25   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> stop(){ 
+<font style="font-style: normal;" color="#000000">26   </font>        Toolkit.getDefaultToolkit().removeAWTEventListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">27   </font>    } 
+<font style="font-style: normal;" color="#000000">28   </font> 
+<font style="font-style: normal;" color="#000000">29   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> eventDispatched(AWTEvent event){ 
+<font style="font-style: normal;" color="#000000">30   </font>        MouseEvent me = (MouseEvent)event; 
+<font style="font-style: normal;" color="#000000">31   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>boolean</b></font><font style="font-family: monospaced;" color="#000000"> isGesture = SwingUtilities.isMiddleMouseButton(me) &amp;&amp; me.getID()==MouseEvent.MOUSE_PRESSED; 
+<font style="font-style: normal;" color="#000000">32   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(!isGesture) 
+<font style="font-style: normal;" color="#000000">33   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">34   </font> 
+<font style="font-style: normal;" color="#000000">35   </font>        JViewport viewPort = (JViewport)SwingUtilities.getAncestorOfClass(JViewport.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">, me.getComponent()); 
+<font style="font-style: normal;" color="#000000">36   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(viewPort==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">37   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">38   </font>        JRootPane rootPane = SwingUtilities.getRootPane(viewPort); 
+<font style="font-style: normal;" color="#000000">39   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(rootPane==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">40   </font>            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">41   </font> 
+<font style="font-style: normal;" color="#000000">42   </font>        Point location = SwingUtilities.convertPoint(me.getComponent(), me.getPoint(), rootPane.getGlassPane()); 
+<font style="font-style: normal;" color="#000000">43   </font>        ScrollGlassPane glassPane = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGlassPane(rootPane.getGlassPane(), viewPort, location); 
+<font style="font-style: normal;" color="#000000">44   </font>        rootPane.setGlassPane(glassPane); 
+<font style="font-style: normal;" color="#000000">45   </font>        glassPane.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">46   </font>    } 
+<font style="font-style: normal;" color="#000000">47   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">11-19: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is a singleton class.</font></p>
+<p><font size="2" face="Verdana">21-27:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The start(...) &amp; stop(...) will start &amp; stop 
+listening for mouse events happing in your application. Note that these methods 
+are in default scope and shouldn't be used by your application.</font></p>
+<p><font size="2" face="Verdana">31-33:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the mouse event is not middle button press, we 
+do nothing.</font></p>
+<p><font size="2" face="Verdana">35-37:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We test whether the middle button press happened 
+on a component which is in viewport, if not we do nothing.</font></p>
+<p><font size="2" face="Verdana">38-40:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We check whether the component is a descendant of 
+rootpane, if not we do nothing. Note that JFrame &amp; JDialog contain rootpane. We 
+need rootpane because we are going to use glasspane.</font></p>
+<p><font size="2" face="Verdana">42-45:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; We convert the current mouse location to 
+glasspane and replace the current glasspane with our own glasspane which does 
+the rest of the work. </font> </p>
+<p><b><font size="2" face="Verdana">Let us see the glasspane implementation:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">10   </font></font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGlassPane </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JPanel </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> ActionListener, MouseInputListener, SwingConstants{ 
+<font style="font-style: normal;" color="#000000">11   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Image img = Toolkit.getDefaultToolkit().createImage(EnhancedScrollingDemo.</font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000">.getResource(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;mouse.gif&quot;</b></font><font style="font-family: monospaced;" color="#000000">)); 
+<font style="font-style: normal;" color="#000000">12   </font> 
+<font style="font-style: normal;" color="#000000">13   </font>    Component oldGlassPane = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">14   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Point location = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">15   </font> 
+<font style="font-style: normal;" color="#000000">16   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Timer movingTimer; 
+<font style="font-style: normal;" color="#000000">17   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Point mouseLocation; 
+<font style="font-style: normal;" color="#000000">18   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JViewport viewport; 
+<font style="font-style: normal;" color="#000000">19   </font> 
+<font style="font-style: normal;" color="#000000">20   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> ScrollGlassPane(Component oldGlassPane, JViewport viewport, Point location){ 
+<font style="font-style: normal;" color="#000000">21   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.oldGlassPane = oldGlassPane; 
+<font style="font-style: normal;" color="#000000">22   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.viewport = viewport; 
+<font style="font-style: normal;" color="#000000">23   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.location = mouseLocation = location; 
+<font style="font-style: normal;" color="#000000">24   </font> 
+<font style="font-style: normal;" color="#000000">25   </font>        setOpaque(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">26   </font> 
+<font style="font-style: normal;" color="#000000">27   </font>        ScrollGestureRecognizer.getInstance().stop(); 
+<font style="font-style: normal;" color="#000000">28   </font>        addMouseListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">29   </font>        addMouseMotionListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">30   </font> 
+<font style="font-style: normal;" color="#000000">31   </font>        movingTimer = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Timer(</font><font style="font-family: monospaced;" color="#0000ff">100</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">32   </font>        movingTimer.setRepeats(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">33   </font>        movingTimer.start(); 
+<font style="font-style: normal;" color="#000000">34   </font>    } 
+<font style="font-style: normal;" color="#000000">35   </font> 
+<font style="font-style: normal;" color="#000000">36   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>protected</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> paintComponent(Graphics g){ 
+<font style="font-style: normal;" color="#000000">37   </font>        g.drawImage(img, location.x-</font><font style="font-family: monospaced;" color="#0000ff">15</font><font style="font-family: monospaced;" color="#000000">, location.y-</font><font style="font-family: monospaced;" color="#0000ff">15</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">38   </font>    } 
+<font style="font-style: normal;" color="#000000">39   </font> 
+<font style="font-style: normal;" color="#000000">40   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">41   </font> 
+<font style="font-style: normal;" color="#000000">42   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e) { 
+<font style="font-style: normal;" color="#000000">43   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> deltax = (mouseLocation.x - location.x)/</font><font style="font-family: monospaced;" color="#0000ff">4</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">44   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> deltay = (mouseLocation.y - location.y)/</font><font style="font-family: monospaced;" color="#0000ff">4</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">45   </font> 
+<font style="font-style: normal;" color="#000000">46   </font> 
+<font style="font-style: normal;" color="#000000">47   </font>        Point p = viewport.getViewPosition(); 
+<font style="font-style: normal;" color="#000000">48   </font>        p.translate(deltax, deltay); 
+<font style="font-style: normal;" color="#000000">49   </font> 
+<font style="font-style: normal;" color="#000000">50   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(p.x&lt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">51   </font>            p.x=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">52   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(p.x&gt;=viewport.getView().getWidth()-viewport.getWidth()) 
+<font style="font-style: normal;" color="#000000">53   </font>            p.x = viewport.getView().getWidth()-viewport.getWidth(); 
+<font style="font-style: normal;" color="#000000">54   </font> 
+<font style="font-style: normal;" color="#000000">55   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(p.y&lt;</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+<font style="font-style: normal;" color="#000000">56   </font>            p.y = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+<font style="font-style: normal;" color="#000000">57   </font>        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(p.y&gt;=viewport.getView().getHeight()-viewport.getHeight()) 
+<font style="font-style: normal;" color="#000000">58   </font>            p.y = viewport.getView().getHeight()-viewport.getHeight(); 
+<font style="font-style: normal;" color="#000000">59   </font> 
+<font style="font-style: normal;" color="#000000">60   </font>        viewport.setViewPosition(p); 
+<font style="font-style: normal;" color="#000000">61   </font>    } 
+<font style="font-style: normal;" color="#000000">62   </font> 
+<font style="font-style: normal;" color="#000000">63   </font>    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ MouseListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+<font style="font-style: normal;" color="#000000">64   </font>     
+<font style="font-style: normal;" color="#000000">65   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mousePressed(MouseEvent e) { 
+<font style="font-style: normal;" color="#000000">66   </font>        movingTimer.stop(); 
+<font style="font-style: normal;" color="#000000">67   </font>        setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">68   </font>        JRootPane rootPane = SwingUtilities.getRootPane(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+<font style="font-style: normal;" color="#000000">69   </font>        rootPane.setGlassPane(oldGlassPane); 
+<font style="font-style: normal;" color="#000000">70   </font>        ScrollGestureRecognizer.getInstance().start(); 
+<font style="font-style: normal;" color="#000000">71   </font>    } 
+<font style="font-style: normal;" color="#000000">72   </font> 
+<font style="font-style: normal;" color="#000000">73   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseClicked(MouseEvent e){ 
+<font style="font-style: normal;" color="#000000">74   </font>        mousePressed(me); 
+<font style="font-style: normal;" color="#000000">75   </font>    } 
+<font style="font-style: normal;" color="#000000">76   </font> 
+<font style="font-style: normal;" color="#000000">77   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseMoved(MouseEvent e) { 
+<font style="font-style: normal;" color="#000000">78   </font>        mouseLocation = e.getPoint(); 
+<font style="font-style: normal;" color="#000000">79   </font>    } 
+<font style="font-style: normal;" color="#000000">80   </font> 
+<font style="font-style: normal;" color="#000000">81   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseDragged(MouseEvent e){} 
+<font style="font-style: normal;" color="#000000">82   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseEntered(MouseEvent e){} 
+<font style="font-style: normal;" color="#000000">83   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseExited(MouseEvent e){} 
+<font style="font-style: normal;" color="#000000">84   </font>    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> mouseReleased(MouseEvent e){} 
+<font style="font-style: normal;" color="#000000">85   </font>}</font></pre>
+    </td>
+  </tr>
+</table>
+
+<p><font size="2" face="Verdana">20-23:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The original glasspane, viewport and 
+location at which scrolling are initiated are taken in the constructor.</font></p>
+<p><font size="2" face="Verdana">27-29:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Stops the ScrollGestureRecognizer, because 
+ScrollGestureRecognizer is just meant to know when and where scrolling gesture 
+is recognized. List for mouse events on itself.</font></p>
+<p><font size="2" face="Verdana">31-33:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Starts a timer. when the timer hits we scroll the 
+view.</font></p>
+<p><font size="2" face="Verdana">36-38:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Paints the scroll icon. I used a image here. I am 
+bit lazy in writing painting code :)</font></p>
+<p><font size="2" face="Verdana">42-61:<br>
+&nbsp;&nbsp;&nbsp;&nbsp; We calculate the delta between current mouse position 
+and the location of scroll icon. and scroll the viewport's view accordingly. 
+Note that you shouldn't scroll in such a way that view's bounds are crossed.</font></p>
+<p><font size="2" face="Verdana">65-73:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When mouse is pressed or clicked, we finish the 
+scrolling. i.e, stop the timer, restore the original glasspane, and start the 
+ScrollGestureRecognizer.</font></p>
+<p><font size="2" face="Verdana">77-79:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Used to collection the current location of mouse.</font></p>
+<p><b><font size="2" face="Verdana">How to use this:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">   </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// initializes and installs enhanced scrolling</i></font><font style="font-family: monospaced;" color="#000000"> 
+        ScrollGestureRecognizer.getInstance();
+        
+        .....
+   }</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Add the above as first line of you application.
+<b>You simply get the enhanced scrolling to all JScrollPanes of your application 
+with just single line.</b></font></p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/EnhancedScrolling.gif" width="518" height="299"></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/EnhancedScrolling.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

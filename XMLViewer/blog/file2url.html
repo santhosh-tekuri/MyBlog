@@ -1,0 +1,61 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">When developers tries to convert a file which 
+contains special characters like spaces or exclamation mark in their filepath to 
+url, they face some problems.<br>
+<br>
+Here is sample snippet which tries to convert file to url:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> FileToURL{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String[] args) </font><font style="font-family: monospaced" color="#000080"><b>throws</b></font><font style="font-family: monospaced" color="#000000"> Exception{ 
+        File file = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> File(</font><font style="font-family: monospaced" color="#008000"><b>&quot;C:</b></font><font style="font-family: monospaced" color="#000080"><b>\\</b></font><font style="font-family: monospaced" color="#008000"><b>Documents and Settings</b></font><font style="font-family: monospaced" color="#000080"><b>\\</b></font><font style="font-family: monospaced" color="#008000"><b>administrator</b></font><font style="font-family: monospaced" color="#000080"><b>\\</b></font><font style="font-family: monospaced" color="#008000"><b>Desktop</b></font><font style="font-family: monospaced" color="#000080"><b>\\</b></font><font style="font-family: monospaced" color="#008000"><b>xsl</b></font><font style="font-family: monospaced" color="#000080"><b>\\</b></font><font style="font-family: monospaced" color="#008000"><b>test.xsl&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+        System.out.println(</font><font style="font-family: monospaced" color="#008000"><b>&quot;file.toURL() ----&gt; &quot;</b></font><font style="font-family: monospaced" color="#000000">+file.toURL()); 
+        System.out.println(</font><font style="font-family: monospaced" color="#008000"><b>&quot;file.toURI().toURL() ----&gt; &quot;</b></font><font style="font-family: monospaced" color="#000000">+file.toURI().toURL()); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">when you run the program it prints the 
+following output:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%"><font face="Courier New" size="2">file.toURL() ----&gt; 
+    file:/C:/Documents and Settings/administrator/Desktop/xsl/test.xsl<br>
+    file.toURI().toURL() ----&gt; 
+    file:/C:/Documents%20and%20Settings/administrator/Desktop/xsl/test.xsl</font></td>
+  </tr>
+</table>
+<p><font face="Verdana"><b><font size="2">File.toURL():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </font></b><font size="2">it just preppends 
+&quot;file:/&quot; to the filepath. it doesn't try to escape any special characters in the 
+filepath<br>
+<br>
+<b>File.toURI().toURL():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>it gives correct output, escaping any 
+special characters in the filepath.<br>
+<br>
+there are actualy bugs for this in Sun's bugzilla.<br>
+<br>
+<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4273532">4273532</a>:&nbsp; 
+toURL() method in File class needs to escape excluded URL characters<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this bug is closed 
+by saying &lt;b&gt;won't fix&lt;/b&gt;. The reason it says is, it breaks backward 
+compatibility and suggests to use URI class which was<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; introduced in JDK 
+1.4<br>
+<br>
+<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179468">6179468</a>: 
+File.toURL should be @deprecated<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this is fixed for 
+mustang release (b39)<br>
+<br>
+so, be careful when converting File to URL.</font></font></p>
+
+</body>
+
+</html>

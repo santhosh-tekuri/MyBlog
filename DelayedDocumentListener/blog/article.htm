@@ -1,0 +1,187 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">Now I am developing simple XMLEditor just for 
+fun:</font><br>
+<br>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/XMLEditor.gif" width="447" height="405"></p>
+<p><font size="2" face="Verdana">User enters the xml and we want to show any 
+errors in bottom text area.</font></p>
+<p><font size="2" face="Verdana">One solution is provide <b>[Validate]</b> 
+button. When user presses <b>[Validate]</b> button, we validate the xml entered 
+so for and show the errors in error pane. But it disturbs the user. User gets 
+irritated pressing <b>[Validate]</b> button, every time he/she wants to validate 
+xml.</font></p>
+<p><font size="2" face="Verdana">Another solution is add a DocumentListener to 
+XML textarea and validate the xml on any change in xml editor. But this also 
+disturbs user and on every key stroke in xml editor we keep validating. It takes 
+both CPU time and the interface gets hanged as validation happens on very minor 
+change.</font></p>
+<p><font size="2" face="Verdana">My solution is to use a DelayedDocumentListener. 
+The DelayedDocumentListener listens for changes in Document but doesn't validate 
+immediately. When it detects that user has delayed editing for a while, then 
+starts doing validation. Say the amount of delay is 3 sec. Then if the time 
+between consecutive changes of Document is less then 3 sec, we don't validate. 
+When we don't receive any document change event after 3 sec of last change 
+event, we do validation.</font></p>
+<p><font size="2" face="Verdana">Let us make this DelayedDocumentListener also 
+reusable so that, in future if we are Developing SQL Editor, we can reuse this 
+DelayedDocumentListener. I don't want to test your patience any more. Here is 
+the code:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * Wrap your DocumentListner inside this class and register with Document. 
+ * it notifies your listener after specified delay. if they are more changes 
+ * occurred within this delay, it still notifies you only once for last change 
+ * 
+ * </i><b>@author</b><i> Santhosh Kumar T 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> DelayedDocumentListener </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> DocumentListener, ActionListener{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> Timer timer = </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> DocumentListener delegate; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> DocumentEvent event; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> DelayedDocumentListener(DocumentListener delegate){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">(delegate, </font><font style="font-family: monospaced;" color="#0000ff">3000</font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> DelayedDocumentListener(DocumentListener delegate, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> delay){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.delegate = delegate; 
+        timer = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Timer(delay, </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> documentChanged(DocumentEvent de){ 
+        timer.restart(); </font><font style="font-family: monospaced;" color="#808080"><i>// Restart the timer which starts the calls back after the specified delay.</i></font><font style="font-family: monospaced;" color="#000000"> 
+        event = de; 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ DocumentListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changedUpdate(DocumentEvent e){ 
+        documentChanged(e); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> insertUpdate(DocumentEvent e){ 
+        documentChanged(e); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeUpdate(DocumentEvent e){ 
+        documentChanged(e); 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>/*-------------------------------------------------[ ActionListener ]---------------------------------------------------*/</i></font><font style="font-family: monospaced;" color="#000000"> 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (timer.isRunning()) 
+            timer.stop(); 
+ 
+        DocumentEvent.EventType eventType = event.getType(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(eventType==DocumentEvent.EventType.INSERT) 
+            delegate.insertUpdate(event); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(eventType==DocumentEvent.EventType.REMOVE) 
+            delegate.removeUpdate(event); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(eventType==DocumentEvent.EventType.CHANGE) 
+            delegate.changedUpdate(event); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">How it works:</font></p>
+<ul>
+  <li><font size="2" face="Verdana">It takes any DocumentListener and notifies 
+  the change events after the delayed time.</font></li>
+  <li><font size="2" face="Verdana">When a change occurs it starts the timer, if 
+  it is not started yet.</font></li>
+  <li><font size="2" face="Verdana">When timer hits its delayed time, the 
+  wrapped document listener is notified and timer is stopped</font></li>
+</ul>
+<p><font size="2" face="Verdana">How to use it:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="100%">
+    <pre>d<font style="font-family: monospaced;" color="#000000">ocument.addDocumentListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DelayedDocumentListener(yourDocumentListener));</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">&nbsp;Now here is our XML Editor Applcation:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> XMLEditor </font><font style="font-family: monospaced;" color="#000080"><b>extends</b></font><font style="font-family: monospaced;" color="#000000"> JFrame{ 
+    JTextArea editor = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextArea(); 
+    JTextArea errors = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextArea(); 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> XMLEditor(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;XMLEditor - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        errors.setEditable(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+        errors.setForeground(Color.red); 
+        editor.getDocument().addDocumentListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DelayedDocumentListener(editorListener)); 
+        JSplitPane split = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JSplitPane(JSplitPane.VERTICAL_SPLIT, createScroll(editor), createScroll(errors)); 
+        split.setResizeWeight(</font><font style="font-family: monospaced;" color="#0000ff">0.7d</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setBorder(BorderFactory.createEmptyBorder(</font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">10</font><font style="font-family: monospaced;" color="#000000">)); 
+        getContentPane().add(split); 
+    } 
+ 
+    DocumentListener editorListener = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DocumentListener(){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> insertUpdate(DocumentEvent e){ 
+            validateXML(e.getDocument()); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> removeUpdate(DocumentEvent e){ 
+            validateXML(e.getDocument()); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> changedUpdate(DocumentEvent e){ 
+            validateXML(e.getDocument()); 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> validateXML(Document doc){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            errors.setText(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+ 
+            Reader reader = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> StringReader(doc.getText(</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">, doc.getLength())); 
+            SAXParserFactory.newInstance().newSAXParser().parse(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> InputSource(reader), </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> DefaultHandler(){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> warning(SAXParseException e){ 
+                    errors.append(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Warning [&quot;</b></font><font style="font-family: monospaced;" color="#000000">+e.getLineNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>':'</b></font><font style="font-family: monospaced;" color="#000000">+e.getColumnNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;]: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+ e.getMessage()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+                } 
+ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> error(SAXParseException e){ 
+                    errors.append(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Error [&quot;</b></font><font style="font-family: monospaced;" color="#000000">+e.getLineNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>':'</b></font><font style="font-family: monospaced;" color="#000000">+e.getColumnNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;]: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+ e.getMessage()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+                } 
+ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> fatalError(SAXParseException e) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> SAXException{ 
+                    errors.append(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;FatalError [&quot;</b></font><font style="font-family: monospaced;" color="#000000">+e.getLineNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>':'</b></font><font style="font-family: monospaced;" color="#000000">+e.getColumnNumber()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;]: &quot;</b></font><font style="font-family: monospaced;" color="#000000">+ e.getMessage()+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>super</b></font><font style="font-family: monospaced;" color="#000000">.fatalError(e); 
+                } 
+            }); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception ignore){ 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>private</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane createScroll(Component c){ 
+        JScrollPane scroll = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(c); 
+        scroll.setBorder(BorderFactory.createEmptyBorder()); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> scroll; 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">This is how the IDEs do syntax-analysis in 
+real-time and report errors without disturbing user from editing.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/XMLEditor.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">Your comments are welcome.</font><br>
+&nbsp;</p>
+
+</body>
+
+</html>

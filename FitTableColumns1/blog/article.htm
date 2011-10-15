@@ -1,0 +1,76 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">In Microsoft Windows Explorer, I noticed an 
+intuitive action. Pressing <b>Ctrl-Numpad-Plus</b> resizes table columns to fit 
+the content.</font></p>
+<p><font size="2" face="Verdana">I tried to do the same in swing.</font></p>
+<table border="1" width="100%" id="table1" bordercolor="#000000" style="border-collapse: collapse">
+	<tr>
+		<td>
+		<pre><span class="java-keywords">/**
+* MySwing: Advanced Swing Utilites
+* Copyright (C) 2005 Santhosh Kumar T
+* &lt;p/&gt;
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+* &lt;p/&gt;
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*/
+
+public</span> <span class="java-keywords">class</span> FitTableColumnsAction <span class="java-keywords">extends</span> AbstractAction{
+    <span class="java-keywords">public</span> <span class="java-layer-method">FitTableColumnsAction</span>(){
+        <span class="java-keywords">super</span>(<span class="java-string-literal">&quot;Fit Table Columns&quot;</span>);
+    }
+
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">actionPerformed</span>(ActionEvent ae){
+        JTable table = (JTable)ae.<span class="java-layer-method">getSource</span>();
+        JTableHeader header = table.<span class="java-layer-method">getTableHeader</span>();
+        <span class="java-keywords">int</span> rowCount = table.<span class="java-layer-method">getRowCount</span>();
+
+        Enumeration columns = table.<span class="java-layer-method">getColumnModel</span>().<span class="java-layer-method">getColumns</span>();
+        <span class="java-keywords">while</span>(columns.<span class="java-layer-method">hasMoreElements</span>()){
+            TableColumn column = (TableColumn)columns.<span class="java-layer-method">nextElement</span>();
+            <span class="java-keywords">int</span> col = header.<span class="java-layer-method">getColumnModel</span>().<span class="java-layer-method">getColumnIndex</span>(column.<span class="java-layer-method">getIdentifier</span>());
+            <span class="java-keywords">int</span> width = (<span class="java-keywords">int</span>)table.<span class="java-layer-method">getTableHeader</span>().<span class="java-layer-method">getDefaultRenderer</span>()
+                    .<span class="java-layer-method">getTableCellRendererComponent</span>(table, column.<span class="java-layer-method">getIdentifier</span>()
+                            , <span class="java-keywords">false</span>, <span class="java-keywords">false</span>, -<span class="java-numeric-literals">1</span>, col).<span class="java-layer-method">getPreferredSize</span>().<span class="java-layer-method">getWidth</span>();
+            <span class="java-keywords">for</span>(<span class="java-keywords">int</span> row = <span class="java-numeric-literals">0</span>; row&lt;rowCount; row++){
+                <span class="java-keywords">int</span> preferedWidth = (<span class="java-keywords">int</span>)table.<span class="java-layer-method">getCellRenderer</span>(row, col).<span class="java-layer-method">getTableCellRendererComponent</span>(table,
+                        table.<span class="java-layer-method">getValueAt</span>(row, col), <span class="java-keywords">false</span>, <span class="java-keywords">false</span>, row, col).<span class="java-layer-method">getPreferredSize</span>().<span class="java-layer-method">getWidth</span>();
+                width = Math.<span class="java-layer-method">max</span>(width, preferedWidth);
+            }
+            header.<span class="java-layer-method">setResizingColumn</span>(column); <span class="java-block-comment">// this line is very important</span>
+            column.<span class="java-layer-method">setWidth</span>(width+table.<span class="java-layer-method">getIntercellSpacing</span>().width);
+        }
+    }
+}</pre>
+		</td>
+	</tr>
+</table>
+<p><font size="2" face="Verdana">How to use it:</font></p>
+<table border="1" width="100%" id="table2">
+	<tr>
+		<td>
+		<pre><span class="s0"> 
+<a name="l24">table.registerKeyboardAction(</a></span><span class="s1"><a name="l24">new </a></span><span class="s0"><a name="l24">FitTableColumnsAction() 
+</a><a name="l25">        , KeyStroke.getKeyStroke(KeyEvent.VK_ADD, KeyEvent.CTRL_MASK) 
+</a><a name="l26">        , JComponent.WHEN_FOCUSED);</a></span></pre>
+		</td>
+	</tr>
+</table>
+<p><a href="http://jroller.com/resources/s/santhosh/FitTableColumns1.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+<p><font size="2" face="Verdana">In webstart demo, <b>select a row</b> in table 
+so that it gets focus and press <b>Ctrl-Numpad-Plus</b>.</font></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

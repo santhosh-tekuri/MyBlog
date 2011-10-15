@@ -1,0 +1,63 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Sat Jul 09 22:47:16 GMT+05:30 2005
+#
+# Jar file to be obfuscated:           GloballyContextSensitiveActions.jar
+# Target Jar file for obfuscated code: GloballyContextSensitiveActions_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# Memory in use after class data structure built: 289376 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 3 times	(30%)
+#  'if'   	used 1 times	(10%)
+#  'for'   	used 1 times	(10%)
+#  'new'   	used 1 times	(10%)
+#  'try'   	used 1 times	(10%)
+#  'int'   	used 1 times	(10%)
+#  'byte'   	used 1 times	(10%)
+#  'do'   	used 1 times	(10%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (0%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/GloballyContextSensitiveActionsDemo
+.method santhosh/GloballyContextSensitiveActionsDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/GloballyContextSensitiveAction$2 2
+.field_map santhosh/GloballyContextSensitiveAction$2/this$0 this$0
+.method_map santhosh/GloballyContextSensitiveAction$2/propertyChange (Ljava/beans/PropertyChangeEvent;)V propertyChange
+.class_map santhosh/GloballyContextSensitiveAction$1 1
+.field_map santhosh/GloballyContextSensitiveAction$1/this$0 this$0
+.method_map santhosh/GloballyContextSensitiveAction$1/propertyChange (Ljava/beans/PropertyChangeEvent;)V propertyChange
+.class_map santhosh/GloballyContextSensitiveAction a
+.field_map santhosh/GloballyContextSensitiveAction/actionName a
+.field_map santhosh/GloballyContextSensitiveAction/focusOwnerListener if
+.field_map santhosh/GloballyContextSensitiveAction/support do
+.field_map santhosh/GloballyContextSensitiveAction/delegate for
+.field_map santhosh/GloballyContextSensitiveAction/longDescription int
+.field_map santhosh/GloballyContextSensitiveAction/delegateListener new
+.field_map santhosh/GloballyContextSensitiveAction/source try
+.field_map santhosh/GloballyContextSensitiveAction/shortDescription byte
+.method_map santhosh/GloballyContextSensitiveAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.method_map santhosh/GloballyContextSensitiveAction/putValue (Ljava/lang/String;Ljava/lang/Object;)V putValue
+.method_map santhosh/GloballyContextSensitiveAction/removePropertyChangeListener (Ljava/beans/PropertyChangeListener;)V removePropertyChangeListener
+.method_map santhosh/GloballyContextSensitiveAction/getValue (Ljava/lang/String;)Ljava/lang/Object; getValue
+.method_map santhosh/GloballyContextSensitiveAction/isEnabled ()Z isEnabled
+.method_map santhosh/GloballyContextSensitiveAction/changeDelegate (Ljavax/swing/JComponent;Ljavax/swing/Action;)V a
+.method_map santhosh/GloballyContextSensitiveAction/addPropertyChangeListener (Ljava/beans/PropertyChangeListener;)V addPropertyChangeListener
+.method_map santhosh/GloballyContextSensitiveAction/access$000 (Lsanthosh/GloballyContextSensitiveAction;Ljavax/swing/JComponent;Ljavax/swing/Action;)V access$000
+.method_map santhosh/GloballyContextSensitiveAction/setEnabled (Z)V setEnabled

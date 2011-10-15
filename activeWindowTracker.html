@@ -1,0 +1,97 @@
+<html>
+<body>
+<p><font size="2" face="Verdana">Sometimes we want to show a dialog to user, and 
+we don't have any window in that scope to give it as owner. </font></p>
+<p><font size="2" face="Verdana"><b>for example:</b>&nbsp; in
+<a href="http://www.jroller.com/page/santhosh/20050526#process_uncaught_exceptions_in_edt">
+Process uncaught exceptions in EDT</a>, when exception caught we want to show 
+the exception details to user in a dialog.</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced" color="#000000"> 
+</font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> ActiveWindowTracker{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> Window activeWindow; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> WindowListener windowListener = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> WindowAdapter(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> windowDeactivated(WindowEvent we){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(!we.getWindow().isShowing()) 
+                windowHiddenOrClosed(we); 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> windowClosed(WindowEvent we){ 
+            windowHiddenOrClosed(we); 
+        } 
+ 
+        </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> windowHiddenOrClosed(WindowEvent we){ 
+            we.getWindow().removeWindowListener(</font><font style="font-family: monospaced" color="#000080"><b>this</b></font><font style="font-family: monospaced" color="#000000">); 
+            activeWindow=</font><font style="font-family: monospaced" color="#000080"><b>null;</b></font><font style="font-family: monospaced" color="#000000">
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>private</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> PropertyChangeListener propListener = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> PropertyChangeListener(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> propertyChange(PropertyChangeEvent evt){ 
+            </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(evt.getNewValue()!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">){ 
+                </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(activeWindow!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+                    activeWindow.removeWindowListener(windowListener); 
+                activeWindow = (Window)evt.getNewValue(); 
+                activeWindow.addWindowListener(windowListener); 
+            } 
+        } 
+    }; 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000">{ 
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(</font><font style="font-family: monospaced" color="#008000"><b>&quot;activeWindow&quot;</b></font><font style="font-family: monospaced" color="#000000">, propListener); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> Window findActiveWindow(){ 
+        </font><font style="font-family: monospaced" color="#000080"><b>if</b></font><font style="font-family: monospaced" color="#000000">(activeWindow!=</font><font style="font-family: monospaced" color="#000080"><b>null</b></font><font style="font-family: monospaced" color="#000000">) 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> activeWindow; 
+        </font><font style="font-family: monospaced" color="#000080"><b>else</b></font><font style="font-family: monospaced" color="#000000">{ 
+            </font><font style="font-family: monospaced" color="#808080"><i>// Trick to get the shared frame instance.</i></font><font style="font-family: monospaced" color="#000000"> 
+            JDialog dlg = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JDialog(); 
+            Window owner = </font><font style="font-family: monospaced" color="#000080"><b>new</b></font><font style="font-family: monospaced" color="#000000"> JDialog().getOwner(); 
+            dlg.dispose(); 
+            </font><font style="font-family: monospaced" color="#000080"><b>return</b></font><font style="font-family: monospaced" color="#000000"> owner; 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">We ask the KeyboardFocusManager to notify us 
+whenever it finds that active window is changed. When we want to show a dialog, 
+it might happen that none of the window in the application is active (all 
+windows might have been minimized), so we store the last active window in a 
+static variable. As a good programmer, to favor garbage collection, we use 
+window listener and make that static variable null, when the window is no longer 
+visible.<br>
+<br>
+The method findActiveWindow() returns the current active window. If there is no 
+window currently active, it returns last active window. If that is also not 
+there, it returns the shared frame instance. Thus it is guaranteed to return 
+non-null value always :)</font></p>
+<p><b><font size="2" face="Verdana">How to use it:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#808080"><i>// make sure that the above class is loaded in order to ensure that
+// </i></font><font color="#808080"><i>its static block is executed.</i></font><font style="font-family: monospaced" color="#000080"><b>
+public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String[] args){ 
+   ActiveWindowTracker.</font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000">.getClass(); 
+   ......
+} 
+
+</font><font style="font-family: monospaced" color="#808080"><i>// to get current/last active window
+</i></font><font style="font-family: monospaced" color="#000000">Window window = ActiveWindowTracker.</font>findActiveWindow();<font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#808080"><i>// guaranteed to return non-null</i></font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana"><b><font size="2">Note:</font></b><font size="2"> I 
+assumed that KeyBoardFocusManager is not changed after ActiveWindowTracker is 
+initialized.</font></font></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

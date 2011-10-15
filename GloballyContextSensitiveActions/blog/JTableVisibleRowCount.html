@@ -1,0 +1,73 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">When ever I pack a dialog or frame with a 
+JTable, I always end up with more size than expected. The problem is JTable 
+occupies the more screen space than expected. The simplest solution could be set 
+the preferredScrollableViewPort size of JTable. (Normally developers make 
+mistake here in trying to set the preferredSize of JTable. This will create 
+problems in scrolling of JTable).</font></p>
+<p><font size="2" face="Verdana">Hard coding preferred sizes of any component is 
+not good idea, because it might look working, but it will create problems when&nbsp; 
+application is launched in other look and feels.</font></p>
+<p><font size="2" face="Verdana">I started investigating, how this can be done 
+more effectively.</font></p>
+<p><font face="Verdana"><font size="2">JList has a concept of visible row count 
+to hadle this : </font>
+<a href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/JList.html#setVisibleRowCount(int)">
+<font size="2">JList.setVisibleRowCount(int rows)</font></a></font></p>
+<p><font size="2" face="Verdana">Visible Row Count tells the preferred number of 
+rows in the component (JTable) that can be displayed without scrollbar.</font></p>
+<p><font size="2" face="Verdana">But one such method is missing in JTable. It 
+looks strange to me, why swing team didn't take care of this?</font></p>
+<p><font size="2" face="Verdana">How does visible row count works for JList ?&nbsp; 
+Answer is the preferred scrollable viewport size is calcutated based on the 
+visible row count. Then question arises how does JTable determine the preferred 
+scrollable viewport size. I look into the source code of JTable and found that 
+it is hard coded in initializeLocalVars() method as follows:</font></p>
+<p><font size="2" face="Verdana">setPreferredScrollableViewportSize(new 
+Dimension(450, 400));</font></p>
+<p><font size="2" face="Verdana">This is how I tried in my first attempt:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setVisibleRowCount(JTable table, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rows){ 
+        table.setPreferredScrollableViewportSize(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension( 
+                table.getPreferredScrollableViewportSize().width, 
+                rows*table.getRowHeight() 
+        )); 
+    } </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">After that I noticed that, JTable can have 
+variable row heights. and these variable row heights are stored in a private 
+variable called rowModel which is instance of SizeSequence. Unfortunately, there 
+is now way to find whether a JTable uses variable row heights or fixed row 
+heights. So to make it work with variable row heights, I modified the above 
+static method as follows:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> setVisibleRowCount(JTable table, </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> rows){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> height = </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; 
+        </font><font style="font-family: monospaced;" color="#000080"><b>for</b></font><font style="font-family: monospaced;" color="#000000">(</font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> row=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">; row&lt;rows; row++) 
+            height += table.getRowHeight(row); 
+ 
+        table.setPreferredScrollableViewportSize(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Dimension( 
+                table.getPreferredScrollableViewportSize().width, 
+                height 
+        )); 
+    }</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Note that, I have taken only the beginning row 
+heights into account. </font></p>
+
+<p><font face="Verdana" size="2">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

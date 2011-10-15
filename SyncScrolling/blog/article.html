@@ -1,0 +1,29 @@
+<html>
+<body>
+
+<p>&nbsp;</p>
+<p>
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/SyncScrolling.gif" width="500" height="300"></p>
+<p>When you move the vertical scrollbar of first textarea, the vertical 
+scrollbar of second text area also moves and vice versa.</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">  JScrollPane scroll1 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(textArea1); 
+  JScrollPane scroll2 = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(textArea2); 
+  scroll1.getVerticalScrollBar().setModel(scroll2.getVerticalScrollBar().getModel());</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana"><b>Assumption:</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp; the maximum value of both vertical scrollbars are same.</font></p>
+<p><font size="2" face="Verdana">This might even work if we use the maximum 
+value of both vertical scrollbars and use the same for both.</font></p>
+<p><a href="http://www.jroller.com/resources/s/santhosh/SyncScrolling.jnlp">
+<font size="2" face="Verdana">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></p>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+</body>
+
+</html>

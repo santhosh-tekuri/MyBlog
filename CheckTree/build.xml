@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO :: specify project name here -->
+<project basedir="." default="make" name="CheckTree">
+
+  <target name="init">
+    <mkdir dir="classes"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src" destdir="classes" debug="true" deprecation="false" nowarn="false"/>
+  </target>
+
+  <target name="archive">
+    <jar compress="true" jarfile="${ant.project.name}.jar">
+      <fileset dir="classes"/>
+    </jar>
+  </target>
+
+  <target name="cleanup">
+    <delete file="${ant.project.name}.jar"/>
+    <delete dir="classes"/>
+  </target>
+
+  <target name="make" depends="compile,archive"/>
+  <target name="rebuild" depends="cleanup,make"/>
+
+</project>

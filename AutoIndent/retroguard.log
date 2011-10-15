@@ -1,0 +1,37 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Fri Jun 30 00:59:12 GMT+05:30 2006
+#
+# Jar file to be obfuscated:           AutoIndent.jar
+# Target Jar file for obfuscated code: AutoIndent_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# Memory in use after class data structure built: 285664 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'if'   	used 1 times	(50%)
+#  'a'   	used 1 times	(50%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (0%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/AutoIndentAction
+.class santhosh/AutoIndentDemo
+.method santhosh/AutoIndentDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.method_map santhosh/AutoIndentAction/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.method_map santhosh/AutoIndentAction/getLeadingWhiteSpace (Ljava/lang/String;)Ljava/lang/String; a
+.method_map santhosh/AutoIndentAction/getLeadingWhiteSpaceWidth (Ljava/lang/String;)I if

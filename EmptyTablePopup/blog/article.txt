@@ -1,0 +1,32 @@
+It looks like as simple as writing a MouseListener implementation and register with JTable where the MouseListener implementation shows JPopupMenu.
+
+But this doesn't works if there are no rows in JTable. Why so? The height of the JTable is zero when there are no rows, Thus the area where user clicks is not JTable, it is JViewPort.
+
+This can be solved by overriding the method<a  href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html#getScrollableTracksViewportHeight()">getScrollableTracksViewportHeight</a>() of <a  href="http://java.sun.com/j2se/1.4.2/docs/api/javax/swing/Scrollable.html">Scrollable</a> interface. JTable already implements Scrollable interface. So we just override that method and make the table height same as that of view-port if its preferred size is smaller than view-port size
+
+[code]
+JTable table = new JTable(0, 5){ 
+    public boolean getScrollableTracksViewportHeight() { 
+        return getPreferredSize().height < getParent().getHeight(); 
+    } 
+};
+[/code]
+
+This is how JTextComponent handles this. You can checkout JTextComponent.java and see getScrollableTracksViewportHeight() implementation.
+<br><br>
+Any JComponent can be scrollable by adding to JScrollable. Then what is Scrollable interface is for ?
+Scrollable interface which gives some hints to perform better scrolling, such as how many pixels to move per mouse-click or page up or page down.
+<br><br>
+<img border="0" src="http://jroller.com/resources/s/santhosh/EmptyTablePopup.gif"/>
+<br><br>
+The demo contains two tables. and both tables have the same MouseListener registered. But only the bottom table shows JPopupMenu on right mouse click. The bottom table overrides getScrollableTracksViewportHeight() as explained above.
+<br><br>
+<a href="http://jroller.com/resources/s/santhosh/EmptyTablePopup.jnlp"><img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg"/></a>
+<br><br>
+Your comments are appreciated.
+<br><br>
+Santhosh Kumar T    - santhosh@in.fiorano.com
+<br>Contributing Editor - santhosh@javalobby.org
+<br>MySwing Project     - https://myswing.dev.java.net/
+<br>Cool Swing Stuff    - http://www.jroller.com/page/santhosh
+<br>Sr. Software Eng    - http://www.fiorano.com

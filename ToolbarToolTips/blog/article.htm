@@ -1,0 +1,73 @@
+<html>
+
+<body>
+
+<font face="Verdana" size="2">Normal Tooltip&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Accelerated Tooltip</font><p>
+
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/originalJToolbarTooltip.gif" width="81" height="68">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/acceleratedtooltips.gif" width="161" height="64"></p>
+</p>
+
+<p><font face="Verdana" size="2">Accelerated Tooltip - in my terms it is tooltip 
+showing accelerator key</font></p>
+<p><font face="Verdana" size="2">JMenuItem by default shows the accelerator 
+text. so we steal code from there :)</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>/** 
+ * converts KeyStroke to readable string format. 
+ * this can be used to show the accelerator along with the tooltip for 
+ * toolbar buttons 
+ * 
+ * this code is extracted from javax.swing.plaf.basic.BasicMenuItemUI class 
+ */</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> String getAcceleratorText(KeyStroke accelerator){ 
+    String acceleratorDelimiter = UIManager.getString(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;MenuItem.acceleratorDelimiter&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(acceleratorDelimiter==</font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) 
+        acceleratorDelimiter = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;+&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+ 
+    String acceleratorText = </font><font style="font-family: monospaced;" color="#008000"><b>&quot;&quot;</b></font><font style="font-family: monospaced;" color="#000000">; 
+    </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (accelerator != </font><font style="font-family: monospaced;" color="#000080"><b>null</b></font><font style="font-family: monospaced;" color="#000000">) { 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> modifiers = accelerator.getModifiers(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (modifiers &gt; </font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) { 
+            acceleratorText = KeyEvent.getKeyModifiersText(modifiers); 
+            acceleratorText += acceleratorDelimiter; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>int</b></font><font style="font-family: monospaced;" color="#000000"> keyCode = accelerator.getKeyCode(); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000"> (keyCode!=</font><font style="font-family: monospaced;" color="#0000ff">0</font><font style="font-family: monospaced;" color="#000000">) 
+            acceleratorText += KeyEvent.getKeyText(keyCode); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+            acceleratorText += accelerator.getKeyChar(); 
+    } 
+    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> acceleratorText; 
+} 
+ 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> Action enableAcceleratedTooltips(Action action){ 
+    String accelerator = getAcceleratorText((KeyStroke)action.getValue(Action.ACCELERATOR_KEY)); 
+    action.putValue(Action.SHORT_DESCRIPTION, action.getValue(Action.NAME)+</font><font style="font-family: monospaced;" color="#008000"><b>&quot;   &quot;</b></font><font style="font-family: monospaced;" color="#000000">+accelerator); 
+    </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> action; 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">how to use this:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000000">// normal tooltips 
+toolbar.add(action); 
+
+// for accelerated tooltips
+toolbar.add(enableAcceleratedTooltips(action)); </font></pre>
+    </td>
+  </tr>
+</table>
+<p><a href="http://www.jroller.com/resources/s/santhosh/ToolbarToolTips.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></p>
+
+</body>
+
+</html>

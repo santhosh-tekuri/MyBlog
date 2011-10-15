@@ -1,0 +1,42 @@
+<html>
+<body>
+
+<p><font face="Verdana" size="2">Create a class with a static method 
+handle(Throwable) and set its class name in system property
+<b>&quot;sun.awt.exception.handler&quot;</b></font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000"> EDTExceptionHandler{ 
+    </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000">{ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// see the documentation of the private method handleException of java.awt.EventDispatchThread</i></font><font style="font-family: monospaced" color="#000000"> 
+        System.setProperty(</font><font style="font-family: monospaced" color="#008000"><b>&quot;sun.awt.exception.handler&quot;</b></font><font style="font-family: monospaced" color="#000000">, EDTExceptionHandler.</font><font style="font-family: monospaced" color="#000080"><b>class</b></font><font style="font-family: monospaced" color="#000000">.getName()); 
+    } 
+ 
+    </font><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> handle(Throwable thr){ 
+        </font><font style="font-family: monospaced" color="#808080"><i>// log to file or do whatever you want</i></font><font style="font-family: monospaced" color="#000000"> 
+    } 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+<p><font face="Verdana" size="2">inside your main method we simply do: (similar 
+to loading JDBC driver)&nbsp;&nbsp;&nbsp; </font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced" color="#000080"><b>public</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>static</b></font><font style="font-family: monospaced" color="#000000"> </font><font style="font-family: monospaced" color="#000080"><b>void</b></font><font style="font-family: monospaced" color="#000000"> main(String[] args){ 
+    </font><font style="font-family: monospaced" color="#000080"><b>try</b></font><font style="font-family: monospaced" color="#000000">{ 
+        Class.forName(</font><font style="font-family: monospaced" color="#008000"><b>&quot;santhosh.blog.EDTExceptionHandler&quot;</b></font><font style="font-family: monospaced" color="#000000">); 
+    } </font><font style="font-family: monospaced" color="#000080"><b>catch</b></font><font style="font-family: monospaced" color="#000000">(ClassNotFoundException e){ 
+        e.printStackTrace(); 
+    } 
+    ..... 
+} </font></pre>
+    </td>
+  </tr>
+</table>
+
+</body>
+
+</html>

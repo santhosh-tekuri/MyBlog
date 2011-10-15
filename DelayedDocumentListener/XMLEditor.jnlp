@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="http://www.jroller.com/resources/s/santhosh">
+  <information>
+    <title>RealTime Syntax-Analysis [without disturbing user]</title>
+    <vendor>Santhosh Kumar T - santhosh@in.fiorano.com</vendor>
+    <offline-allowed/>
+  </information>  
+  <resources>
+    <j2se version="1.4+" />
+    <jar href="XMLEditor.jar"/>
+  </resources>
+  <application-desc main-class="santhosh.XMLEditorTest"/>
+</jnlp>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="http://www.jroller.com/resources/s/santhosh">
+  <information>
+    <title>File Path AutoCompletion</title>
+    <vendor>Santhosh Kumar T - santhosh@in.fiorano.com</vendor>
+    <offline-allowed/>
+  </information>  
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.4+" />
+    <jar href="AutoComplete.jar"/>
+  </resources>
+  <application-desc main-class="santhosh.FileAutoCompleter"/>
+</jnlp>

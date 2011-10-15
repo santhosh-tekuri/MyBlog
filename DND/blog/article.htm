@@ -1,0 +1,61 @@
+<html>
+
+<body>
+
+<p><font size="2" face="Verdana">Today I am giving a programming challenge to my 
+blog readers on Drag-n-Drop.</font></p>
+<p><font size="2" face="Verdana">
+<img border="0" src="http://www.jroller.com/resources/s/santhosh/DNDChallenge.gif" width="500" height="300"></font></p>
+<p><font size="2" face="Verdana">The application contains 3 lists named <b>
+personList, employeeList, ManagerList</b> and one <b>textEditor</b>. </font></p>
+<p><font size="2" face="Verdana">We have 3 class in our application:<br>
+<br>
+</font><font size="2" face="Courier New">Person extends Object;<br>
+Employee extends Person;<br>
+Manager extends Employee;<br>
+</font><font size="2" face="Verdana"><br>
+<b>Constraints on Lists' data:</b></font></p>
+<ul>
+  <li><font size="2" face="Verdana">personList can hold only persons (i,e Object 
+  of type Person, Employee, Manager)</font></li>
+  <li><font size="2" face="Verdana">employeeList can hold only employees (i,e 
+  Object of type Employee, Manager)</font></li>
+  <li><font size="2" face="Verdana">managerList can hold only managers (i,e 
+  Object of type Manager)</font></li>
+</ul>
+<p><font size="2" face="Verdana">Now the challenge is implementing dnd for all 
+the lists and the textEditor.<br>
+<br>
+You should allow the user to move list items from one to another, but should 
+disallow the dnd which result a violation of above rule.</font></p>
+<p><font size="2" face="Verdana">i,e,</font></p>
+<p><font face="Verdana"><font size="2">user should be allowed to drop a Manager 
+object to the personList, employeeList and managerList.<br>
+user should be allowed to drop a Employee object to either personList or 
+employeeList<br>
+user should not be allowed to drop Person object only to personList.<br>
+<br>
+Any Object can be dropped onto the editor and on drop it should insert that 
+object name(i,e toString) in the textEditor.<br>
+<br>
+I have solved this problem. So you can run it using webstart to clear the above 
+said ideas.<br>
+<br>
+</font><a href="http://www.jroller.com/resources/s/santhosh/DNDChallenge.jnlp">
+<font size="2">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></font></a></font></p>
+<p><font size="2" face="Verdana">You can download the sources for this challenge
+<b><a href="http://www.jroller.com/resources/s/santhosh/DNDChallenge_src.zip">here</a></b>. 
+Note that the downloaded sources just contains the complete application without 
+any dnd. The challenge is implementing dnd for this application. <br>
+<br>
+Once again I am telling. solving the challenge is not important, the important 
+thing is how effective and reusable you solution is. If you sincerely try this, 
+You will learn lot of things about dnd. Once I get enough responces, I will post 
+my solution along with tricks/design I used to solve this challenge.<br>
+<br>
+&nbsp;</font></p>
+
+</body>
+
+</html>

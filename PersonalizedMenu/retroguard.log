@@ -1,0 +1,59 @@
+# If this log is to be used for incremental obfuscation / patch generation, 
+# add any '.class', '.method', '.field' and '.attribute' restrictions here:
+
+
+#-DO-NOT-EDIT-BELOW-THIS-LINE------------------DO-NOT-EDIT-BELOW-THIS-LINE--
+#
+# RetroGuard Bytecode Obfuscator, v2.0.2, a product of Retrologic Systems - www.retrologic.com
+#
+# Logfile created on Tue Feb 28 01:27:33 GMT+05:30 2006
+#
+# Jar file to be obfuscated:           PersonalizedMenus.jar
+# Target Jar file for obfuscated code: PersonalizedMenus_obfsucated.jar
+# RetroGuard Script file used:         (none, defaults used)
+#
+#
+# WARNING - Methods are called which may unavoidably break in obfuscated
+# version at runtime. Please review your source code to ensure that these
+# methods are not intended to act on classes within the obfuscated Jar file.
+#      Your class santhosh/PersonalizedMenusDemo uses '.class' or calls java/lang/Class.forName(Ljava/lang/String;)Ljava/lang/Class;
+#
+# Memory in use after class data structure built: 521280 bytes
+# Total memory available                        : 2031616 bytes
+#
+#
+# Obfuscated name overloading frequency:
+#  'a'   	used 3 times	(100%)
+#  Other names (each used in <1% of mappings) used a total of 0 times (0%)
+#
+#
+# Names reserved from obfuscation:
+#
+.class santhosh/ExpandMenuItem
+.field santhosh/ExpandMenuItem/listener Ljavax/swing/event/PopupMenuListener;
+.field santhosh/ExpandMenuItem/timer Ljavax/swing/Timer;
+.class santhosh/PersonalizedMenusDemo
+.method santhosh/PersonalizedMenusDemo/main ([Ljava/lang/String;)V
+#
+#
+# Obfuscated name mappings (some of these may be unchanged due to polymorphism constraints):
+#
+.class_map santhosh/ExpandMenuItem$2 2
+.field_map santhosh/ExpandMenuItem$2/this$0 this$0
+.method_map santhosh/ExpandMenuItem$2/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.class_map santhosh/ExpandMenuItem$1 1
+.field_map santhosh/ExpandMenuItem$1/this$0 this$0
+.method_map santhosh/ExpandMenuItem$1/popupMenuWillBecomeInvisible (Ljavax/swing/event/PopupMenuEvent;)V popupMenuWillBecomeInvisible
+.method_map santhosh/ExpandMenuItem$1/popupMenuWillBecomeVisible (Ljavax/swing/event/PopupMenuEvent;)V popupMenuWillBecomeVisible
+.method_map santhosh/ExpandMenuItem$1/popupMenuCanceled (Ljavax/swing/event/PopupMenuEvent;)V popupMenuCanceled
+.field_map santhosh/ExpandMenuItem/PERSONALIZED a
+.method_map santhosh/ExpandMenuItem/access$000 (Lsanthosh/ExpandMenuItem;Z)V access$000
+.method_map santhosh/ExpandMenuItem/showPersonalizedItems (Z)V a
+.method_map santhosh/ExpandMenuItem/addNotify ()V addNotify
+.method_map santhosh/ExpandMenuItem/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.method_map santhosh/ExpandMenuItem/setPersonalized (Ljavax/swing/JMenuItem;)V a
+.method_map santhosh/ExpandMenuItem/menuSelectionChanged (Z)V menuSelectionChanged
+.class_map santhosh/PersonalizedMenusDemo$1 1
+.method_map santhosh/PersonalizedMenusDemo$1/actionPerformed (Ljava/awt/event/ActionEvent;)V actionPerformed
+.field_map santhosh/PersonalizedMenusDemo/class$santhosh$PersonalizedMenusDemo class$santhosh$PersonalizedMenusDemo
+.method_map santhosh/PersonalizedMenusDemo/class$ (Ljava/lang/String;)Ljava/lang/Class; class$

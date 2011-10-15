@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO :: specify project name here -->
+<project basedir="." default="make" name="BrowseTextField">
+  <property file="../keystore.properties"/>
+  <target name="init">
+    <mkdir dir="classes"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="src" destdir="classes" debug="true" deprecation="false" nowarn="false"/>
+  </target>
+
+  <target name="archive">
+    <jar compress="true" jarfile="${ant.project.name}.jar">
+      <fileset dir="classes"/>
+      <fileset dir="src">
+      	<exclude name="**/*.java"/>
+       </fileset>
+    </jar>
+    <delete file="keystore.ks"/>
+    <genkey keystore="keystore.ks" alias="${keystore.alias}" storepass="${keystore.password}">
+    	<dname>
+	   <param name="CN" value="${keystore.commonName}"/>
+	   <param name="OU" value="${keystore.organizationUnit}"/>
+	   <param name="O"  value="${keystore.organization}"/>
+	   <param name="L"  value="${keystore.locality}"/>
+	   <param name="S"  value="${keystore.state}"/>
+	   <param name="C"  value="${keystore.country}"/>
+	 </dname>
+     </genkey>
+     <signjar jar="${ant.project.name}.jar" keystore="keystore.ks" alias="${keystore.alias}" storepass="${keystore.password}"/>
+
+  </target>
+
+  <target name="cleanup">
+    <delete file="${ant.project.name}.jar"/>
+    <delete dir="classes"/>
+  </target>
+
+  <target name="make" depends="compile,archive"/>
+  <target name="rebuild" depends="cleanup,make"/>
+
+</project>

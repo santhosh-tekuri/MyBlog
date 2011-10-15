@@ -1,0 +1,72 @@
+Putoff DTD Parsing
+
+Sometimes it is desired to putoff dtd parsing to speedup the xml parsing by saving time spent by parser in parsing dtd file. This tip lets you know how to do this.
+
+
+I have the following xml file at D:/MyBlog/DTDValidation/note.xml
+[xml]
+<?xml version="1.0"?>
+<!DOCTYPE note SYSTEM "note.dtd">
+
+<note>
+   <to>Tove</to>
+   <from>Jani</from>
+   <heading>Reminder</heading>
+   <body>Don't forget me this weekend!</body>
+</note> 
+[/xml]
+The above xml has a doctype declaration which refers to note.dtd file. When I try to parse the above xml using SAX, the xml parser tries to find note.dtd file and parses that dtd file. I want to make the xml parser not to parse the dtd file. Why do I need so ?
+
+<ol>
+  <li>I don't have note.dtd in my filesystem</li>
+  <li>I want to save the time spent by parser in parsing dtd file. This will improve the performance of application. </li>
+</ol>
+
+Following is sample code that can be used to parse the above xml file using SAX:
+[code]
+public class DTDValidationTest{
+    public static void main(String[] args) throws Exception{
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser parser = factory.newSAXParser();
+        parser.getXMLReader().parse("d:/MyBlog/DTDValidation/note.xml");
+    }
+}
+[/code]
+When I run the above program, I got the following exception:
+[code]
+ava.io.FileNotFoundException: d:\MyBlog\DTDValidation\note.dtd (The system cannot find the file specified)
+	at org.apache.crimson.parser.Parser2.fatal(Parser2.java:3339)
+	at org.apache.crimson.parser.Parser2.externalParameterEntity(Parser2.java:3027)
+	at org.apache.crimson.parser.Parser2.maybeDoctypeDecl(Parser2.java:1314)
+[/code]
+Because I don't have the file note.dtd.
+How can I tell the parser not to find/parse the dtd file. I found a simple trick to solve this. Here is modified code:
+[code]
+public class DTDValidationTest{
+    public static void main(String[] args) throws Exception{
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser parser = factory.newSAXParser();
+        parser.getXMLReader().setEntityResolver(new EntityResolver(){
+            public InputSource resolveEntity(String publicId, String systemId){
+                return new InputSource(new ByteArrayInputStream(new byte[0]));
+            }
+        });
+        parser.getXMLReader().parse("d:/MyBlog/DTDValidation/note.xml");
+    }
+}
+[/code]
+We set a EntityResolver which always returns a empty byte stream when parser asks to resolve the dtd. When you run the above program it works fine. That is we saved the time spent by parser in parsing dtd file.
+
+<b>Assumptions:</b>
+<ol>
+  <li>the xml file doesn't refer any entities defined in the dtd</li>
+  <li>the dtd is not inlined in xml file.</li>
+</ol>
+
+Enjoy!
+Santhosh Kumar T 
+Contributing Editor
+santhosh@javalobby.org
+santhosh@in.fiorano.com
+http://www.jroller.com/page/santhosh
+http://www.fiorano.com

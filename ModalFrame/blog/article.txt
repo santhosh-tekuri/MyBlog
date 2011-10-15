@@ -1,0 +1,200 @@
+<html>
+<body> 
+<p><font size="2" face="Verdana">Some times I desperately wanted to have a 
+maximize button on JDialog's title bar. But this is not possible in pure java. I 
+can't use JFrame because I want the modal window behavior which is not supported 
+by JFrame.</font></p>
+<p><font size="2" face="Verdana">Today I will tell you a secret, how to make 
+JFrame behave like modal dialog. </font></p>
+<p><font size="2" face="Verdana">There is a java.net project called
+<a href="https://jmodalwindow.dev.java.net/">JModalWindow</a>, which tries to do 
+the same. I will explain the advantages of my implementation over JModalWindow 
+at end.</font></p>
+<p><font size="2" face="Verdana">I encapsulated this trick into a static utility 
+class. Here is that class:</font></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.WindowAdapter; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.WindowEvent; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.lang.reflect.InvocationHandler; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.lang.reflect.Method; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.lang.reflect.Proxy; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ModalFrameUtil{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> EventPump </font><font style="font-family: monospaced;" color="#000080"><b>implements</b></font><font style="font-family: monospaced;" color="#000000"> InvocationHandler{ 
+        Frame frame; 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> EventPump(Frame frame){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">.frame = frame; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> Object invoke(Object proxy, Method method, Object[] args) </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Throwable { 
+            </font><font style="font-family: monospaced;" color="#000080"><b>return</b></font><font style="font-family: monospaced;" color="#000000"> frame.isShowing() ? Boolean.TRUE : Boolean.FALSE; 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// when the reflection calls in this method has to be</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#808080"><i>// replaced once Sun provides a public API to pump events.</i></font><font style="font-family: monospaced;" color="#000000"> 
+        </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> start() </font><font style="font-family: monospaced;" color="#000080"><b>throws</b></font><font style="font-family: monospaced;" color="#000000"> Exception{ 
+            Class clazz = Class.forName(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;java.awt.Conditional&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            Object conditional = Proxy.newProxyInstance( 
+                    clazz.getClassLoader(), 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Class[]{clazz}, 
+                    </font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            Method pumpMethod = Class.forName(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;java.awt.EventDispatchThread&quot;</b></font><font style="font-family: monospaced;" color="#000000">) 
+                    .getDeclaredMethod(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;pumpEvents&quot;</b></font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Class[]{clazz}); 
+            pumpMethod.setAccessible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+            pumpMethod.invoke(Thread.currentThread(), </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> Object[]{conditional}); 
+        } 
+    } 
+ 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// show the given frame as modal to the specified owner.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#808080"><i>// NOTE: this method returns only after the modal frame is closed.</i></font><font style="font-family: monospaced;" color="#000000"> 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> showAsModal(</font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Frame frame, </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> Frame owner){ 
+        frame.addWindowListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> WindowAdapter(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> windowOpened(WindowEvent e){ 
+                owner.setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>false</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> windowClosed(WindowEvent e){ 
+                owner.setEnabled(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+                owner.removeWindowListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        }); 
+ 
+        owner.addWindowListener(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> WindowAdapter(){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> windowActivated(WindowEvent e){ 
+                </font><font style="font-family: monospaced;" color="#000080"><b>if</b></font><font style="font-family: monospaced;" color="#000000">(frame.isShowing()){ 
+                    frame.setExtendedState(JFrame.NORMAL); 
+                    frame.toFront(); 
+                }</font><font style="font-family: monospaced;" color="#000080"><b>else</b></font><font style="font-family: monospaced;" color="#000000"> 
+                    owner.removeWindowListener(</font><font style="font-family: monospaced;" color="#000080"><b>this</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        }); 
+ 
+        frame.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> EventPump(frame).start(); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Throwable throwable){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>throw</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> RuntimeException(throwable); 
+        } 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b>How to use it:</b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#808080"><i>// this method call returns only after the modal frame is closed</i></font><font style="font-family: monospaced;" color="#000000">
+ModalFrameUtil.showAsModal(frameToBeShownAsModal, ownerFrame);</font></pre>
+    </td>
+  </tr>
+</table>
+<p><b><font size="2" face="Verdana">How does it work:</font></b></p>
+<p><font size="2" face="Verdana"><b>First Trick:</b> <br>
+When you do Frame.setEnabled(false), the components inside that frame will no 
+longer respond to either mouse clicks or key strokes. This is used to block the 
+input to the owner frame. we add a listener to the given frame, when the frame 
+is show, we disable the owner frame, and enable it back when given frame is 
+closed.</font></p>
+<p><font size="2" face="Verdana"><b>Second Trick:</b><br>
+We want to make the modal frame always on top of owner frame. The disabled 
+Frames doesn't gain focus. But problem arises when both frames are minimized and 
+user tries to open the owner frame. To achieve this. we add a window listener to 
+owner frame, and when it gets activated, we restore the modal frame and bring it 
+to front.</font></p>
+<p><font size="2" face="Verdana"><b>Third Trick:</b><br>
+When the modal listener is closed, we have to remove the window listeners we 
+have registered.</font></p>
+<p><font size="2" face="Verdana"><b>Last Trick (important):</b><br>
+blocking the showAsFrame(...) to return until the modal frame is closed. Here we 
+block the EDT thread, and stat dispatching events ourselves until the modal frame 
+is closed. This is the same trick used by JDialog to block setVisible(....) from 
+returning control until dialog is visible.</font></p>
+<p><b><font size="2" face="Verdana">How does it compare it to JModalWindow:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber3">
+  <tr>
+    <td width="50%" align="center" bgcolor="#C0C0C0">
+    <font size="2" face="Verdana">My Implementation</font></td>
+    <td width="50%" align="center" bgcolor="#C0C0C0">
+    <font size="2" face="Verdana">&nbsp;JModelWindow Project's implementation</font></td>
+  </tr>
+  <tr>
+    <td width="50%"><font size="2" face="Verdana">No need extend any specific 
+    subclass of JFrame. You can show any JFrame as modal frane</font></td>
+    <td width="50%"><font size="2" face="Verdana">You must extend JModalFrame to 
+    achieve this behavior</font></td>
+  </tr>
+  <tr>
+    <td width="50%"><font size="2" face="Verdana">showAsFrame(...) method is 
+    blocked until modal frame is closed. You can call this method from EDT also. 
+    The EDT thread gets blocked and it starts pumping events on its own just 
+    like JDialog.</font></td>
+    <td width="50%"><font size="2" face="Verdana">No similar functionality 
+    exists. <br>
+    it has waitForClose(...) but it shouldn't be called from EDT as its javadoc 
+    says</font></td>
+  </tr>
+  <tr>
+    <td width="50%"><font size="2" face="Verdana">Every thing is fitted into a 
+    single utility class</font></td>
+    <td width="50%"><font size="2" face="Verdana">It is a project</font></td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">
+<a href="http://www.jroller.com/resources/s/santhosh/ModalFrame.jnlp">
+<img border="0" src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg" width="115" height="20"></a></font></p>
+<p><b><font size="2" face="Verdana">Source code of Webstart Application:</font></b></p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber4">
+  <tr>
+    <td width="100%">
+    <pre><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> javax.swing.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.*; 
+</font><font style="font-family: monospaced;" color="#000080"><b>import</b></font><font style="font-family: monospaced;" color="#000000"> java.awt.event.ActionEvent; 
+ 
+</font><font style="font-family: monospaced;" color="#808080"><i>// @author Santhosh Kumar T - santhosh@in.fiorano.com</i></font><font style="font-family: monospaced;" color="#000000"> 
+</font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>class</b></font><font style="font-family: monospaced;" color="#000000"> ModalFrameTest{ 
+    </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>static</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> main(String[] args){ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>try</b></font><font style="font-family: monospaced;" color="#000000">{ 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
+        } </font><font style="font-family: monospaced;" color="#000080"><b>catch</b></font><font style="font-family: monospaced;" color="#000000">(Exception e){ 
+            e.printStackTrace(); 
+        } 
+ 
+        </font><font style="font-family: monospaced;" color="#000080"><b>final</b></font><font style="font-family: monospaced;" color="#000000"> JFrame mainFrame = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Are you missing maximize button in JDialog ?? - santhosh@in.fiorano.com&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+        mainFrame.getContentPane().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTextArea(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;this is simle text area. </b></font><font style="font-family: monospaced;" color="#000080"><b>\n</b></font><font style="font-family: monospaced;" color="#008000"><b>you won't be able to edit me while modal frame is visible...&quot;</b></font><font style="font-family: monospaced;" color="#000000">))); 
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        mainFrame.setSize(</font><font style="font-family: monospaced;" color="#0000ff">400</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">); 
+ 
+        Action action = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> AbstractAction(</font><font style="font-family: monospaced;" color="#008000"><b>&quot;Show Modal Frame...&quot;</b></font><font style="font-family: monospaced;" color="#000000">){ 
+            </font><font style="font-family: monospaced;" color="#000080"><b>public</b></font><font style="font-family: monospaced;" color="#000000"> </font><font style="font-family: monospaced;" color="#000080"><b>void</b></font><font style="font-family: monospaced;" color="#000000"> actionPerformed(ActionEvent e){ 
+                JFrame frame = </font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JFrame(); 
+                frame.getContentPane().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JScrollPane(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JTree())); 
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+                frame.setSize(</font><font style="font-family: monospaced;" color="#0000ff">300</font><font style="font-family: monospaced;" color="#000000">, </font><font style="font-family: monospaced;" color="#0000ff">400</font><font style="font-family: monospaced;" color="#000000">); 
+                ModalFrameUtil.showAsModal(frame, mainFrame); 
+                </font><font style="font-family: monospaced;" color="#808080"><i>// this statement will be executed only after the modal frame is closed</i></font><font style="font-family: monospaced;" color="#000000"> 
+                JOptionPane.showMessageDialog(mainFrame, </font><font style="font-family: monospaced;" color="#008000"><b>&quot;modal frame closed.&quot;</b></font><font style="font-family: monospaced;" color="#000000">); 
+            } 
+        }; 
+ 
+        mainFrame.getContentPane().add(</font><font style="font-family: monospaced;" color="#000080"><b>new</b></font><font style="font-family: monospaced;" color="#000000"> JButton(action), BorderLayout.SOUTH); 
+        mainFrame.setVisible(</font><font style="font-family: monospaced;" color="#000080"><b>true</b></font><font style="font-family: monospaced;" color="#000000">); 
+    } 
+}</font></pre>
+    </td>
+  </tr>
+</table>
+<p><font size="2" face="Verdana">Your comments are appreciated.</font></p>
+
+<p><font face="Verdana" size="2"><b>Note:</b> I have tested this only on Windows 
+OS</font></p>
+
+</body>
+
+</html>

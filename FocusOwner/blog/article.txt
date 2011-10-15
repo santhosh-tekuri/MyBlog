@@ -1,0 +1,169 @@
+Today we are going to create a simple custom component called <b>JTitledPanel</b>.
+
+<img src="http://www.jroller.com/resources/s/santhosh/JTitledPanel.gif"/>
+
+JTitledPanel contains a title-bar and content-pane. The title that appears in the title-bar is passed in the constructor. User can add any component to the content-pane.
+
+<b>The feature that is provided by this component is:</b>
+           When any component inside JTitlePane gets focus, the title-bar gets highlighted (say in blue color), as soon as the focus goes to any component outside the JTtitlePane, the title-bar removes the highlighting (say in gray color).
+
+<b>How does JTitledPanel knows when focus is from a component inside it to a component outside it and vice-versa ?</b>
+           One naive answer is, add focus listener to the content-pane, highlight the title-bar when focusGained(...) is called and remove the highlight when focusLost(...) is called.
+
+But that doesn't work. Because scope of the notification of FocusListener is just the component to which it is registered, not to the descendants of that component.
+
+<b>Thinking one step further:</b>
+          Add a focusListener to all descendants of content-pane and track the focus.
+
+This seems to work, But not perfect. Why? If some components are added/removed to the content-pane's descendants depending on user's action, this will no longer work.
+
+<b>Thinking one more step further:</b>
+         In addition to focusListener, also add a containerListener to all descendant container's and when componentRemoved(...) called unregister the focusListener recursively and when componentAdded(...) is called add focusListener recursively.
+
+I think this approach is lot of mess. What do you say ?
+
+There is <b>clean & simple solution</b> to handle this: <b>KeyboardFocusManager</b>
+
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public abstract class FocusOwnerTracker implements PropertyChangeListener{ 
+    private static final String PERMANENT_FOCUS_OWNER = "permanentFocusOwner"; 
+ 
+    private KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager(); 
+    private Component comp; 
+    private boolean inside; 
+ 
+    public FocusOwnerTracker(Component comp){ 
+        this.comp = comp; 
+    } 
+ 
+    public boolean isFocusInside(){ 
+        return isFocusInside(false); 
+    } 
+ 
+    private boolean isFocusInside(boolean find){ 
+        if(!find) 
+            return inside; 
+ 
+        Component c = focusManager.getPermanentFocusOwner(); 
+        while(c!=null){ 
+            if(c==comp){ 
+                return true; 
+            } else if((c instanceof Window) || 
+                    (c instanceof Applet && c.getParent()==null)){ 
+                if(c==SwingUtilities.getRoot(comp)){ 
+                    return false; 
+                } 
+                break; 
+            } 
+            c = c.getParent(); 
+        } 
+        return false; 
+    } 
+ 
+    public void start(){ 
+        focusManager.addPropertyChangeListener(PERMANENT_FOCUS_OWNER, this); 
+        inside = isFocusInside(true); 
+    } 
+ 
+    public void stop(){ 
+        focusManager.removePropertyChangeListener(PERMANENT_FOCUS_OWNER, this); 
+    } 
+ 
+    public void propertyChange(PropertyChangeEvent evt){ 
+        boolean inside = isFocusInside(true); 
+        if(this.inside!=inside){ 
+            if(inside) 
+                focusGained(); 
+            else 
+                focusLost(); 
+            this.inside = inside; 
+        } 
+    } 
+ 
+    public abstract void focusLost(); 
+    public abstract void focusGained(); 
+}
+[/code]
+We listen for the change in the property "permanentFocusOwner" from keyboardFocusManager and find whether the focus is still inside the JTitledPanel. This is how JTable supports "terminateEditOnFocusLost" client property. I separated this into a nice class so that this can be re-used at many places.
+
+In the above class, we have start() & stop() which starts/stops listening to changes from keyboardFocusManager. Note that, when you are adding a listener to a long lived object (keyboardFocusManager), you should take special care to avoid memory leaks.
+
+Let us see how to use this in JTitledPanel implementation:
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+6    public class JTitledPanel extends JComponent{ 
+7        JLabel titleLabel = new JLabel(); 
+8     
+9        FocusOwnerTracker tracker = new FocusOwnerTracker(this){ 
+10           public void focusGained(){ 
+11               titleLabel.setForeground(UIManager.getColor("textHighlightText")); 
+12               titleLabel.setBackground(UIManager.getColor("textHighlight")); 
+13           } 
+14    
+15           public void focusLost(){ 
+16               titleLabel.setForeground(UIManager.getColor("textText")); 
+17               titleLabel.setBackground(UIManager.getColor("control").darker()); 
+18           } 
+19       }; 
+20    
+21       JPanel contents = new JPanel(new BorderLayout()); 
+22    
+23       public JTitledPanel(String title){ 
+24           setLayout(new BorderLayout()); 
+25           titleLabel.setText(title); 
+26           titleLabel.setOpaque(true); 
+27           titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD)); 
+28           titleLabel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); 
+29           tracker.focusLost(); 
+30    
+31           add(titleLabel, BorderLayout.NORTH); 
+32           add(contents, BorderLayout.CENTER); 
+33    
+34           // Memory-Leak occurs here. Why ? 
+35           // How to avoid this ? 
+36           tracker.start(); 
+37       } 
+38    
+39       public JPanel getContents(){ 
+40           return contents; 
+41       } 
+42   }
+[/code]
+Line 9-19: JTitledPanel uses FocusOwnerTracker to track changes in focus and changes the title bar highlighting.
+
+<b>Let us write a simple demo to see it in action:</b>
+[code]
+// @author Santhosh Kumar T - santhosh@in.fiorano.com 
+public class FocusOwnerDemo extends JFrame{ 
+    public FocusOwnerDemo(){ 
+        super("Focus Tracking - santhosh@in.fiorano.com"); 
+        JTitledPanel tp1 = new JTitledPanel("First FileChooser"); 
+        tp1.getContents().add(new JFileChooser()); 
+ 
+        JTitledPanel tp2 = new JTitledPanel("Second FileChooser"); 
+        tp2.getContents().add(new JFileChooser()); 
+ 
+        JPanel contents = (JPanel)getContentPane(); 
+        contents.setLayout(new GridLayout(2, 1)); 
+        contents.add(tp1); 
+        contents.add(tp2); 
+        pack(); 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setVisible(true); 
+    } 
+ 
+    public static void main(String[] args){ 
+        new FocusOwnerDemo().setVisible(true); 
+    } 
+} 
+[/code]
+
+<img src="http://www.jroller.com/resources/s/santhosh/FocusTracking.gif"/>
+
+The demo contains two JFileChoosers each in a JTitledPanel. When you switch focus from one filechooser to another, the title-bars also changes highlighting.
+
+<b>Note:</b>
+    This webstart demo requires access to local file system as it contains file choosers. I was bit lazy in creating demo :)
+
+<a href="http://www.jroller.com/resources/s/santhosh/FocusOwner.jnlp"><img src="http://java.sun.com/products/jfc/tsc/sightings/images/webstart.small.jpg"/></a>
