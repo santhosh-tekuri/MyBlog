@@ -12,9 +12,19 @@ import java.awt.event.MouseAdapter;
 // @author Santhosh Kumr T - santhosh@in.fiorano.com
 public class CheckTreeTableManager extends CheckTreeManager{
 
-    public CheckTreeTableManager(JXTreeTable treeTable){
-        super((JTree)treeTable.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass), true);
+    public CheckTreeTableManager(JXTreeTable treeTable, boolean dig, boolean showRootNodeCheckBox){
+        super(getTree(treeTable)), dig, showRootNodeCheckBox);
         treeTable.addMouseListener(treeTableMouseListener);
+    }
+
+    private static JTree getTree(JXTreeTable treeTable){
+        try{
+            Field field = JXTreeTable.class.getDeclaredField("renderer");
+            field.setAccessible(true);
+            return (JTree)field.get(treeTable);
+        }catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     private MouseListener treeTableMouseListener = new MouseAdapter(){
