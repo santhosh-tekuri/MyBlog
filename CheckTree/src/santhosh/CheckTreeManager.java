@@ -59,7 +59,7 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
                 for(int i = 0; i<selectionPaths.length; i++)
                     buf.append(selectionPaths[i].getLastPathComponent().toString()+", ");
                 String text = buf.toString();
-                label.setText("Selection: "+ text.substring(0, text.length()-2));
+                label.setText("Selection: "+ (text.isEmpty() ? text : text.substring(0, text.length()-2)));
             }
         }
     }
