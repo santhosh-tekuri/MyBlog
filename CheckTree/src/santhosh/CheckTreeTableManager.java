@@ -1,5 +1,6 @@
 package santhosh;
 
+import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
@@ -8,13 +9,26 @@ import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
+import java.lang.reflect.Field;
 
 // @author Santhosh Kumr T - santhosh@in.fiorano.com
 public class CheckTreeTableManager extends CheckTreeManager{
-
+    private JXTreeTable treeTable;
     public CheckTreeTableManager(JXTreeTable treeTable, boolean dig, boolean showRootNodeCheckBox){
-        super(getTree(treeTable)), dig, showRootNodeCheckBox);
+        super(getTree(treeTable), dig, showRootNodeCheckBox);
+        this.treeTable = treeTable;
         treeTable.addMouseListener(treeTableMouseListener);
+    }
+
+    protected void setCellRenderer(){
+        JXTree jxTree = (JXTree)tree;
+        tree.setCellRenderer(new CheckTreeCellRenderer(jxTree.getWrappedCellRenderer(), selectionModel, showRootNodeCheckBox));
+    }
+
+    @Override
+    protected void treeChanged(){
+        treeTable.revalidate();
+        treeTable.repaint();
     }
 
     private static JTree getTree(JXTreeTable treeTable){
@@ -35,7 +49,6 @@ public class CheckTreeTableManager extends CheckTreeManager{
                 final int count = treeTable.getColumnCount();
                 for(int i = count-1; i>= 0; i--){
                     if(treeTable.isHierarchical(i)){
-
                         int savedHeight = tree.getRowHeight();
                         tree.setRowHeight(treeTable.getRowHeight());
                         MouseEvent pressed = new MouseEvent

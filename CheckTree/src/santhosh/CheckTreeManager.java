@@ -8,18 +8,26 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class CheckTreeManager extends MouseAdapter implements TreeSelectionListener{
-    private CheckTreeSelectionModel selectionModel;
+    protected CheckTreeSelectionModel selectionModel;
     protected JTree tree = new JTree();
-    private boolean showRootNodeCheckBox;
+    protected boolean showRootNodeCheckBox;
     int hotspot = new JCheckBox().getPreferredSize().width;
 
     public CheckTreeManager(JTree tree, boolean dig, boolean showRootNodeCheckBox){
         this.tree = tree;
         this.showRootNodeCheckBox = showRootNodeCheckBox;
         selectionModel = new CheckTreeSelectionModel(tree.getModel(), dig);
-        tree.setCellRenderer(new CheckTreeCellRenderer(tree.getCellRenderer(), selectionModel, showRootNodeCheckBox));
+        setCellRenderer();
         tree.addMouseListener(this);
         selectionModel.addTreeSelectionListener(this);
+    }
+
+    protected void setCellRenderer(){
+        tree.setCellRenderer(new CheckTreeCellRenderer(tree.getCellRenderer(), selectionModel, showRootNodeCheckBox));
+    }
+
+    protected void treeChanged(){
+        tree.treeDidChange();
     }
 
     JLabel label = new JLabel("Selection:");
@@ -42,7 +50,7 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
                 selectionModel.addSelectionPath(path);
         } finally{
             selectionModel.addTreeSelectionListener(this);
-            tree.treeDidChange();
+            treeChanged();
             TreePath[] selectionPaths = selectionModel.getSelectionPaths();
             if(selectionPaths==null)
                 label.setText("Selection:");
