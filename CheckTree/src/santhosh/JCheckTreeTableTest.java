@@ -4,6 +4,8 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.treetable.*;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -17,7 +19,13 @@ public class JCheckTreeTableTest{
         TreeTableModel model = new TestTreeTableModel(new JTree().getModel().getRoot());
         final JXTreeTable treeTable = new JXTreeTable(model);
         CheckTreeManager manager = new CheckTreeTableManager(treeTable, dig, true);
-
+        manager.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener(){
+            public void valueChanged(TreeSelectionEvent treeSelectionEvent){
+                for(TreePath path: treeSelectionEvent.getPaths()){
+                    System.out.println(path.getLastPathComponent()+": "+treeSelectionEvent.isAddedPath(path));
+                }
+            }
+        });
 
         panel.add(new JScrollPane(treeTable), BorderLayout.CENTER);
         panel.add(manager.label, BorderLayout.SOUTH);
