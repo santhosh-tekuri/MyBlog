@@ -24,6 +24,7 @@ public class JCheckTreeTableTest{
                 for(TreePath path: treeSelectionEvent.getPaths()){
                     System.out.println(path.getLastPathComponent()+": "+treeSelectionEvent.isAddedPath(path));
                 }
+                System.out.println("---------");
             }
         });
 

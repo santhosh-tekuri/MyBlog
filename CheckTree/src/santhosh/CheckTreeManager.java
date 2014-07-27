@@ -6,6 +6,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
 public class CheckTreeManager extends MouseAdapter implements TreeSelectionListener{
     protected CheckTreeSelectionModel selectionModel;
@@ -30,6 +33,11 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         tree.treeDidChange();
     }
 
+    private VetoableChangeListener changeListener;
+    public void setVetoableChangeListener(VetoableChangeListener changeListener){
+        this.changeListener = changeListener;
+    }
+
     JLabel label = new JLabel("Selection:");
     public void mouseClicked(MouseEvent me){
         TreePath path = tree.getPathForLocation(me.getX(), me.getY());
@@ -44,11 +52,18 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         selectionModel.removeTreeSelectionListener(this);
 
         try{
-            if(selected)
+            if(selected){
+                if(changeListener!=null)
+                    changeListener.vetoableChange(new PropertyChangeEvent(this, "checkSelection", null, path));
                 selectionModel.removeSelectionPath(path);
-            else
+            }else{
+                if(changeListener!=null)
+                    changeListener.vetoableChange(new PropertyChangeEvent(this, "checkSelection", path, null));
                 selectionModel.addSelectionPath(path);
-        } finally{
+            }
+        }catch(PropertyVetoException ex){
+            // ignore
+        }finally{
             selectionModel.addTreeSelectionListener(this);
             treeChanged();
             TreePath[] selectionPaths = selectionModel.getSelectionPaths();
