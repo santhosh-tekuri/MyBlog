@@ -54,11 +54,11 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         try{
             if(selected){
                 if(changeListener!=null)
-                    changeListener.vetoableChange(new PropertyChangeEvent(this, "checkSelection", null, path));
+                    changeListener.vetoableChange(new PropertyChangeEvent(this, "uncheckSelection", path, null));
                 selectionModel.removeSelectionPath(path);
             }else{
                 if(changeListener!=null)
-                    changeListener.vetoableChange(new PropertyChangeEvent(this, "checkSelection", path, null));
+                    changeListener.vetoableChange(new PropertyChangeEvent(this, "checkSelection", null, path));
                 selectionModel.addSelectionPath(path);
             }
         }catch(PropertyVetoException ex){
