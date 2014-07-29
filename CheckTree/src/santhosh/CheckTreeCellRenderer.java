@@ -10,7 +10,7 @@ public class CheckTreeCellRenderer extends JPanel implements TreeCellRenderer{
     private TreeCellRenderer delegate;
     private boolean showRootNodeCheckBox;
     private TristateCheckBox checkBox = new TristateCheckBox("");
-
+    protected CheckTreeManager.CheckBoxCustomizer checkBoxCustomer;
     public CheckTreeCellRenderer(TreeCellRenderer delegate, CheckTreeSelectionModel selectionModel, boolean showRootNodeCheckBox){
         this.delegate = delegate;
         this.selectionModel = selectionModel;
@@ -27,6 +27,8 @@ public class CheckTreeCellRenderer extends JPanel implements TreeCellRenderer{
 
         TreePath path = tree.getPathForRow(row);
         if(path!=null){
+            if(checkBoxCustomer!=null && !checkBoxCustomer.showCheckBox(path))
+                return renderer;
             if(selectionModel.isPathSelected(path, selectionModel.isDigged()))
                 checkBox.getTristateModel().setState(TristateState.SELECTED);
             else

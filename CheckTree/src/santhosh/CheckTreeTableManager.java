@@ -22,7 +22,7 @@ public class CheckTreeTableManager extends CheckTreeManager{
 
     protected void setCellRenderer(){
         JXTree jxTree = (JXTree)tree;
-        tree.setCellRenderer(new CheckTreeCellRenderer(jxTree.getWrappedCellRenderer(), selectionModel, showRootNodeCheckBox));
+        tree.setCellRenderer(renderer=new CheckTreeCellRenderer(jxTree.getWrappedCellRenderer(), selectionModel, showRootNodeCheckBox));
     }
 
     @Override

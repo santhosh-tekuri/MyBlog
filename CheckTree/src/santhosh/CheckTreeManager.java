@@ -25,8 +25,9 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         selectionModel.addTreeSelectionListener(this);
     }
 
+    protected CheckTreeCellRenderer renderer;
     protected void setCellRenderer(){
-        tree.setCellRenderer(new CheckTreeCellRenderer(tree.getCellRenderer(), selectionModel, showRootNodeCheckBox));
+        tree.setCellRenderer(renderer=new CheckTreeCellRenderer(tree.getCellRenderer(), selectionModel, showRootNodeCheckBox));
     }
 
     protected void treeChanged(){
@@ -38,10 +39,22 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         this.changeListener = changeListener;
     }
 
+    public static interface CheckBoxCustomizer{
+        public boolean showCheckBox(TreePath path);
+    }
+
+    private CheckBoxCustomizer checkBoxCustomer = null;
+    public void setCheckBoxCustomer(CheckBoxCustomizer checkBoxCustomer){
+        this.checkBoxCustomer = checkBoxCustomer;
+        renderer.checkBoxCustomer = checkBoxCustomer;
+    }
+
     JLabel label = new JLabel("Selection:");
     public void mouseClicked(MouseEvent me){
         TreePath path = tree.getPathForLocation(me.getX(), me.getY());
         if(path==null)
+            return;
+        if(checkBoxCustomer!=null && !checkBoxCustomer.showCheckBox(path))
             return;
         if(me.getX()>tree.getPathBounds(path).x+hotspot)
             return;
