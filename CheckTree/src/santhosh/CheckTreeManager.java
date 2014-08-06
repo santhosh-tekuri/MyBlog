@@ -4,13 +4,12 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreePath;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
-public class CheckTreeManager extends MouseAdapter implements TreeSelectionListener{
+public class CheckTreeManager extends MouseAdapter implements TreeSelectionListener, ActionListener{
     protected CheckTreeSelectionModel selectionModel;
     protected JTree tree = new JTree();
     protected boolean showRootNodeCheckBox;
@@ -22,6 +21,7 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         selectionModel = new CheckTreeSelectionModel(tree.getModel(), dig);
         setCellRenderer();
         tree.addMouseListener(this);
+        tree.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
         selectionModel.addTreeSelectionListener(this);
     }
 
@@ -49,14 +49,8 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         renderer.checkBoxCustomer = checkBoxCustomer;
     }
 
-    JLabel label = new JLabel("Selection:");
-    public void mouseClicked(MouseEvent me){
-        TreePath path = tree.getPathForLocation(me.getX(), me.getY());
+    public void toggleSelection(TreePath path){
         if(path==null)
-            return;
-        if(checkBoxCustomer!=null && !checkBoxCustomer.showCheckBox(path))
-            return;
-        if(me.getX()>tree.getPathBounds(path).x+hotspot)
             return;
 
         boolean selected = selectionModel.isPathSelected(path, selectionModel.isDigged());
@@ -92,11 +86,30 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         }
     }
 
+    JLabel label = new JLabel("Selection:");
+    public void mouseClicked(MouseEvent me){
+        TreePath path = tree.getPathForLocation(me.getX(), me.getY());
+        if(path==null)
+            return;
+        if(checkBoxCustomer!=null && !checkBoxCustomer.showCheckBox(path))
+            return;
+        if(me.getX()>tree.getPathBounds(path).x+hotspot)
+            return;
+
+        toggleSelection(path);
+    }
+
     public CheckTreeSelectionModel getSelectionModel(){
         return selectionModel;
     }
 
     public void valueChanged(TreeSelectionEvent e){
         tree.treeDidChange();
+    }
+
+    /*-----------------------------[ ActionListener ]------------------------------*/
+
+    public void actionPerformed(ActionEvent e){
+        toggleSelection(tree.getSelectionPath());
     }
 }
