@@ -35,8 +35,8 @@ public class CheckTreeTest{
 //        });
 
         checkTreeManager.getSelectionModel().setSelectionPaths(new TreePath[]{
-            TreePathUtil.deserialize(model, "JTree, colors, red"),
-            TreePathUtil.deserialize(model, "JTree, sports, football"),
+            TreePathUtil.deserialize(model, "JTree/colors/red"),
+            TreePathUtil.deserialize(model, "JTree/sports/football"),
         });
 
         return panel;
