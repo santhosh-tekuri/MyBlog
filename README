@@ -1,1 +1,18 @@
 This project contains the source code of http://jroller.com/santhosh
+
+Licensing Information
+=============================
+
+Originally, this code was released under the LGPL from above blog.
+
+Now this code may be used under the terms of either the
+
+ * GNU Lesser General Public License (LGPL) 2.1
+   http://www.gnu.org/licenses/lgpl-2.1.html
+
+or the
+
+ * Apache License, Version 2.0
+   http://www.apache.org/licenses/LICENSE-2.0
+
+you may choose which license to receive the code under.
