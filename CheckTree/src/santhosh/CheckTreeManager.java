@@ -8,6 +8,10 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 public class CheckTreeManager extends MouseAdapter implements TreeSelectionListener, ActionListener{
     protected CheckTreeSelectionModel selectionModel;
@@ -105,6 +109,17 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
 
     public void valueChanged(TreeSelectionEvent e){
         tree.treeDidChange();
+    }
+
+    public Enumeration getAllCheckedNodes(){
+        List<Object> selected = new ArrayList<Object>();
+        for(TreePath treePath : selectionModel.getSelectionPaths()){
+            selected.add(treePath.getLastPathComponent());
+        }
+        if(selectionModel.isDigged())
+            return new PreorderEnumeration(tree.getModel(), selected.toArray());
+        else
+            return Collections.enumeration(selected);
     }
 
     /*-----------------------------[ ActionListener ]------------------------------*/
